@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:pnu_plato_advanced_browser/screens/calendarScreen.dart';
 import 'package:pnu_plato_advanced_browser/screens/chatScreen.dart';
 import 'package:pnu_plato_advanced_browser/screens/platoScreen.dart';
@@ -12,7 +14,8 @@ class NavigatorScreen extends StatefulWidget {
 
 class _NavigatorScreenState extends State<NavigatorScreen> {
   int _currentIndex = 0;
-  final _pages = [PlatoScreen(), CalendarScreen(), ChatScreen()];
+  final _pages = [const PlatoScreen(), const CalendarScreen(), const ChatScreen()];
+  final _userDataController = Get.find<UserDataController>();
 
   @override
   Widget build(BuildContext context) {
@@ -22,29 +25,84 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
         elevation: 0.0,
       ),
       drawer: Drawer(
-        child: ListView(
-          children: [
-            UserAccountsDrawerHeader(
-              currentAccountPicture: CircleAvatar(
-                backgroundImage: AssetImage("assets/defaultAvatar.png",),
-              ),
-              accountEmail: Text('test@gmail.com'),
-              accountName: Text('test'),
-            ),
-            /*
-              로그인 상태 : 로그아웃, 세팅, 버그리포트
-              로그아웃 상태 : 로그인
-            */
-            ListTile(
-                title: Text('item1')
-            ),
-            ListTile(
-                title: Text('item2')
-            ),
-            ListTile(
-                title: Text('item3')
-            ),
-          ],
+        child: Builder(
+          builder: (context) {
+            return GetBuilder<UserDataController>(
+              builder: (controller) {
+                if (_userDataController.loginStatus) {
+                  return ListView(
+                      children: [
+                        UserAccountsDrawerHeader(
+                          currentAccountPicture: CircleAvatar(
+                            backgroundImage: NetworkImage(_userDataController.imgUrl),
+                          ),
+                          accountEmail: Text(_userDataController.department),
+                          accountName: Text(_userDataController.name),
+                        ),
+                        ListTile(
+                          title: Text('동기화 시간: ${_userDataController.lastSyncTime}'),
+                          dense: true,
+                        ),
+                        ListTile(
+                          trailing: const Icon(Icons.logout),
+                          title: const Text('로그아웃'),
+                          onTap: () {
+                            /* TODO: 로그아웃 메시지박스 띄운 뒤 로그아웃 처리 */
+                          }
+                        ),
+                        ListTile(
+                          trailing: const Icon(Icons.settings),
+                          title: const Text('세팅'),
+                          onTap: () {
+                              /* TODO: 세팅 화면으로 이동 */
+                            //Get.toNamed('/setting');
+                          }
+                        ),
+                        ListTile(
+                          trailing: const Icon(Icons.bug_report_outlined),
+                          title: const Text('버그리포트'),
+                          onTap: () {
+                            /* TODO: 버그리포트 메지박스 띄우기 */
+                          }
+                        )
+                      ]
+                  );
+                }
+                else {
+                  return ListView(
+                      children: [
+                        UserAccountsDrawerHeader(
+                          currentAccountPicture: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                _userDataController.imgUrl),
+                          ),
+                          accountEmail: Text(_userDataController.department),
+                          accountName: Text(_userDataController.name),
+                          decoration: const BoxDecoration(
+                              color: Colors.grey
+                          ),
+                        ),
+                        ListTile(
+                          trailing: const Icon(Icons.login),
+                          title: const Text('로그인'),
+                          onTap: () {
+                            /* TODO: 로그인 페이지 추가 */
+                            //Get.toNamed('/login');
+                          },
+                        ),
+                        ListTile(
+                          trailing: const Icon(Icons.bug_report_outlined),
+                          title: const Text('버그리포트'),
+                          onTap: () {
+                            /* TODO: 버그리포트 메지박스 띄우기 */
+                          }
+                        )
+                      ]
+                  );
+                }
+              },
+            );
+          }
         ),
       ),
       body: _pages[_currentIndex],
