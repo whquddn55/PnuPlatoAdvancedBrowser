@@ -4,6 +4,7 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/chatPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
@@ -27,7 +28,6 @@ class _NavigatorPageState extends State<NavigatorPage> {
         elevation: 0.0,
       ),
       drawer: _renderDrawer(),
-      body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
@@ -50,6 +50,15 @@ class _NavigatorPageState extends State<NavigatorPage> {
             label: '쪽지',
           ),
         ],
+      ),
+      body: FutureBuilder(
+        future: Get.find<UserDataController>().login(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return _pages[_currentIndex];
+          }
+          return const LoadingPage(msg: '로그인 중...');
+        }
       ),
     );
   }

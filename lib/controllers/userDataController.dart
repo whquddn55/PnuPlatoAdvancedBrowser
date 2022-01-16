@@ -6,6 +6,7 @@ import 'package:html/parser.dart' show parse;
 import 'package:dio/dio.dart' as Dio;
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notificationController.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserDataController extends GetxController {
   String _username = '', _password = '';
@@ -39,6 +40,13 @@ class UserDataController extends GetxController {
   set password(String password) => _password = password;
 
   Future<bool> login() async {
+    final preference = await SharedPreferences.getInstance();
+    _username = preference.getString('username') ?? _username;
+    _password = preference.getString('password') ?? _password;
+    if (_username == '' || _password == '') {
+      return false;
+    }
+
     String body = 'username=$_username&password=${Uri.encodeQueryComponent(_password)}';
     Dio.Response response;
     try {
@@ -107,6 +115,8 @@ class UserDataController extends GetxController {
 
     _updateSyncTime();
     await _getInformation();
+    await preference.setString('username', _username);
+    await preference.setString('password', _password);
     update();
     return _loginStatus = true;
   }
@@ -117,6 +127,10 @@ class UserDataController extends GetxController {
       return false;
     }
     await Dio.Dio().get('https://plato.pusan.ac.kr/login/logout.php?sesskey=$_sessionKey');
+
+    final preference = await SharedPreferences.getInstance();
+    preference.remove('username');
+    preference.remove('password');
     _username = '';
     _password = '';
     _loginStatus = false;
@@ -221,7 +235,6 @@ class UserDataController extends GetxController {
         headers: {
           'Cookie': _moodleSessionKey
         });
-
 
     var response = await request('https://plato.pusan.ac.kr/calendar/export.php', options: options);
 

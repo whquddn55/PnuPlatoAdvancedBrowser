@@ -35,9 +35,7 @@ class _LoginPageState extends State<LoginPage> {
               child: const Icon(Icons.navigate_next),
               onPressed: () async {
                 var pd = ProgressDialog(context: context);
-                pd.show(max: 1,
-                    msg: '로그인 중입니다...',
-                    progressBgColor: Colors.transparent);
+                pd.show(max: 1, msg: '로그인 중입니다...', progressBgColor: Colors.transparent);
                 _formKey.currentState!.save();
                 bool loginResult = await _userDataController.login();
                 pd.close();
