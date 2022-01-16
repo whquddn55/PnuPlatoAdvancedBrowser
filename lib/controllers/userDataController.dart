@@ -107,6 +107,7 @@ class UserDataController extends GetxController {
 
     _updateSyncTime();
     await _getInformation();
+    update();
     return _loginStatus = true;
   }
 
@@ -115,7 +116,21 @@ class UserDataController extends GetxController {
     if (sessionkeyRes == false) {
       return false;
     }
-    log(_sessionKey);
+    await Dio.Dio().get('https://plato.pusan.ac.kr/login/logout.php?sesskey=$_sessionKey');
+    _username = '';
+    _password = '';
+    _loginStatus = false;
+    _sessionKey = '';
+    _moodleSessionKey = '';
+    _loginMsg = '';
+    _debugMsg = '';
+    _studentId = 123456789;
+    _name = 'thuthi';
+    _department = '전기컴퓨터공학부';
+    _imgUrl = 'https://plato.pusan.ac.kr/theme/image.php/coursemosv2/core/1636448872/u/f1';
+    _lastSyncTime = DateTime(1946, 05, 15).toString();
+    _loginStatus = false;
+    update();
     return true;
   }
 
