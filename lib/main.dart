@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
-import 'package:pnu_plato_advanced_browser/screens/landingScreen.dart';
-import 'package:pnu_plato_advanced_browser/screens/loginPage/loginPage.dart';
-import 'package:pnu_plato_advanced_browser/screens/loginPage/sections/findInformationPage.dart';
-import 'package:pnu_plato_advanced_browser/screens/navigatorScreen.dart';
+import 'package:pnu_plato_advanced_browser/pages/landingPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/loginPage/loginPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/loginPage/sections/findInformationPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/navigatorPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,8 +22,8 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       getPages: [
-        GetPage(name: '/', page: () => const LandingScreen(), transition: Transition.cupertino),
-        GetPage(name: '/navigator', page: () => const NavigatorScreen(), transition: Transition.cupertino),
+        GetPage(name: '/', page: () => const LandingPage(), transition: Transition.cupertino),
+        GetPage(name: '/navigator', page: () => const NavigatorPage(), transition: Transition.cupertino),
         GetPage(name: '/login', page: () => const LoginPage(), transition: Transition.cupertino),
         GetPage(name: '/login/findInformation/:target', page: () => FindInformationPage(), transition: Transition.cupertino)
       ]

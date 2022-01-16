@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class PlatoScreen extends StatelessWidget {
-  const PlatoScreen({Key? key}) : super(key: key);
+class PlatoPage extends StatelessWidget {
+  const PlatoPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

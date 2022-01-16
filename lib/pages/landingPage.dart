@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/screens/platoScreen.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage.dart';
 
-class LandingScreen extends StatefulWidget {
-  const LandingScreen({Key? key}) : super(key: key);
+class LandingPage extends StatefulWidget {
+  const LandingPage({Key? key}) : super(key: key);
 
   @override
-  State<LandingScreen> createState() => _LandingScreenState();
+  State<LandingPage> createState() => _LandingPageState();
 }
 
-class _LandingScreenState extends State<LandingScreen> {
+class _LandingPageState extends State<LandingPage> {
   bool _animationFinished = false;
 
   TextStyle _outlinedTextStyle(Color color) {

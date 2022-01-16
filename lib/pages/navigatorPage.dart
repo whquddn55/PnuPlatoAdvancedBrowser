@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
-import 'package:pnu_plato_advanced_browser/screens/calendarScreen.dart';
-import 'package:pnu_plato_advanced_browser/screens/chatScreen.dart';
-import 'package:pnu_plato_advanced_browser/screens/platoScreen.dart';
+import 'package:pnu_plato_advanced_browser/pages/calendarPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/chatPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
-class NavigatorScreen extends StatefulWidget {
-  const NavigatorScreen({Key? key}) : super(key: key);
+class NavigatorPage extends StatefulWidget {
+  const NavigatorPage({Key? key}) : super(key: key);
 
   @override
-  _NavigatorScreenState createState() => _NavigatorScreenState();
+  _NavigatorPageState createState() => _NavigatorPageState();
 }
 
-class _NavigatorScreenState extends State<NavigatorScreen> {
+class _NavigatorPageState extends State<NavigatorPage> {
   int _currentIndex = 0;
-  final _pages = [const PlatoScreen(), const CalendarScreen(), const ChatScreen()];
+  final _pages = [const PlatoPage(), const CalendarPage(), const ChatPage()];
   final _userDataController = Get.find<UserDataController>();
 
   @override
