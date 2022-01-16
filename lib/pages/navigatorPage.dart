@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/chatPage.dart';
@@ -97,7 +98,6 @@ class _NavigatorPageState extends State<NavigatorPage> {
                                   },
                                 ),
                               );
-                              /* TODO: 로그아웃 메시지박스 띄운 뒤 로그아웃 처리 */
                             }
                         ),
                         ListTile(
@@ -112,7 +112,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
                             trailing: const Icon(Icons.bug_report_outlined),
                             title: const Text('버그리포트'),
                             onTap: () {
-                              /* TODO: 버그리포트 메지박스 띄우기 */
+                              showBugReport('123');
                             }
                         )
                       ]
@@ -143,7 +143,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
                             trailing: const Icon(Icons.bug_report_outlined),
                             title: const Text('버그리포트'),
                             onTap: () {
-                              /* TODO: 버그리포트 메지박스 띄우기 */
+                              showBugReport('123');
                             }
                         )
                       ]
