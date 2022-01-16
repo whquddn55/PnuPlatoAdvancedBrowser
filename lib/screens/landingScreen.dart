@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/screens/platoScreen.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({Key? key}) : super(key: key);
@@ -37,13 +39,18 @@ class _LandingScreenState extends State<LandingScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    // TODO: implement initState
+    super.initState();
     Future.delayed(const Duration(seconds: 10), () {
       setState(() {
         _animationFinished = true;
       });
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
         body: Stack(
           children: [
@@ -129,7 +136,7 @@ class _LandingScreenState extends State<LandingScreen> {
                             minimumSize: const Size(300, 50),
                           ),
                           onPressed: () {
-                            print(1);
+                            Get.offNamed('/navigator');
                           },
                         ),
                       ),
