@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'PnuPlatoAdvancedBrowser',
       theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
+        primarySwatch: Colors.lightBlue,
       ),
       initialRoute: '/',
       routes: {
