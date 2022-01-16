@@ -39,6 +39,7 @@ dependencies:
   html:
   sn_progress_dialog:
   flutter_inappwebview:
+  shared_preferences: ^2.0.12
 
 dev_dependencies:
   flutter_test:
