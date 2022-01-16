@@ -4,6 +4,7 @@ import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:pnu_plato_advanced_browser/screens/calendarScreen.dart';
 import 'package:pnu_plato_advanced_browser/screens/chatScreen.dart';
 import 'package:pnu_plato_advanced_browser/screens/platoScreen.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
 class NavigatorScreen extends StatefulWidget {
   const NavigatorScreen({Key? key}) : super(key: key);
@@ -24,87 +25,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),
-      drawer: Drawer(
-        child: Builder(
-          builder: (context) {
-            return GetBuilder<UserDataController>(
-              builder: (controller) {
-                if (_userDataController.loginStatus) {
-                  return ListView(
-                      children: [
-                        UserAccountsDrawerHeader(
-                          currentAccountPicture: CircleAvatar(
-                            backgroundImage: NetworkImage(_userDataController.imgUrl),
-                          ),
-                          accountEmail: Text(_userDataController.department),
-                          accountName: Text(_userDataController.name),
-                        ),
-                        ListTile(
-                          title: Text('동기화 시간: ${_userDataController.lastSyncTime}'),
-                          dense: true,
-                        ),
-                        ListTile(
-                          trailing: const Icon(Icons.logout),
-                          title: const Text('로그아웃'),
-                          onTap: () {
-                            /* TODO: 로그아웃 메시지박스 띄운 뒤 로그아웃 처리 */
-                          }
-                        ),
-                        ListTile(
-                          trailing: const Icon(Icons.settings),
-                          title: const Text('세팅'),
-                          onTap: () {
-                              /* TODO: 세팅 화면으로 이동 */
-                            //Get.toNamed('/setting');
-                          }
-                        ),
-                        ListTile(
-                          trailing: const Icon(Icons.bug_report_outlined),
-                          title: const Text('버그리포트'),
-                          onTap: () {
-                            /* TODO: 버그리포트 메지박스 띄우기 */
-                          }
-                        )
-                      ]
-                  );
-                }
-                else {
-                  return ListView(
-                      children: [
-                        UserAccountsDrawerHeader(
-                          currentAccountPicture: CircleAvatar(
-                            backgroundImage: NetworkImage(
-                                _userDataController.imgUrl),
-                          ),
-                          accountEmail: Text(_userDataController.department),
-                          accountName: Text(_userDataController.name),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
-                          ),
-                        ),
-                        ListTile(
-                          trailing: const Icon(Icons.login),
-                          title: const Text('로그인'),
-                          onTap: () {
-                            /* TODO: 로그인 페이지 추가 */
-                            //Get.toNamed('/login');
-                          },
-                        ),
-                        ListTile(
-                          trailing: const Icon(Icons.bug_report_outlined),
-                          title: const Text('버그리포트'),
-                          onTap: () {
-                            /* TODO: 버그리포트 메지박스 띄우기 */
-                          }
-                        )
-                      ]
-                  );
-                }
-              },
-            );
-          }
-        ),
-      ),
+      drawer: _renderDrawer(),
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -128,6 +49,109 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
             label: '쪽지',
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _renderDrawer() {
+    return Drawer(
+      child: Builder(
+          builder: (context) {
+            return GetBuilder<UserDataController>(
+              builder: (controller) {
+                if (_userDataController.loginStatus) {
+                  return ListView(
+                      children: [
+                        UserAccountsDrawerHeader(
+                          currentAccountPicture: CircleAvatar(
+                            backgroundImage: NetworkImage(_userDataController.imgUrl),
+                          ),
+                          accountEmail: Text(_userDataController.department),
+                          accountName: Text(_userDataController.name),
+                        ),
+                        ListTile(
+                          title: Text('동기화 시간: ${_userDataController.lastSyncTime}'),
+                          dense: true,
+                        ),
+                        ListTile(
+                            trailing: const Icon(Icons.logout),
+                            title: const Text('로그아웃'),
+                            onTap: () {
+                              Get.defaultDialog(
+                                title: '로그아웃',
+                                middleText: '로그아웃 시 모든 세팅이 초기화 됩니다.',
+                                cancel: TextButton(
+                                  child: Text('취소', style: TextStyle(color: Colors.grey)),
+                                  onPressed: () {
+                                      Get.back();
+                                  },
+                                ),
+                                confirm: TextButton(
+                                  child: Text('로그아웃'),
+                                  onPressed: () async {
+                                    var pd = ProgressDialog(context: context);
+                                    Get.back();
+                                    pd.show(max: 1, msg: '로그아웃 중입니다...', progressBgColor: Colors.transparent);
+                                    await _userDataController.logout();
+                                    pd.close();
+                                  },
+                                ),
+                              );
+                              /* TODO: 로그아웃 메시지박스 띄운 뒤 로그아웃 처리 */
+                            }
+                        ),
+                        ListTile(
+                            trailing: const Icon(Icons.settings),
+                            title: const Text('세팅'),
+                            onTap: () {
+                              /* TODO: 세팅 화면으로 이동 */
+                              //Get.toNamed('/setting');
+                            }
+                        ),
+                        ListTile(
+                            trailing: const Icon(Icons.bug_report_outlined),
+                            title: const Text('버그리포트'),
+                            onTap: () {
+                              /* TODO: 버그리포트 메지박스 띄우기 */
+                            }
+                        )
+                      ]
+                  );
+                }
+                else {
+                  return ListView(
+                      children: [
+                        UserAccountsDrawerHeader(
+                          currentAccountPicture: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                _userDataController.imgUrl),
+                          ),
+                          accountEmail: Text(_userDataController.department),
+                          accountName: Text(_userDataController.name),
+                          decoration: const BoxDecoration(
+                              color: Colors.grey
+                          ),
+                        ),
+                        ListTile(
+                          trailing: const Icon(Icons.login),
+                          title: const Text('로그인'),
+                          onTap: () {
+                            Get.toNamed('/login');
+                          },
+                        ),
+                        ListTile(
+                            trailing: const Icon(Icons.bug_report_outlined),
+                            title: const Text('버그리포트'),
+                            onTap: () {
+                              /* TODO: 버그리포트 메지박스 띄우기 */
+                            }
+                        )
+                      ]
+                  );
+                }
+              },
+            );
+          }
       ),
     );
   }

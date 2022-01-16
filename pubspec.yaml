@@ -37,6 +37,8 @@ dependencies:
   get:
   dio:
   html:
+  sn_progress_dialog:
+  flutter_inappwebview:
 
 dev_dependencies:
   flutter_test:

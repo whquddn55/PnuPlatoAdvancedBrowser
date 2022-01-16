@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:pnu_plato_advanced_browser/screens/landingScreen.dart';
+import 'package:pnu_plato_advanced_browser/screens/loginPage/loginPage.dart';
+import 'package:pnu_plato_advanced_browser/screens/loginPage/sections/findInformationPage.dart';
 import 'package:pnu_plato_advanced_browser/screens/navigatorScreen.dart';
 
 void main() {
@@ -22,6 +24,8 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(name: '/', page: () => const LandingScreen(), transition: Transition.cupertino),
         GetPage(name: '/navigator', page: () => const NavigatorScreen(), transition: Transition.cupertino),
+        GetPage(name: '/login', page: () => const LoginPage(), transition: Transition.cupertino),
+        GetPage(name: '/login/findInformation/:target', page: () => FindInformationPage(), transition: Transition.cupertino)
       ]
     );
   }
