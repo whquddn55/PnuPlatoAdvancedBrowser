@@ -25,7 +25,7 @@ class _LandingPageState extends State<LandingPage> {
           ),
           Shadow( // bottomRight
               offset: Offset(1.5, -1.5),
-              color :Colors.white
+              color: Colors.white
           ),
           Shadow( // topRight
               offset: Offset(1.5, 1.5),

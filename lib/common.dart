@@ -59,7 +59,7 @@ void showBugReport(String msg) {
       ],
     ),
     cancel: TextButton(
-      child: const Text('취소', style: TextStyle(color: Colors.grey)),
+      child: Text('취소', style: TextStyle(color: Get.theme.disabledColor)),
       onPressed: () => Get.back(),
     ),
     confirm: TextButton(

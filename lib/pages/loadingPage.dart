@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:get/get.dart';
 
 class LoadingPage extends StatelessWidget {
   final String msg;
@@ -12,8 +13,8 @@ class LoadingPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SpinKitRing(
-              color: Colors.blueGrey,
+            SpinKitRing(
+              color: Get.theme.primaryColor,
               lineWidth: 4.0,
             ),
             Text(msg)

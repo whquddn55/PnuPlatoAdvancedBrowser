@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _renderForm(),
-            Text(_loginMsg, style: const TextStyle(color: Colors.red)),
+            Text(_loginMsg, style: TextStyle(color: Get.theme.errorColor)),
             const SizedBox(height: 30),
             ElevatedButton(
               child: const Icon(Icons.navigate_next),
@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                     suffixIcon: IconButton(
                       icon: Icon(_passwordVisible
                           ? Icons.visibility_off
-                          : Icons.visibility, color: Colors.grey),
+                          : Icons.visibility, color: Get.theme.disabledColor),
                       onPressed: () {
                         setState(() {
                           _passwordVisible = !_passwordVisible;
@@ -130,17 +130,17 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
           const SizedBox(height: 30),
-          const Text(
+          Text(
             '* 아이디/비밀번호는 플라토 인증 외에 어느 곳에서도 사용되지 않으며, 앱 내부 오프라인 스토리지에만 저장되어 서버에 저장되는 정보는 일절 없음을 알려드립니다.',
             style: TextStyle(
-                color: Colors.grey
+                color: Get.theme.disabledColor
             ),
           ),
           const SizedBox(height: 10),
-          const Text(
+          Text(
             '* 아이디/비밀번호 찾기는 스마트학생지원시스템에서 제공하는 홈페이지로 이동하여 인증하게됩니다.',
             style: TextStyle(
-                color: Colors.grey
+                color: Get.theme.disabledColor
             ),
           ),
         ]

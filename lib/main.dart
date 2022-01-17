@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/controllers/appSettingController.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:pnu_plato_advanced_browser/pages/landingPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/loginPage.dart';
@@ -11,6 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   Get.put(UserDataController());
+  Get.put(AppSettingController());
 
   runApp(const MyApp());
 }
@@ -27,8 +29,12 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
         title: 'PnuPlatoAdvancedBrowser',
         theme: ThemeData(
-          primarySwatch: Colors.lightBlue,
-            brightness: Brightness.dark,
+          primaryColor: Colors.lightBlue,
+          brightness: Brightness.light,
+        ),
+        darkTheme: ThemeData(
+          primaryColor: Colors.lightBlue,
+          brightness: Brightness.dark
         ),
         initialRoute: '/',
         getPages: [

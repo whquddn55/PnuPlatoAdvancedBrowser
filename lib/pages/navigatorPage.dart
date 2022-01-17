@@ -30,6 +30,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
+        selectedItemColor: Get.theme.primaryColor,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
@@ -77,6 +78,9 @@ class _NavigatorPageState extends State<NavigatorPage> {
                           ),
                           accountEmail: Text(controller.department),
                           accountName: Text(controller.name),
+                          decoration: BoxDecoration(
+                              color: Get.theme.primaryColor
+                          ),
                         ),
                         ListTile(
                           title: Text('동기화 시간: ${controller.lastSyncTime}'),
@@ -91,7 +95,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
                                 title: '로그아웃',
                                 middleText: '로그아웃 시 모든 세팅이 초기화 됩니다.',
                                 cancel: TextButton(
-                                  child: Text('취소', style: TextStyle(color: Colors.grey)),
+                                  child: Text('취소', style: TextStyle(color: Get.theme.disabledColor)),
                                   onPressed: () {
                                       Get.back();
                                   },
@@ -128,6 +132,12 @@ class _NavigatorPageState extends State<NavigatorPage> {
                             onTap: () {
                               showBugReport('123');
                             }
+                        ),
+                        ListTile(
+                          onTap: () {
+                            Get.changeThemeMode(ThemeMode.light);
+                            print(Get.theme.primaryColor);
+                          }
                         )
                       ]
                   );
@@ -142,8 +152,8 @@ class _NavigatorPageState extends State<NavigatorPage> {
                           ),
                           accountEmail: Text(controller.department),
                           accountName: Text(controller.name),
-                          decoration: const BoxDecoration(
-                              color: Colors.grey
+                          decoration: BoxDecoration(
+                              color: Get.theme.disabledColor
                           ),
                         ),
                         ListTile(
