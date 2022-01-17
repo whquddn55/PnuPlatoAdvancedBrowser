@@ -129,8 +129,7 @@ class UserDataController extends GetxController {
     await Dio.Dio().get('https://plato.pusan.ac.kr/login/logout.php?sesskey=$_sessionKey');
 
     final preference = await SharedPreferences.getInstance();
-    preference.remove('username');
-    preference.remove('password');
+    await preference.clear();
     _username = '';
     _password = '';
     _loginStatus = false;

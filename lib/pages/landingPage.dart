@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({Key? key}) : super(key: key);
@@ -135,7 +136,8 @@ class _LandingPageState extends State<LandingPage> {
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(300, 50),
                           ),
-                          onPressed: () {
+                          onPressed: () async {
+                            (await SharedPreferences.getInstance()).setBool('isFirst', false);
                             Get.offNamed('/navigator');
                           },
                         ),

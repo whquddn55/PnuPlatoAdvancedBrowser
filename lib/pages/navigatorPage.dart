@@ -18,7 +18,6 @@ class NavigatorPage extends StatefulWidget {
 class _NavigatorPageState extends State<NavigatorPage> {
   int _currentIndex = 0;
   final _pages = [const PlatoPage(), const CalendarPage(), const ChatPage()];
-  final _userDataController = Get.find<UserDataController>();
 
   @override
   Widget build(BuildContext context) {
@@ -69,20 +68,21 @@ class _NavigatorPageState extends State<NavigatorPage> {
           builder: (context) {
             return GetBuilder<UserDataController>(
               builder: (controller) {
-                if (_userDataController.loginStatus) {
+                if (controller.loginStatus) {
                   return ListView(
                       children: [
                         UserAccountsDrawerHeader(
                           currentAccountPicture: CircleAvatar(
-                            backgroundImage: NetworkImage(_userDataController.imgUrl),
+                            backgroundImage: NetworkImage(controller.imgUrl),
                           ),
-                          accountEmail: Text(_userDataController.department),
-                          accountName: Text(_userDataController.name),
+                          accountEmail: Text(controller.department),
+                          accountName: Text(controller.name),
                         ),
                         ListTile(
-                          title: Text('동기화 시간: ${_userDataController.lastSyncTime}'),
+                          title: Text('동기화 시간: ${controller.lastSyncTime}'),
                           dense: true,
                         ),
+                        const Divider(height: 0),
                         ListTile(
                             trailing: const Icon(Icons.logout),
                             title: const Text('로그아웃'),
@@ -99,16 +99,20 @@ class _NavigatorPageState extends State<NavigatorPage> {
                                 confirm: TextButton(
                                   child: Text('로그아웃'),
                                   onPressed: () async {
-                                    var pd = ProgressDialog(context: context);
                                     Get.back();
+                                    var pd = ProgressDialog(context: context);
                                     pd.show(max: 1, msg: '로그아웃 중입니다...', progressBgColor: Colors.transparent);
-                                    await _userDataController.logout();
+                                    bool res = await controller.logout();
                                     pd.close();
+                                    if (res) {
+                                      Get.offAndToNamed('/');
+                                    }
                                   },
                                 ),
                               );
                             }
                         ),
+                        const Divider(height: 0),
                         ListTile(
                             trailing: const Icon(Icons.settings),
                             title: const Text('세팅'),
@@ -117,6 +121,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
                               //Get.toNamed('/setting');
                             }
                         ),
+                        const Divider(height: 0),
                         ListTile(
                             trailing: const Icon(Icons.bug_report_outlined),
                             title: const Text('버그리포트'),
@@ -133,10 +138,10 @@ class _NavigatorPageState extends State<NavigatorPage> {
                         UserAccountsDrawerHeader(
                           currentAccountPicture: CircleAvatar(
                             backgroundImage: NetworkImage(
-                                _userDataController.imgUrl),
+                                controller.imgUrl),
                           ),
-                          accountEmail: Text(_userDataController.department),
-                          accountName: Text(_userDataController.name),
+                          accountEmail: Text(controller.department),
+                          accountName: Text(controller.name),
                           decoration: const BoxDecoration(
                               color: Colors.grey
                           ),
@@ -148,6 +153,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
                             Get.toNamed('/login');
                           },
                         ),
+                        const Divider(height: 0),
                         ListTile(
                             trailing: const Icon(Icons.bug_report_outlined),
                             title: const Text('버그리포트'),
