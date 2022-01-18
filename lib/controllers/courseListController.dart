@@ -1,11 +1,10 @@
-import 'dart:developer';
-
 import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:dio/dio.dart' as Dio;
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
+import 'package:pnu_plato_advanced_browser/data/course.dart';
 
 class CourseListController {
   static Future<List<Course>?> getCurrentSemesterCourses() async {
@@ -13,7 +12,7 @@ class CourseListController {
         headers: {
           'Cookie': Get.find<UserDataController>().moodleSessionKey
         });
-    var response = await request('https://plato.pusan.ac.kr/local/ubion/user/index.php?year=2021&semester=20', options: options, callback: Get.find<UserDataController>().login);
+    var response = await request(CommonUrl.courseListUrl + 'year=2021&semester=20', options: options, callback: Get.find<UserDataController>().login);
     if (response == null) {
       /* TODO: 에러메시지 */
       return null;
@@ -33,12 +32,4 @@ class CourseListController {
     }
     return courseList;
   }
-}
-
-class Course {
-  final String title;
-  final String sub;
-  final String id;
-
-  Course({required this.title, required this.sub, required this.id});
 }

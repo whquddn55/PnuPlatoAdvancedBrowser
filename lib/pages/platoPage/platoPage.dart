@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/courseListController.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
+import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/sections/lectureTile.dart';
 
@@ -15,7 +16,6 @@ class PlatoPage extends StatefulWidget {
 
 class _PlatoPageState extends State<PlatoPage> {
   final ExpandedTileController _expandedTileController = ExpandedTileController(isExpanded: true);
-  var temp = CourseListController.getCurrentSemesterCourses();
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class _PlatoPageState extends State<PlatoPage> {
         }
         else {
           return FutureBuilder(
-              future: temp,
+              future: CourseListController.getCurrentSemesterCourses(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return Column(
@@ -54,8 +54,14 @@ class _PlatoPageState extends State<PlatoPage> {
                             ),
                             title: const Text('현재 진행 강좌'),
                             controller: _expandedTileController,
-                            content: _renderCourseList(
-                                snapshot.data as List<Course>)
+                            content: Column(
+                              children: [
+                                for (Course course in snapshot.data as List<Course>) ...[
+                                  LectureTile(title: course.title, tail: course.sub),
+                                  const SizedBox(height: 10),
+                                ],
+                              ],
+                            )
                         )
                       ]
                   );
@@ -67,17 +73,6 @@ class _PlatoPageState extends State<PlatoPage> {
           );
         }
       },
-    );
-  }
-
-  Widget _renderCourseList(List<Course> courseList) {
-    return Column(
-      children: [
-        for (Course course in courseList) ...[
-          LectureTile(title: course.title, tail: course.sub),
-          const SizedBox(height: 10),
-        ],
-      ],
     );
   }
 }

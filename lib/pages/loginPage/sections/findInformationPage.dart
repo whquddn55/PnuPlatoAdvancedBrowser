@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 
 class FindInformationPage extends StatelessWidget {
   final String target = Get.parameters['target']!;
   final String? url = {
-    'id' : 'https://u-pip.pusan.ac.kr/rSSO/popup/FindID_step1.asp',
-    'pw' : 'https://u-pip.pusan.ac.kr/rSSO/popup/FindPassword_step1.asp',
+    'id' : CommonUrl.findIdUrl,
+    'pw' : CommonUrl.findPwUrl,
   }[Get.parameters['target']!];
 
   InAppWebViewController? _webViewController;

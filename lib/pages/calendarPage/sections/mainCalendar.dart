@@ -69,6 +69,7 @@ class _MainCalendarState extends State<MainCalendar> {
         rightChevronIcon: Icon(Icons.arrow_right),
         titleTextStyle: TextStyle(fontSize: 17.0),
       ),
+      rowHeight: 52 + 15,
       calendarStyle: CalendarStyle(
         todayDecoration: BoxDecoration(
           color: Get.theme.disabledColor,
@@ -118,6 +119,9 @@ class _MainCalendarState extends State<MainCalendar> {
           int assignCnt = 0;
           int zoomCnt = 0;
           for (Event event in events) {
+            if (event.done) {
+              continue;
+            }
             switch (event.type) {
               case EventType.video:
                 videoCnt++;
@@ -138,7 +142,10 @@ class _MainCalendarState extends State<MainCalendar> {
                   flex: 1,
                   child: Container(
                     child: Text('$videoCnt', textAlign: TextAlign.center),
-                    color: Colors.blue,
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                   ),
               ) else const Expanded(flex: 1, child: SizedBox.shrink()),
               if (assignCnt != 0)
@@ -146,7 +153,10 @@ class _MainCalendarState extends State<MainCalendar> {
                   flex: 1,
                   child: Container(
                     child: Text('$assignCnt', textAlign: TextAlign.center),
-                    color: Colors.red,
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                   ),
                 ) else const Expanded(flex: 1, child: SizedBox.shrink()),
               if (zoomCnt != 0)
@@ -154,7 +164,10 @@ class _MainCalendarState extends State<MainCalendar> {
                   flex: 1,
                   child: Container(
                     child: Text('$zoomCnt', textAlign: TextAlign.center),
-                    color: Colors.green,
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                   ),
               ) else const Expanded(flex: 1, child: SizedBox.shrink()),
             ],
