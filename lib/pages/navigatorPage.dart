@@ -5,7 +5,7 @@ import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/chatPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/platoPage.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
 class NavigatorPage extends StatefulWidget {
@@ -18,12 +18,12 @@ class NavigatorPage extends StatefulWidget {
 class _NavigatorPageState extends State<NavigatorPage> {
   int _currentIndex = 0;
   final _pages = [const PlatoPage(), const CalendarPage(), const ChatPage()];
+  final _loginFuture = Get.find<UserDataController>().login();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),
       drawer: _renderDrawer(),
@@ -52,7 +52,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
         ],
       ),
       body: FutureBuilder(
-        future: Get.find<UserDataController>().login(),
+        future: _loginFuture,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return _pages[_currentIndex];
@@ -136,7 +136,6 @@ class _NavigatorPageState extends State<NavigatorPage> {
                         ListTile(
                           onTap: () {
                             Get.changeThemeMode(ThemeMode.light);
-                            print(Get.theme.primaryColor);
                           }
                         )
                       ]

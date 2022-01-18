@@ -113,6 +113,8 @@ class UserDataController extends GetxController {
     _debugMsg = 'login success';
     _loginMsg = 'login success';
 
+    print("Synced with Plato");
+
     _updateSyncTime();
     await _getInformation();
     await preference.setString('username', _username);

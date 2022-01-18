@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/platoPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LandingPage extends StatefulWidget {
