@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
-import 'package:pnu_plato_advanced_browser/pages/calendarPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/calendarPage/calendarPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/chatPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/platoPage.dart';

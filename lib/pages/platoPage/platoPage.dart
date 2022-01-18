@@ -18,12 +18,6 @@ class _PlatoPageState extends State<PlatoPage> {
   var temp = CourseListController.getCurrentSemesterCourses();
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return GetBuilder<UserDataController>(
       builder: (controller) {
@@ -46,7 +40,7 @@ class _PlatoPageState extends State<PlatoPage> {
           return FutureBuilder(
               future: temp,
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.done) {
                   return Column(
                       children: [
                         ExpandedTile(

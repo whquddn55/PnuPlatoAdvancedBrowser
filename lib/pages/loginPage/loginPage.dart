@@ -25,33 +25,35 @@ class _LoginPageState extends State<LoginPage> {
           title: const Text('로그인'),
           centerTitle: true,
         ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _renderForm(),
-            Text(_loginMsg, style: TextStyle(color: Get.theme.errorColor)),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              child: const Icon(Icons.navigate_next),
-              onPressed: () async {
-                var pd = ProgressDialog(context: context);
-                pd.show(max: 1, msg: '로그인 중입니다...', progressBgColor: Colors.transparent);
-                _formKey.currentState!.save();
-                bool loginResult = await _userDataController.login();
-                pd.close();
-                if (loginResult == false) {
-                  setState(() {
-                    _loginMsg = _userDataController.loginMsg;
-                  });
-                }
-                else {
-                  Get.back();
-                }
-              },
-            ),
-            const SizedBox(height: 30),
-            _renderNote()
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _renderForm(),
+              Text(_loginMsg, style: TextStyle(color: Get.theme.errorColor)),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                child: const Icon(Icons.navigate_next),
+                onPressed: () async {
+                  var pd = ProgressDialog(context: context);
+                  pd.show(max: 1, msg: '로그인 중입니다...', progressBgColor: Colors.transparent);
+                  _formKey.currentState!.save();
+                  bool loginResult = await _userDataController.login();
+                  pd.close();
+                  if (loginResult == false) {
+                    setState(() {
+                      _loginMsg = _userDataController.loginMsg;
+                    });
+                  }
+                  else {
+                    Get.back();
+                  }
+                },
+              ),
+              const SizedBox(height: 30),
+              _renderNote()
+            ],
+          ),
         )
     );
   }
