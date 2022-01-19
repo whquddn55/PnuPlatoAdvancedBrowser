@@ -1,0 +1,95 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
+
+class LoginForm extends StatefulWidget {
+  const LoginForm({Key? key}) : super(key: key);
+
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _userDataController = Get.find<UserDataController>();
+  final _idFocusNode = FocusNode();
+  final _pwFocusNode = FocusNode();
+  bool _passwordVisible = false;
+  String _loginMsg = '';
+
+  void _submit() async {
+    FocusScope.of(context).unfocus();
+    var pd = ProgressDialog(context: context);
+    pd.show(max: 1, msg: '로그인 중입니다...', progressBgColor: Colors.transparent);
+    _formKey.currentState!.save();
+    bool loginResult = await _userDataController.login();
+    pd.close();
+    if (loginResult == false) {
+      setState(() {
+        _loginMsg = _userDataController.loginMsg;
+      });
+      _idFocusNode.requestFocus();
+    } else {
+      Get.back();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  autofocus: true,
+                  focusNode: _idFocusNode,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                      labelText: 'Plato 아이디'),
+                  onSaved: (value) => _userDataController.username = value ?? '',
+                  onFieldSubmitted: (_) => _pwFocusNode.requestFocus(),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  focusNode: _pwFocusNode,
+                  keyboardType: TextInputType.visiblePassword,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                      labelText: 'Plato 비밀번호',
+                      suffixIcon: IconButton(
+                        icon: Icon(_passwordVisible ? Icons.visibility_off : Icons.visibility, color: Get.theme.disabledColor),
+                        onPressed: () {
+                          setState(() {
+                            _passwordVisible = !_passwordVisible;
+                          });
+                        },
+                      )),
+                  obscureText: !_passwordVisible,
+                  onSaved: (value) => _userDataController.password = value ?? '',
+                  onFieldSubmitted: (_) => _submit(),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Text(_loginMsg, style: TextStyle(color: Get.theme.errorColor)),
+        const SizedBox(height: 30),
+        ElevatedButton(
+          child: const Icon(Icons.navigate_next),
+          onPressed: _submit,
+        ),
+      ],
+    );
+  }
+}
