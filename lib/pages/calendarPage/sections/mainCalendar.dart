@@ -2,41 +2,38 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/data/event.dart';
+import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class MainCalendar extends StatefulWidget {
-  final Map<DateTime, List<Event>> _events = HashMap(
-      equals: isSameDay,
-      hashCode: (DateTime key) =>
-      key.day * 10000000 + key.month * 10000 + key.year
-  )
-    ..addAll({
-      DateTime.now(): [
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.assign),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.assign),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.video),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.video),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.zoom),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.quiz),
-      ],
-      DateTime(2022, 1, 17): [
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.assign),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.assign),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.video),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.video),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.zoom),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.quiz),
-      ],
-      DateTime(2022, 1, 19): [
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.assign),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.assign),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.video),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.video),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.zoom),
-        Event(id : '1', title: 'test', courseId: '1', dueDate: DateTime.now(), type: EventType.quiz),
-      ]
-    });
+  final Map<DateTime, List<Activity>> _events =
+      HashMap(equals: isSameDay, hashCode: (DateTime key) => key.day * 10000000 + key.month * 10000 + key.year)
+        ..addAll({
+          DateTime.now(): [
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.zoom),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.quiz),
+            // ],
+            // DateTime(2022, 1, 17): [
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.zoom),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.quiz),
+            // ],
+            // DateTime(2022, 1, 19): [
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.zoom),
+            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.quiz),
+          ]
+        });
 
   MainCalendar({Key? key}) : super(key: key);
 
@@ -87,13 +84,8 @@ class _MainCalendarState extends State<MainCalendar> {
         cellMargin: const EdgeInsets.fromLTRB(0, 5, 0, 20),
       ),
       daysOfWeekHeight: 20,
-      daysOfWeekStyle: DaysOfWeekStyle(
-        weekendStyle: const TextStyle(color: Colors.red),
-        decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.3)
-        )
-      ),
-
+      daysOfWeekStyle:
+          DaysOfWeekStyle(weekendStyle: const TextStyle(color: Colors.red), decoration: BoxDecoration(color: Colors.grey.withOpacity(0.3))),
       onHeaderTapped: (_) {
         setState(() {
           _selectedDay = DateTime.now();
@@ -110,70 +102,74 @@ class _MainCalendarState extends State<MainCalendar> {
         });
       },
       eventLoader: (day) {
-        return widget._events[day] ?? <Event>[];
+        return widget._events[day] ?? <Activity>[];
       },
-      calendarBuilders: CalendarBuilders(
-        markerBuilder: (context, day, events) {
-          events as List<Event>;
-          int videoCnt = 0;
-          int assignCnt = 0;
-          int zoomCnt = 0;
-          for (Event event in events) {
-            if (event.done) {
-              continue;
-            }
-            switch (event.type) {
-              case EventType.video:
-                videoCnt++;
-                break;
-              case EventType.assign:
-              case EventType.quiz:
-                assignCnt++;
-                break;
-              case EventType.zoom:
-                zoomCnt++;
-            }
+      calendarBuilders: CalendarBuilders(markerBuilder: (context, day, events) {
+        events as List<Activity>;
+        int videoCnt = 0;
+        int assignCnt = 0;
+        int zoomCnt = 0;
+        for (Activity event in events) {
+          if (event.done) {
+            continue;
           }
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              if (videoCnt != 0)
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: Text('$videoCnt', textAlign: TextAlign.center),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-              ) else const Expanded(flex: 1, child: SizedBox.shrink()),
-              if (assignCnt != 0)
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: Text('$assignCnt', textAlign: TextAlign.center),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                ) else const Expanded(flex: 1, child: SizedBox.shrink()),
-              if (zoomCnt != 0)
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: Text('$zoomCnt', textAlign: TextAlign.center),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-              ) else const Expanded(flex: 1, child: SizedBox.shrink()),
-            ],
-          );
+          // switch (event.type) {
+          //   case ActivityTime.video:
+          //     videoCnt++;
+          //     break;
+          //   case ActivityTime.assign:
+          //   case ActivityTime.quiz:
+          //     assignCnt++;
+          //     break;
+          //   case ActivityTime.zoom:
+          //     zoomCnt++;
+          // }
         }
-      ),
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            if (videoCnt != 0)
+              Expanded(
+                flex: 1,
+                child: Container(
+                  child: Text('$videoCnt', textAlign: TextAlign.center),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              )
+            else
+              const Expanded(flex: 1, child: SizedBox.shrink()),
+            if (assignCnt != 0)
+              Expanded(
+                flex: 1,
+                child: Container(
+                  child: Text('$assignCnt', textAlign: TextAlign.center),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              )
+            else
+              const Expanded(flex: 1, child: SizedBox.shrink()),
+            if (zoomCnt != 0)
+              Expanded(
+                flex: 1,
+                child: Container(
+                  child: Text('$zoomCnt', textAlign: TextAlign.center),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              )
+            else
+              const Expanded(flex: 1, child: SizedBox.shrink()),
+          ],
+        );
+      }),
     );
   }
 }

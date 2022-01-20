@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:pnu_plato_advanced_browser/controllers/activityController.dart';
 import 'package:pnu_plato_advanced_browser/controllers/appSettingController.dart';
+import 'package:pnu_plato_advanced_browser/controllers/courseController.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:pnu_plato_advanced_browser/pages/LandingPage/landingPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/loginPage.dart';
@@ -14,6 +16,8 @@ void main() async {
   await initializeDateFormatting();
   Get.put(UserDataController());
   Get.put(AppSettingController());
+  Get.put(CourseController());
+  Get.put(ActivityController());
 
   runApp(const MyApp());
 }

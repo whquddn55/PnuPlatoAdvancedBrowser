@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/courseListController.dart';
+import 'package:pnu_plato_advanced_browser/controllers/courseController.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
@@ -25,52 +25,45 @@ class _PlatoPageState extends State<PlatoPage> {
           return GestureDetector(
             behavior: HitTestBehavior.translucent,
             child: const Center(
-                child: Text('로그인이 필요합니다.',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                  ),
-                )
-            ),
+                child: Text(
+              '로그인이 필요합니다.',
+              style: TextStyle(
+                fontSize: 20.0,
+              ),
+            )),
             onTap: () {
               Scaffold.of(context).openDrawer();
             },
           );
-        }
-        else {
+        } else {
           return FutureBuilder(
-              future: CourseListController.getCurrentSemesterCourses(),
+              future: Get.find<CourseController>().updateCurrentSemesterCourseList(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  return Column(
-                      children: [
-                        ExpandedTile(
-                            theme: ExpandedTileThemeData(
-                                headerPadding: EdgeInsets.zero,
-                                headerColor: Get.theme.secondaryHeaderColor,
-                                headerRadius: 0.0,
-                                contentPadding: EdgeInsets.all(8.0),
-                                contentRadius: 0.0,
-                                contentBackgroundColor: Colors.transparent
-                            ),
-                            title: const Text('현재 진행 강좌'),
-                            controller: _expandedTileController,
-                            content: Column(
-                              children: [
-                                for (Course course in snapshot.data as List<Course>) ...[
-                                  LectureTile(title: course.title, tail: course.sub),
-                                  const SizedBox(height: 10),
-                                ],
-                              ],
-                            )
-                        )
-                      ]
-                  );
-                }
-                else {
+                  return Column(children: [
+                    ExpandedTile(
+                        theme: ExpandedTileThemeData(
+                            headerPadding: EdgeInsets.zero,
+                            headerColor: Get.theme.secondaryHeaderColor,
+                            headerRadius: 0.0,
+                            contentPadding: EdgeInsets.all(8.0),
+                            contentRadius: 0.0,
+                            contentBackgroundColor: Colors.transparent),
+                        title: const Text('현재 진행 강좌'),
+                        controller: _expandedTileController,
+                        content: Column(
+                          children: [
+                            for (Course course in Get.find<CourseController>().currentSemesterCourseList) ...[
+                              LectureTile(title: course.title, tail: course.sub),
+                              const SizedBox(height: 10),
+                            ],
+                          ],
+                        ))
+                  ]);
+                } else {
                   return const LoadingPage(msg: '동기화 중...');
                 }
-              }
-          );
+              });
         }
       },
     );

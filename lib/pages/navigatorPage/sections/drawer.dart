@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/activityListController.dart';
+import 'package:pnu_plato_advanced_browser/controllers/courseController.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
@@ -76,8 +78,18 @@ class _MainDrawerState extends State<MainDrawer> {
                     onTap: () {
                       showBugReport('123');
                     }),
-                ListTile(onTap: () {
-                  Get.changeThemeMode(ThemeMode.light);
+                ListTile(onTap: () async {
+                  var t = [10, 11, 20, 21];
+                  for (int i = 2014; i <= 2021; ++i) {
+                    for (int j in t) {
+                      var list = await Get.find<CourseController>().getCourseList(i, j);
+                      if (list != null) {
+                        for (var course in list) {
+                          await Get.find<ActivityController>().getCourseActivityList('${course.id}');
+                        }
+                      }
+                    }
+                  }
                 })
               ]);
             } else {
@@ -103,7 +115,7 @@ class _MainDrawerState extends State<MainDrawer> {
                     title: const Text('버그리포트'),
                     onTap: () {
                       showBugReport('123');
-                    })
+                    }),
               ]);
             }
           },
