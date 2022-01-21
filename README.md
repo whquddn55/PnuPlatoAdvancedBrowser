@@ -1,16 +1,31 @@
-# pnu_plato_advanced_browser
+# PnuPlatoAdvancedBrowser
+### 개요
+기존 부산대학교 플라토 공식 어플의 불편한 ux/ui을 개선하고, 캘린더, 강의 다운로드 등의 기능을 추가한 플라토 브라우저
 
-PNU Plato Advanced Browser
+### 목적
+1. 부산대학교 플라토 어플의 불편한 ux/ui개선
+	1.1 하단 네비게이션의 동작이 통일되어 있지않다
+	1.2 쪽지를 주고받는 화면을 열어둔 채로 홈 화면으로 나갈 경우 새 쪽지 알림이 뜨지 않는다
+	1.3 새로운 알림이 발생할 경우 기존의 알림이 덮어씌워진다
+	1.4 등록된 오브젝트(동영상, 파일, 화상강의 등)별 설명이 생략된다
+2. 부산대학교 플라토 어플에서만 지원하지 않는 기능 추가
+	2.1 웹브라우저에서는 확인가능한 강의 성적이 어플에서는 조회되지 않는다
+	2.2 교수계획표가 조회되지 않는다
+	2.3 등록된 오브젝트별 학습활동 조회되지 않는다
+3. 부산대학교 플라토 자체에서 지원하지 않는 기능 추가
+	3.1 일정관리를 위한 캘린더 추가
+	3.2 오프라인 동영상 재생을 위한 동영상 다운로드 기능 추가
 
-## Getting Started
+### 한계
+1. otp, 모바일 학생증등의 보안관련 기능 구현 불가능
+	1.1 wireshark를 통한 네트워크 감지는 TLS때문에 감지되지 않아서 불가능하다
+	1.2 부산대학교 공식 앱을 디컴파일하여 구현방법 모색중
+2. 동영상 오프라인 재생을 위한 다운로드 기능이 저작권법에 저촉될 가능성
+	2.1 기존에 서비스했던 동영상 다운로드 크롬 확장프로그램이 학교측에 의해 경고받은 적이 있음
+	2.2 암호화된 파일을 다운받고, 재생 시 복호화하여 재생시키는 방안을 생각 중임
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 개발환경
+- FrontEnd: Flutter 2.8.1(Dart 2.15.1)
+	+ Libraries: Dio, Html, GetX, sn_progress_dialog, flutter_inappwebview
+- BackEnd: Firebase
+- 
