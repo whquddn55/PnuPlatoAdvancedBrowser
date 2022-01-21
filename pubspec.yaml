@@ -37,6 +37,7 @@ dependencies:
   get:
   dio:
   html:
+  flutter_html: ^2.2.1
   sn_progress_dialog:
   flutter_inappwebview:
   shared_preferences: ^2.0.12
@@ -44,6 +45,9 @@ dependencies:
   flutter_expanded_tile: ^0.3.6
   table_calendar: ^3.0.3
   intl: ^0.17.0
+  auto_size_text: ^3.0.0
+  marquee: ^2.2.0
+  cached_network_image: ^3.2.0
 
 dev_dependencies:
   flutter_test:

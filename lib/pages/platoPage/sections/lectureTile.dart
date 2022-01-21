@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/data/course.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/sections/courseMainPage.dart';
 
 class LectureTile extends StatelessWidget {
   final int videoCnt;
@@ -7,8 +10,7 @@ class LectureTile extends StatelessWidget {
   final Color videoColor;
   final Color assignColor;
   final Color zoomColor;
-  final String title;
-  final String tail;
+  final Course course;
 
   const LectureTile({
     Key? key,
@@ -18,8 +20,7 @@ class LectureTile extends StatelessWidget {
     this.videoColor = Colors.blue,
     this.assignColor = Colors.red,
     this.zoomColor = Colors.green,
-    required this.title,
-    required this.tail
+    required this.course,
   }) : super(key: key);
 
   @override
@@ -78,12 +79,17 @@ class LectureTile extends StatelessWidget {
             ),
         ],
       ),
-      title: Text(title),
-      trailing: Text('[$tail]'),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          side: const BorderSide(color:Colors.black)
-      ),
+      title: Text(course.title),
+      trailing: Text('[${course.sub}]'),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0), side: const BorderSide(color: Colors.black)),
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CourseMainPage(
+                      course: course,
+                    )));
+      },
     );
   }
 }

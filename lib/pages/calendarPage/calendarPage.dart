@@ -7,6 +7,7 @@ import 'package:pnu_plato_advanced_browser/data/acamedicCalendarItem.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage/sections/AcademicCalendar.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage/sections/mainCalendar.dart';
 import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/navigatorPage/sections/drawer.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({Key? key}) : super(key: key);
@@ -37,47 +38,52 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<UserDataController>(
-      builder: (controller) {
-        if (controller.loginStatus == false) {
-          return GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            child: const Center(
-                child: Text('로그인이 필요합니다.',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                  ),
-                )
-            ),
-            onTap: () {
-              Scaffold.of(context).openDrawer();
-            },
-          );
-        }
-        else {
-          return FutureBuilder(
-            future: _future,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      AcademicCalendar(itemList: _academicCalendar),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: MainCalendar(),
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0.0,
+        title: const Text('캘린더'),
+        centerTitle: true,
+      ),
+      drawer: const MainDrawer(),
+      body: GetBuilder<UserDataController>(
+        builder: (controller) {
+          if (controller.loginStatus == false) {
+            return GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              child: const Center(
+                  child: Text(
+                '로그인이 필요합니다.',
+                style: TextStyle(
+                  fontSize: 20.0,
+                ),
+              )),
+              onTap: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          } else {
+            return FutureBuilder(
+                future: _future,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          AcademicCalendar(itemList: _academicCalendar),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: MainCalendar(),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              }
-              else {
-                return const LoadingPage(msg: '캘린더를 불러오는 중입니다...');
-              }
-            }
-          );
-        }
-      },
+                    );
+                  } else {
+                    return const LoadingPage(msg: '캘린더를 불러오는 중입니다...');
+                  }
+                });
+          }
+        },
+      ),
     );
   }
 }

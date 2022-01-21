@@ -1,7 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/activityListController.dart';
 import 'package:pnu_plato_advanced_browser/controllers/courseController.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
@@ -24,7 +24,7 @@ class _MainDrawerState extends State<MainDrawer> {
               return ListView(children: [
                 UserAccountsDrawerHeader(
                   currentAccountPicture: CircleAvatar(
-                    backgroundImage: NetworkImage(controller.imgUrl),
+                    backgroundImage: CachedNetworkImageProvider(controller.imgUrl),
                   ),
                   accountEmail: Text(controller.department),
                   accountName: Text(controller.name),
@@ -85,7 +85,7 @@ class _MainDrawerState extends State<MainDrawer> {
                       var list = await Get.find<CourseController>().getCourseList(i, j);
                       if (list != null) {
                         for (var course in list) {
-                          await Get.find<ActivityController>().getCourseActivityList('${course.id}');
+                          await Get.find<CourseController>().updateCourseSpecification(course);
                         }
                       }
                     }
@@ -96,7 +96,7 @@ class _MainDrawerState extends State<MainDrawer> {
               return ListView(children: [
                 UserAccountsDrawerHeader(
                   currentAccountPicture: CircleAvatar(
-                    backgroundImage: NetworkImage(controller.imgUrl),
+                    backgroundImage: CachedNetworkImageProvider(controller.imgUrl),
                   ),
                   accountEmail: Text(controller.department),
                   accountName: Text(controller.name),

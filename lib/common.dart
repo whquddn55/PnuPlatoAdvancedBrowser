@@ -1,7 +1,12 @@
-import 'package:dio/dio.dart' as Dio;
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:html/parser.dart';
 import 'package:get/get.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:marquee/marquee.dart';
+import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 
 class CommonUrl {
   static const String platoMainUrl = 'https://plato.pusan.ac.kr/';
@@ -29,12 +34,67 @@ class CommonUrl {
   static const String findPwUrl = 'https://u-pip.pusan.ac.kr/rSSO/popup/FindPassword_step1.asp';
 }
 
-Future<Dio.Response?> request(String url, {Dio.Options? options, Function? callback}) async {
-  Dio.Response? response;
+/*---------------------------------------------------------------------------------------------
+*  Copyright (c) nt4f04und. All rights reserved.
+*  Licensed under the BSD-style license. See LICENSE in the project root for license information.
+*--------------------------------------------------------------------------------------------*/
+
+class NFMarquee extends StatelessWidget {
+  const NFMarquee({
+    Key? key,
+    required this.text,
+    required this.fontSize,
+    this.fontWeight = FontWeight.w600,
+    this.velocity = 30.0,
+    this.blankSpace = 65.0,
+    this.startAfter = const Duration(milliseconds: 2000),
+    this.pauseAfterRound = const Duration(milliseconds: 2000),
+  }) : super(key: key);
+
+  final String text;
+  final double fontSize;
+  final FontWeight fontWeight;
+  final double velocity;
+  final double blankSpace;
+  final Duration startAfter;
+  final Duration pauseAfterRound;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: (fontSize + 13.0) * MediaQuery.of(context).textScaleFactor,
+      child: AutoSizeText(
+        text,
+        minFontSize: fontSize,
+        maxFontSize: fontSize,
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          height: 1.7,
+        ),
+        overflowReplacement: Marquee(
+          text: text,
+          blankSpace: blankSpace,
+          accelerationCurve: Curves.easeOutCubic,
+          velocity: velocity,
+          startAfter: startAfter,
+          pauseAfterRound: pauseAfterRound,
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Future<dio.Response?> request(String url, {dio.Options? options, Function? callback}) async {
+  dio.Response? response;
   int retry = 0;
   while (retry < 5) {
     try {
-      response = await Dio.Dio().get(url, options: options);
+      response = await dio.Dio().get(url, options: options);
       if (parse(response.data).children[0].attributes['class'] == 'html_login') {
         retry++;
         if (callback != null) {
@@ -43,11 +103,36 @@ Future<Dio.Response?> request(String url, {Dio.Options? options, Function? callb
       } else {
         break;
       }
-    } on Dio.DioError catch (e, _) {
+    } on dio.DioError catch (e, _) {
       retry++;
     }
   }
   return response;
+}
+
+Html renderHtml(String html) {
+  html = html.replaceAll('<br>', '');
+  return Html(
+    data: html,
+    customImageRenders: {
+      networkSourceMatcher(): (context, attributes, element) {
+        return Container(
+          margin: const EdgeInsets.all(8),
+          child: CachedNetworkImage(
+            imageUrl: attributes["src"]!,
+            httpHeaders: {
+              'Cookie': Get.find<UserDataController>().moodleSessionKey,
+            },
+            placeholder: (context, url) => const CircularProgressIndicator(),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+          ),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black, width: 1.5),
+          ),
+        );
+      },
+    },
+  );
 }
 
 void showBugReport(String msg) {
