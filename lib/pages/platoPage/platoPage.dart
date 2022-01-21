@@ -30,19 +30,21 @@ class _PlatoPageState extends State<PlatoPage> {
       body: GetBuilder<UserDataController>(
         builder: (controller) {
           if (controller.loginStatus == false) {
-            return GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              child: const Center(
-                  child: Text(
-                '로그인이 필요합니다.',
-                style: TextStyle(
-                  fontSize: 20.0,
-                ),
-              )),
-              onTap: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
+            return Builder(builder: (context) {
+              return GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                child: const Center(
+                    child: Text(
+                  '로그인이 필요합니다.',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                  ),
+                )),
+                onTap: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              );
+            });
           } else {
             return FutureBuilder(
                 future: Get.find<CourseController>().updateCurrentSemesterCourseList(),

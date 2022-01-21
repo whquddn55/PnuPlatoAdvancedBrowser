@@ -135,7 +135,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
                           content: Column(
                             children: [
                               widget.course.summaryMap[key] == ''
-                                  ? SizedBox.shrink()
+                                  ? const SizedBox.shrink()
                                   : Container(
                                       child: renderHtml(widget.course.summaryMap[key]!),
                                       decoration: BoxDecoration(
