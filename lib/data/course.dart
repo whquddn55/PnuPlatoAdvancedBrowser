@@ -9,10 +9,12 @@ class Course {
   final String sub;
   final String id;
   Professor? professor;
-  List<CourseAssistant>? assistantList = [];
+  List<CourseAssistant> assistantList = [];
   List<CourseArticle> articleList = [];
   final Map<String, List<Activity>> activityMap = <String, List<Activity>>{};
   final Map<String, String> summaryMap = <String, String>{};
+  late Uri koreanPlanUri;
+  late Uri englishPlanUri;
 
   Course({required this.title, required this.sub, required this.id});
 }

@@ -40,6 +40,8 @@ class CourseController {
     course.professor = _getProfessorInfo(document);
     course.assistantList = _getAssistantInfoList(document, course.professor!);
     course.articleList = _getArticleList(document);
+    course.koreanPlanUri = _getKoreanPlanUri(document);
+    course.englishPlanUri = _getEnglishPlanUri(document);
 
     course.activityMap.clear();
 
@@ -59,17 +61,17 @@ class CourseController {
       final String type = _getType(activity);
       final String description = _getDescription(activity);
       final String title = _getTitle(activity);
-      final String? info = _getInfo(activity, type);
+      final String info = _getInfo(activity, type);
       final List<DateTime?> dueDate = _getDueTime(activity);
-      final Uri iconUri = _getIconUri(activity);
+      final Uri? iconUri = _getIconUri(activity);
 
       var newActivity = Activity(
-        type: type,
-        title: title,
+        type: type.trim(),
+        title: title.trim(),
         id: id,
         courseId: course.id,
-        description: description,
-        info: info,
+        description: description.trim(),
+        info: info.trim(),
         startDate: dueDate[0],
         endDate: dueDate[1],
         lateDate: dueDate[2],
@@ -86,8 +88,6 @@ class CourseController {
     var res = <DateTime?>[null, null, null];
     if (activity.getElementsByClassName('text-ubstrap').isEmpty) {
       /* TODO: duetime 가져오기 */
-      res[0] = DateTime.now();
-      res[1] = DateTime.now();
     } else {
       bool isLateExist = activity.getElementsByClassName('text-late').isNotEmpty;
       res[0] = DateTime.parse(activity.getElementsByClassName('text-ubstrap')[0].text.split(' ~ ')[0].trim());
@@ -106,9 +106,9 @@ class CourseController {
     return res;
   }
 
-  String? _getInfo(Element activity, String type) {
+  String _getInfo(Element activity, String type) {
     if (activity.getElementsByClassName('text-info').isEmpty) {
-      return null;
+      return '';
     } else {
       if (type == 'vod') {
         return activity.getElementsByClassName('text-info')[0].text.substring(1);
@@ -123,7 +123,9 @@ class CourseController {
       return '';
     } else {
       var temp = activity.getElementsByClassName('instancename')[0].text.split(' ');
-      temp.removeLast();
+      if (temp.length > 1) {
+        temp.removeLast();
+      }
       return temp.join(' ');
       /* 뒤에 붙은 필요 없는 단어 제거 오류 시 사용
       final String unusedName =
@@ -155,20 +157,25 @@ class CourseController {
     return Professor(
       name: document.getElementsByClassName('prof-user-name')[0].text.trim(),
       id: document.getElementsByClassName('prof-user-message')[0].children[0].attributes['href']!.split('?id=')[1],
+      iconUri: Uri.parse(document.getElementsByClassName('prof-user-name')[0].previousElementSibling!.attributes['src']!),
     );
   }
 
-  List<CourseAssistant> _getAssistantInfoList(Document document, Professor professorInfo) {
+  List<CourseAssistant> _getAssistantInfoList(Document document, Professor professor) {
     var res = <CourseAssistant>[];
     if (document.getElementsByClassName('prof').isEmpty) {
       return res;
     }
     for (var item in document.getElementsByClassName('prof')) {
+      if (item.text.trim() == professor.name) {
+        continue;
+      }
       final String type = item.parent!.parent!.parent!.children[0].text.trim();
       res.add(CourseAssistant(
         name: item.text.trim(),
         type: type,
         id: item.attributes['href']!.split('?id=')[1],
+        iconUri: Uri.parse(item.children[0].attributes['src']!),
       ));
     }
     return res;
@@ -214,7 +221,16 @@ class CourseController {
     return courseList;
   }
 
-  Uri _getIconUri(Element activity) {
+  Uri? _getIconUri(Element activity) {
+    if (activity.getElementsByTagName('img').isEmpty) return null;
     return Uri.parse(activity.getElementsByTagName('img')[0].attributes['src']!);
+  }
+
+  Uri _getKoreanPlanUri(Document document) {
+    return Uri.parse(document.getElementsByClassName('submenu-item')[0].children[0].attributes['href']!);
+  }
+
+  Uri _getEnglishPlanUri(Document document) {
+    return Uri.parse(document.getElementsByClassName('submenu-item')[1].children[0].attributes['href']!);
   }
 }

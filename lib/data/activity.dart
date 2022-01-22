@@ -4,7 +4,7 @@ class Activity {
   final String id;
   final String courseId;
   final String description;
-  final String? info;
+  final String info;
   final DateTime? startDate;
   final DateTime? endDate;
   final DateTime? lateDate;
@@ -19,7 +19,7 @@ class Activity {
     this.endDate,
     this.lateDate,
     required this.description,
-    this.info,
+    required this.info,
     this.iconUri,
     this.done = false,
   });

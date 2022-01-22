@@ -49,6 +49,7 @@ class NFMarquee extends StatelessWidget {
     this.blankSpace = 65.0,
     this.startAfter = const Duration(milliseconds: 2000),
     this.pauseAfterRound = const Duration(milliseconds: 2000),
+    this.color = Colors.black,
   }) : super(key: key);
 
   final String text;
@@ -58,6 +59,7 @@ class NFMarquee extends StatelessWidget {
   final double blankSpace;
   final Duration startAfter;
   final Duration pauseAfterRound;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +72,10 @@ class NFMarquee extends StatelessWidget {
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: fontWeight,
-          height: 1.7,
+          color: color,
         ),
         overflowReplacement: Marquee(
+          crossAxisAlignment: CrossAxisAlignment.start,
           text: text,
           blankSpace: blankSpace,
           accelerationCurve: Curves.easeOutCubic,
@@ -82,6 +85,7 @@ class NFMarquee extends StatelessWidget {
           style: TextStyle(
             fontSize: fontSize,
             fontWeight: fontWeight,
+            color: color,
           ),
         ),
       ),
