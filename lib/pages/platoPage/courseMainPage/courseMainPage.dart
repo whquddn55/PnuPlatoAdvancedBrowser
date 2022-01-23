@@ -11,6 +11,7 @@ import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/courseArticle.dart';
 import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/gradePage/gradePage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/plannerPage/plannerPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/onlineAbsencePage/onlineAbsencePage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/smartAbsencePage/smartAbsencePage.dart';
@@ -46,7 +47,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
                 children: [
                   UserAccountsDrawerHeader(
                     accountName: Text(widget.course.professor!.name),
-                    accountEmail: Text(''),
+                    accountEmail: null,
                     currentAccountPicture: CircleAvatar(backgroundImage: CachedNetworkImageProvider(widget.course.professor!.iconUri.toString())),
                     otherAccountsPictures: [
                       IconButton(
@@ -138,10 +139,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => PlannerPage(
-                            title: '성적부',
-                            uri: widget.course.englishPlanUri,
-                          ),
+                          builder: (context) => GradePage(courseId: widget.course.id),
                         ),
                       );
                     },

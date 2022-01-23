@@ -31,7 +31,7 @@ class PlannerPage extends StatelessWidget {
               android: AndroidInAppWebViewOptions(
             displayZoomControls: true,
           )),
-          onWebViewCreated: (InAppWebViewController controller) {
+          onWebViewCreated: (controller) {
             _webViewController = controller;
           },
           onLoadStop: (controller, url) async {
@@ -40,17 +40,11 @@ class PlannerPage extends StatelessWidget {
             );
             await controller.evaluateJavascript(
               source:
-                  "async function ppab() {while (document.getElementsByClassName('crownix-close-button').length == 0){ await sleep(100); } document.getElementsByClassName('crownix-close-button')[0].addEventListener('click', (event) => {console.log('ppab:close')})};",
+                  "async function ppab() {while (document.getElementsByClassName('crownix-close-button').length == 0){ await sleep(100); } document.getElementsByClassName('crownix-close-button')[0].remove();document.getElementById('crownix-html5-viewer').attributeStyleMap.clear();document.getElementsByClassName('crownix-overlay')[0].remove();document.getElementById('wrapper').remove();};",
             );
             await controller.evaluateJavascript(
               source: "ppab();",
             );
-          },
-          onConsoleMessage: (controller, msg) {
-            print(msg);
-            if (msg.message == 'ppab:close') {
-              Navigator.pop(context);
-            }
           },
         ),
       ),

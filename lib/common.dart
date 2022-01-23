@@ -30,6 +30,7 @@ abstract class CommonUrl {
   static const String courseVideoProgressUrl = 'https://plato.pusan.ac.kr/report/ubcompletion/user_progress_a.php?id=';
   static const String courseOnlineAbsenceUrl = 'https://plato.pusan.ac.kr/report/ubcompletion/user_progress_a.php?id=';
   static const String courseSmartAbsenceUrl = 'https://plato.pusan.ac.kr/local/ubattendance/my_status.php?id=';
+  static const String courseGradeUrl = 'https://plato.pusan.ac.kr/grade/report/user/index.php?id=';
 
   static const String academicCalendarUrl = 'https://www.pusan.ac.kr/kor/CMS/Haksailjung/PopupView.do';
   static const String findIdUrl = 'https://u-pip.pusan.ac.kr/rSSO/popup/FindID_step1.asp';

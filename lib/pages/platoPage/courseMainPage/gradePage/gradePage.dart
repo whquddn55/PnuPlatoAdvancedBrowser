@@ -5,11 +5,11 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
 
-class SmartAbsencePage extends StatelessWidget {
+class GradePage extends StatelessWidget {
   final String courseId;
   InAppWebViewController? _webViewController;
 
-  SmartAbsencePage({Key? key, required this.courseId}) : super(key: key);
+  GradePage({Key? key, required this.courseId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class SmartAbsencePage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           return Scaffold(
             appBar: AppBar(
-              title: const Text('스마트 출석부'),
+              title: const Text('성적'),
               centerTitle: true,
             ),
             extendBodyBehindAppBar: true,
@@ -43,7 +43,7 @@ class SmartAbsencePage extends StatelessWidget {
                 }
               },
               child: InAppWebView(
-                initialUrlRequest: URLRequest(url: Uri.parse(CommonUrl.courseSmartAbsenceUrl + courseId)),
+                initialUrlRequest: URLRequest(url: Uri.parse(CommonUrl.courseGradeUrl + courseId)),
                 initialOptions: InAppWebViewGroupOptions(
                     android: AndroidInAppWebViewOptions(
                   displayZoomControls: true,
