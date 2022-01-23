@@ -11,8 +11,8 @@ import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/courseArticle.dart';
 import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/plannerPage/plannerPage.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/sections/htmlWebView.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/plannerPage/plannerPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/onlineAbsencePage/onlineAbsencePage.dart';
 
 class CourseMainPage extends StatefulWidget {
   final Course course;
@@ -117,7 +117,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const HtmlWebView(),
+                          builder: (context) => OnlineAbsencePage(courseId: widget.course.id),
                         ),
                       );
                     },

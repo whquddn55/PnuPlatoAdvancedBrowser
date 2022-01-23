@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/sections/courseMainPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/courseMainPage.dart';
 
 class LectureTile extends StatelessWidget {
   final int videoCnt;

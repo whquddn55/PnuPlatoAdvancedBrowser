@@ -9,7 +9,6 @@ class Activity {
   final DateTime? endDate;
   final DateTime? lateDate;
   final Uri? iconUri;
-  bool done;
   Activity({
     required this.type,
     required this.title,
@@ -21,6 +20,5 @@ class Activity {
     required this.description,
     required this.info,
     this.iconUri,
-    this.done = false,
   });
 }

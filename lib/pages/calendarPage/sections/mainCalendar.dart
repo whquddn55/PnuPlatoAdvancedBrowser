@@ -110,9 +110,6 @@ class _MainCalendarState extends State<MainCalendar> {
         int assignCnt = 0;
         int zoomCnt = 0;
         for (Activity event in events) {
-          if (event.done) {
-            continue;
-          }
           // switch (event.type) {
           //   case ActivityTime.video:
           //     videoCnt++;

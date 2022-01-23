@@ -37,7 +37,10 @@ class MyApp extends StatelessWidget {
           primaryColor: Colors.lightBlue,
           brightness: Brightness.light,
         ),
-        darkTheme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.dark),
+        darkTheme: ThemeData(
+          primaryColor: Colors.lightBlue,
+          brightness: Brightness.dark,
+        ),
         initialRoute: '/',
         getPages: [
           GetPage(

@@ -28,6 +28,7 @@ class CommonUrl {
   static const String courseFolderUrl = 'https://plato.pusan.ac.kr/mod/folder/index.php?id=';
   static const String courseReportUrl = 'https://plato.pusan.ac.kr/grade/report/user/index.php?id=';
   static const String courseVideoProgressUrl = 'https://plato.pusan.ac.kr/report/ubcompletion/user_progress_a.php?id=';
+  static const String courseOnlineAbsenceUrl = 'https://plato.pusan.ac.kr/report/ubcompletion/user_progress_a.php?id=';
 
   static const String academicCalendarUrl = 'https://www.pusan.ac.kr/kor/CMS/Haksailjung/PopupView.do';
   static const String findIdUrl = 'https://u-pip.pusan.ac.kr/rSSO/popup/FindID_step1.asp';

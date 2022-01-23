@@ -15,7 +15,7 @@ class CourseController {
 
   List<Course> get currentSemesterCourseList => _currentSemesterCourseList;
 
-  Future<List<Course>?> getCourseList(int year, int semester) async {
+  Future<List<Course>?> fetchCourseList(int year, int semester) async {
     return await _fetchCourseList(year: year, semester: semester);
   }
 
@@ -82,6 +82,46 @@ class CourseController {
     }
 
     return true;
+  }
+
+  Future<Map<String, bool>> getVodStatus(final String courseId) async {
+    var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
+    var response = await request(CommonUrl.courseOnlineAbsenceUrl + courseId, options: options, callback: Get.find<UserDataController>().login);
+
+    if (response == null) {
+      /* TODO: error */
+      return <String, bool>{};
+    }
+
+    _resetVodMark(courseId);
+
+    Map<String, bool> res = <String, bool>{};
+    Document document = parse(response.data);
+    for (var tr in document.getElementsByClassName('user_progress_table')[0].children[2].getElementsByTagName('tr')) {
+      if (tr.getElementsByClassName('text-left').isNotEmpty) {
+        final String title = tr.getElementsByClassName('text-left')[0].text.trim();
+        bool status = false;
+        for (var e in tr.getElementsByClassName('text-center')) {
+          if (e.text == 'O') {
+            status = true;
+          }
+        }
+        res[title] = status;
+      }
+    }
+    return res;
+  }
+
+  void _resetVodMark(final String courseId) {
+    for (var course in _currentSemesterCourseList) {
+      if (course.id == courseId) {
+        for (var activityList in course.activityMap.values) {
+          for (var activity in activityList) {
+            activity.vodMark = false;
+          }
+        }
+      }
+    }
   }
 
   List<DateTime?> _getDueTime(Element activity) {

@@ -92,7 +92,7 @@ class _MainDrawerState extends State<MainDrawer> {
                     var t = [10, 11, 20, 21];
                     for (int i = 2014; i <= 2021; ++i) {
                       for (int j in t) {
-                        var list = await Get.find<CourseController>().getCourseList(i, j);
+                        var list = await Get.find<CourseController>().fetchCourseList(i, j);
                         if (list != null) {
                           for (var course in list) {
                             await Get.find<CourseController>().updateCourseSpecification(course);
