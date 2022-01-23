@@ -11,6 +11,8 @@ import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/courseArticle.dart';
 import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/articlePage.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/boradPage/boardPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/gradePage/gradePage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/plannerPage/plannerPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/onlineAbsencePage/onlineAbsencePage.dart';
@@ -144,20 +146,6 @@ class _CourseMainPageState extends State<CourseMainPage> {
                       );
                     },
                   ),
-                  const Divider(height: 0, thickness: 1),
-                  ListTile(
-                    title: const Text('수강생에게 쪽지 보내기'),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => PlannerPage(
-                            title: '수강생에게 쪽지 보내기',
-                            uri: widget.course.englishPlanUri,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
                 ],
               ),
             ),
@@ -185,6 +173,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
                     ),
                     trailing: const Icon(Icons.chevron_right, color: Colors.black87),
                     content: Container(
+                      padding: const EdgeInsets.only(left: 8),
                       decoration: BoxDecoration(
                         color: const Color(0xfff3f2dd),
                         border: Border.all(
@@ -266,7 +255,9 @@ class _CourseMainPageState extends State<CourseMainPage> {
 
   Widget _articleButton(CourseArticle article) {
     return TextButton(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => ArticlePage(article: article)));
+      },
       style: TextButton.styleFrom(
         padding: EdgeInsets.zero,
       ),
@@ -313,7 +304,9 @@ class _CourseMainPageState extends State<CourseMainPage> {
       onTap: activity.iconUri == null
           ? null
           : () {
-              print(activity.title);
+              if (activity.type == 'ubboard') {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => BoardPage(boardId: activity.id)));
+              }
             },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),

@@ -20,11 +20,30 @@ class CourseController {
   }
 
   Future<bool> updateCurrentSemesterCourseList() async {
-    var res = await _fetchCourseList(year: 2021, semester: 11);
+    var res = await _fetchCourseList(year: 2021, semester: 20);
     if (res == null) {
       return false;
     }
-    _currentSemesterCourseList = res;
+    _currentSemesterCourseList.removeWhere((course) {
+      for (var newCourse in res) {
+        if (newCourse.id == course.id) {
+          return false;
+        }
+      }
+      return true;
+    });
+    for (var newCourse in res) {
+      bool flag = true;
+      for (var course in _currentSemesterCourseList) {
+        if (newCourse.id == course.id) {
+          flag = false;
+          break;
+        }
+      }
+      if (flag) {
+        _currentSemesterCourseList.add(newCourse);
+      }
+    }
     return true;
   }
 
@@ -106,6 +125,84 @@ class CourseController {
         }
         res[title] = status;
       }
+    }
+    return res;
+  }
+
+  Future<Map<String, String>> getArticleInfo(final CourseArticle article) async {
+    var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
+    var response = await request(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}',
+        options: options, callback: Get.find<UserDataController>().login);
+
+    if (response == null) {
+      /* TODO: error */
+      return <String, String>{};
+    }
+
+    Map<String, String> res = <String, String>{};
+    Document document = parse(response.data);
+    res['main'] = document.getElementsByClassName('main')[0].text.trim();
+    res['title'] = document.getElementsByClassName('subject')[0].text.trim();
+    res['writer'] = document.getElementsByClassName('writer')[0].text.trim();
+    res['date'] = document.getElementsByClassName('date')[0].text.trim();
+    res['content'] = document.getElementsByClassName('text_to_html')[0].innerHtml;
+    return res;
+  }
+
+  List<Activity> getBoardList(final String courseId) {
+    var res = <Activity>[];
+    for (var course in _currentSemesterCourseList) {
+      if (course.id == courseId) {
+        for (var activity in course.activityMap['강의 개요']!) {
+          if (activity.type == 'ubboard') {
+            res.add(activity);
+          }
+        }
+      }
+    }
+    return res;
+  }
+
+  Future<Map<String, dynamic>> getBoardInfo(final String boardId, final int page) async {
+    var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
+    var response =
+        await request(CommonUrl.courseBoardUrl + 'id=${boardId}&page=${page}', options: options, callback: Get.find<UserDataController>().login);
+
+    if (response == null) {
+      /* TODO: error */
+      return <String, dynamic>{};
+    }
+    Map<String, dynamic> res = <String, dynamic>{};
+    Document document = parse(response.data);
+
+    res['title'] = document.getElementsByClassName('main')[0].text.trim();
+    if (document.getElementsByClassName('tp').isEmpty) {
+      res['pageLength'] = 1;
+    } else {
+      res['pageLength'] = int.parse(document.getElementsByClassName('tp')[0].text.split('/')[1].trim());
+    }
+    res['articleList'] = <CourseArticle>[];
+
+    if (document.getElementsByTagName('tr').length <= 1) {
+      return res;
+    }
+    for (var i = 1; i < document.getElementsByTagName('tr').length; ++i) {
+      var tr = document.getElementsByTagName('tr')[i];
+      if (tr.children.length < 5) {
+        return res;
+      }
+      var title = tr.children[1].children.fold<String>('', (prv, element) {
+        print('$element, ${element.text.trim()}');
+        return prv + element.text.trim();
+      });
+      print('title : $title');
+      var writer = tr.children[2].text.trim();
+      var date = tr.children[3].text.trim();
+      String id = '';
+      if (tr.children[1].getElementsByTagName('a').isNotEmpty) {
+        id = tr.children[1].getElementsByTagName('a')[0].attributes['href']?.split('bwid=')[1] ?? '';
+      }
+      res['articleList'].add(CourseArticle(title: title, date: date, boardId: boardId, id: id, writer: writer));
     }
     return res;
   }
