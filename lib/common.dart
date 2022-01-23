@@ -8,7 +8,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:marquee/marquee.dart';
 import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
 
-class CommonUrl {
+abstract class CommonUrl {
   static const String platoMainUrl = 'https://plato.pusan.ac.kr/';
   static const String platoUserInformationUrl = 'https://plato.pusan.ac.kr/user/user_edit.php';
   static const String platoCalendarUrl = 'https://plato.pusan.ac.kr/calendar/export.php';
@@ -29,6 +29,7 @@ class CommonUrl {
   static const String courseReportUrl = 'https://plato.pusan.ac.kr/grade/report/user/index.php?id=';
   static const String courseVideoProgressUrl = 'https://plato.pusan.ac.kr/report/ubcompletion/user_progress_a.php?id=';
   static const String courseOnlineAbsenceUrl = 'https://plato.pusan.ac.kr/report/ubcompletion/user_progress_a.php?id=';
+  static const String courseSmartAbsenceUrl = 'https://plato.pusan.ac.kr/local/ubattendance/my_status.php?id=';
 
   static const String academicCalendarUrl = 'https://www.pusan.ac.kr/kor/CMS/Haksailjung/PopupView.do';
   static const String findIdUrl = 'https://u-pip.pusan.ac.kr/rSSO/popup/FindID_step1.asp';

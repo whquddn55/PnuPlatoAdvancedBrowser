@@ -13,6 +13,7 @@ import 'package:pnu_plato_advanced_browser/data/courseArticle.dart';
 import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/plannerPage/plannerPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/onlineAbsencePage/onlineAbsencePage.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/smartAbsencePage/smartAbsencePage.dart';
 
 class CourseMainPage extends StatefulWidget {
   final Course course;
@@ -127,10 +128,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => PlannerPage(
-                            title: '스마트 출석부',
-                            uri: widget.course.englishPlanUri,
-                          ),
+                          builder: (context) => SmartAbsencePage(courseId: widget.course.id),
                         ),
                       );
                     },

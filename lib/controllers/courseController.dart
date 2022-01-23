@@ -93,8 +93,6 @@ class CourseController {
       return <String, bool>{};
     }
 
-    _resetVodMark(courseId);
-
     Map<String, bool> res = <String, bool>{};
     Document document = parse(response.data);
     for (var tr in document.getElementsByClassName('user_progress_table')[0].children[2].getElementsByTagName('tr')) {
@@ -110,18 +108,6 @@ class CourseController {
       }
     }
     return res;
-  }
-
-  void _resetVodMark(final String courseId) {
-    for (var course in _currentSemesterCourseList) {
-      if (course.id == courseId) {
-        for (var activityList in course.activityMap.values) {
-          for (var activity in activityList) {
-            activity.vodMark = false;
-          }
-        }
-      }
-    }
   }
 
   List<DateTime?> _getDueTime(Element activity) {
