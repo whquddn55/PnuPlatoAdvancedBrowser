@@ -300,12 +300,19 @@ class _CourseMainPageState extends State<CourseMainPage> {
   }
 
   Widget _activityButton(Activity activity) {
+    bool avilablity = activity.iconUri != null && activity.availablility == true;
     return InkWell(
-      onTap: activity.iconUri == null
+      onTap: avilablity == false
           ? null
           : () {
               if (activity.type == 'ubboard') {
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => BoardPage(boardId: activity.id)));
+              } else if (activity.type == 'vod') {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => _vodBottomSheet(context, activity),
+                  useRootNavigator: true,
+                );
               }
             },
       child: Padding(
@@ -318,24 +325,28 @@ class _CourseMainPageState extends State<CourseMainPage> {
                   margin: const EdgeInsets.only(right: 10),
                   child: activity.iconUri == null
                       ? const SizedBox.shrink()
-                      : CachedNetworkImage(
-                          imageUrl: activity.iconUri.toString(),
-                          placeholder: (context, url) => const SizedBox(
-                            width: 20,
+                      : Opacity(
+                          opacity: avilablity == false ? 0.5 : 1.0,
+                          child: CachedNetworkImage(
+                            imageUrl: activity.iconUri.toString(),
+                            placeholder: (context, url) => const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 1),
+                            ),
+                            errorWidget: (context, url, error) => const Icon(Icons.error),
                             height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 1),
+                            width: 20,
                           ),
-                          errorWidget: (context, url, error) => const Icon(Icons.error),
-                          height: 20,
-                          width: 20,
                         ),
                 ),
                 Flexible(
                   child: Text.rich(
                     TextSpan(
                       text: activity.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
+                        color: Get.theme.textTheme.bodyText2!.color!.withOpacity(avilablity == false ? 0.5 : 1.0),
                       ),
                       children: [
                         TextSpan(
@@ -363,16 +374,118 @@ class _CourseMainPageState extends State<CourseMainPage> {
                                 color: Colors.orangeAccent,
                                 fontWeight: FontWeight.normal,
                               ),
-                            )
+                            ),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
+            if (activity.availablilityInfo != '') renderHtml(activity.availablilityInfo),
             if (activity.description != '') renderHtml(activity.description)
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _vodBottomSheet(BuildContext context, Activity activity) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.3,
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: CachedNetworkImage(
+                      imageUrl: activity.iconUri!.toString(),
+                      height: 20,
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      activity.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Text(
+                    activity.info,
+                    style: const TextStyle(
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8.0),
+              if (activity.startDate != null)
+                if (activity.lateDate != null)
+                  Text(
+                    '${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.endDate!)}\n(지각: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.lateDate!)})',
+                    style: const TextStyle(
+                      color: Colors.orangeAccent,
+                    ),
+                  )
+                else
+                  Text(
+                    '${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.endDate!)}',
+                    style: const TextStyle(
+                      color: Colors.orangeAccent,
+                    ),
+                  ),
+              const SizedBox(height: 8.0),
+              Row(
+                children: [
+                  const Text('출석 상태: '),
+                  Icon(
+                    Icons.check,
+                    color: Colors.lightGreen,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const Divider(height: 0, thickness: 1.5),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextButton.icon(
+                icon: const Icon(Icons.download),
+                label: const Text('다운로드'),
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                ),
+                onPressed: () {},
+              ),
+              TextButton.icon(
+                icon: const Icon(Icons.videocam),
+                label: const Text('재생'),
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                ),
+                onPressed: () {},
+              ),
+              TextButton.icon(
+                icon: const Icon(Icons.cancel_outlined),
+                label: const Text('취소'),
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart' as dio;
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -20,7 +21,7 @@ class CourseController {
   }
 
   Future<bool> updateCurrentSemesterCourseList() async {
-    var res = await _fetchCourseList(year: 2021, semester: 20);
+    var res = await _fetchCourseList(year: 2021, semester: 10);
     if (res == null) {
       return false;
     }
@@ -83,6 +84,9 @@ class CourseController {
       final String info = _getInfo(activity, type);
       final List<DateTime?> dueDate = _getDueTime(activity);
       final Uri? iconUri = _getIconUri(activity);
+      final String availablilityInfo =
+          activity.getElementsByClassName('availabilityinfo').isEmpty ? '' : activity.getElementsByClassName('availabilityinfo')[0].innerHtml;
+      final bool availablility = activity.getElementsByTagName('a').isNotEmpty;
 
       var newActivity = Activity(
         type: type.trim(),
@@ -95,6 +99,8 @@ class CourseController {
         endDate: dueDate[1],
         lateDate: dueDate[2],
         iconUri: iconUri,
+        availablilityInfo: availablilityInfo,
+        availablility: availablility,
       );
 
       course.activityMap[weeks]!.add(newActivity);
@@ -192,10 +198,8 @@ class CourseController {
         return res;
       }
       var title = tr.children[1].children.fold<String>('', (prv, element) {
-        print('$element, ${element.text.trim()}');
         return prv + element.text.trim();
       });
-      print('title : $title');
       var writer = tr.children[2].text.trim();
       var date = tr.children[3].text.trim();
       String id = '';

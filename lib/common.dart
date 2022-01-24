@@ -141,6 +141,11 @@ Html renderHtml(String html) {
         );
       },
     },
+    style: {
+      ".badge": Style(
+        color: Colors.transparent,
+      )
+    },
   );
 }
 
