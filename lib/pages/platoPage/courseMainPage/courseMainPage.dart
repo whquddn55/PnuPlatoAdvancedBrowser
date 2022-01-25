@@ -10,6 +10,7 @@ import 'package:pnu_plato_advanced_browser/controllers/courseController.dart';
 import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/courseArticle.dart';
+import 'package:pnu_plato_advanced_browser/m3u8Downloader.dart';
 import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/articlePage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/boradPage/boardPage.dart';
@@ -17,6 +18,7 @@ import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/gradeP
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/plannerPage/plannerPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/onlineAbsencePage/onlineAbsencePage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/smartAbsencePage/smartAbsencePage.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/vodPage/vodPage.dart';
 
 class CourseMainPage extends StatefulWidget {
   final Course course;
@@ -442,14 +444,37 @@ class _CourseMainPageState extends State<CourseMainPage> {
                     ),
                   ),
               const SizedBox(height: 8.0),
-              Row(
-                children: [
-                  const Text('출석 상태: '),
-                  Icon(
-                    Icons.check,
-                    color: Colors.lightGreen,
-                  ),
-                ],
+              FutureBuilder(
+                future: Get.find<CourseController>().getVodStatus(activity.courseId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    var data = snapshot.data as Map<String, bool>;
+                    Widget status;
+                    if (data.containsKey(activity.title)) {
+                      if (data[activity.title] == true) {
+                        status = const Icon(
+                          Icons.check,
+                          color: Colors.lightGreen,
+                        );
+                      } else {
+                        status = const Icon(
+                          Icons.close,
+                          color: Colors.red,
+                        );
+                      }
+                      return Row(
+                        children: [
+                          const Text('출석 상태: '),
+                          status,
+                        ],
+                      );
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  } else {
+                    return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
+                  }
+                },
               ),
             ],
           ),
@@ -458,24 +483,61 @@ class _CourseMainPageState extends State<CourseMainPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextButton.icon(
-                icon: const Icon(Icons.download),
-                label: const Text('다운로드'),
+                icon: Icon(
+                  Icons.download,
+                  color: Get.textTheme.bodyText1!.color,
+                ),
+                label: Text(
+                  '다운로드',
+                  style: TextStyle(
+                    color: Get.textTheme.bodyText1!.color,
+                  ),
+                ),
                 style: TextButton.styleFrom(
                   alignment: Alignment.centerLeft,
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  Uri uri = await Get.find<CourseController>().getM3u8Uri(activity.id);
+                  if (uri.toString() == '') {
+                  } else {
+                    bool res = await M3u8Downloader(url: uri.toString(), title: activity.title, courseTitle: widget.course.title).download();
+                    if (res) {
+                      print('downloaded!');
+                    } else {
+                      print('failed!');
+                    }
+                  }
+                },
               ),
               TextButton.icon(
-                icon: const Icon(Icons.videocam),
-                label: const Text('재생'),
+                icon: Icon(
+                  Icons.videocam,
+                  color: Get.textTheme.bodyText1!.color,
+                ),
+                label: Text(
+                  '재생',
+                  style: TextStyle(
+                    color: Get.textTheme.bodyText1!.color,
+                  ),
+                ),
                 style: TextButton.styleFrom(
                   alignment: Alignment.centerLeft,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => VodPage(id: activity.id)));
+                },
               ),
               TextButton.icon(
-                icon: const Icon(Icons.cancel_outlined),
-                label: const Text('취소'),
+                icon: Icon(
+                  Icons.cancel_outlined,
+                  color: Get.textTheme.bodyText1!.color,
+                ),
+                label: Text(
+                  '취소',
+                  style: TextStyle(
+                    color: Get.textTheme.bodyText1!.color,
+                  ),
+                ),
                 style: TextButton.styleFrom(
                   alignment: Alignment.centerLeft,
                 ),

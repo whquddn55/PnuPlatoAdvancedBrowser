@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -115,6 +116,15 @@ class UserDataController extends GetxController {
     await _getInformation();
     await preference.setString('username', _username);
     await preference.setString('password', _password);
+    CookieManager cookieManager = CookieManager.instance();
+    await cookieManager.deleteAllCookies();
+    await cookieManager.setCookie(
+      url: Uri.parse('https://plato.pusan.ac.kr'),
+      name: 'MoodleSession',
+      value: _moodleSessionKey.split('=')[1],
+      domain: 'plato.pusan.ac.kr',
+      path: '/',
+    );
     update();
     return _loginStatus = true;
   }

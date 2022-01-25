@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
@@ -120,18 +122,34 @@ class CourseController {
 
     Map<String, bool> res = <String, bool>{};
     Document document = parse(response.data);
-    for (var tr in document.getElementsByClassName('user_progress_table')[0].children[2].getElementsByTagName('tr')) {
-      if (tr.getElementsByClassName('text-left').isNotEmpty) {
-        final String title = tr.getElementsByClassName('text-left')[0].text.trim();
-        bool status = false;
-        for (var e in tr.getElementsByClassName('text-center')) {
-          if (e.text == 'O') {
-            status = true;
+    if (response.realUri.toString().contains('user_progress_a')) {
+      for (var tr in document.getElementsByClassName('user_progress_table')[0].children[2].getElementsByTagName('tr')) {
+        if (tr.getElementsByClassName('text-left').isNotEmpty) {
+          final String title = tr.getElementsByClassName('text-left')[0].text.trim();
+          bool status = false;
+          for (var e in tr.getElementsByClassName('text-center')) {
+            if (e.text == 'O') {
+              status = true;
+            }
           }
+          res[title] = status;
         }
-        res[title] = status;
+      }
+    } else if (response.realUri.toString().contains('user_progress')) {
+      for (var tr in document.getElementsByClassName('user_progress')[0].children[2].getElementsByTagName('tr')) {
+        if (tr.getElementsByClassName('text-left').isNotEmpty) {
+          final String title = tr.getElementsByClassName('text-left')[0].text.trim();
+          bool status = false;
+          for (var e in tr.getElementsByClassName('text-center')) {
+            if (e.text == '100%') {
+              status = true;
+            }
+          }
+          res[title] = status;
+        }
       }
     }
+
     return res;
   }
 
@@ -209,6 +227,19 @@ class CourseController {
       res['articleList'].add(CourseArticle(title: title, date: date, boardId: boardId, id: id, writer: writer));
     }
     return res;
+  }
+
+  Future<Uri> getM3u8Uri(final String activityId) async {
+    var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
+    var response = await request(CommonUrl.vodViewerUrl + activityId, options: options, callback: Get.find<UserDataController>().login);
+
+    if (response == null) {
+      /* TODO: error */
+      return Uri.parse('');
+    }
+    Map<String, dynamic> res = <String, dynamic>{};
+    Document document = parse(response.data);
+    return Uri.parse(document.getElementsByTagName('source')[0].attributes['src'] ?? '');
   }
 
   List<DateTime?> _getDueTime(Element activity) {

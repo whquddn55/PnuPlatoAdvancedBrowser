@@ -48,6 +48,9 @@ dependencies:
   auto_size_text: ^3.0.0
   marquee: ^2.2.0
   cached_network_image: ^3.2.0
+  http: ^0.13.4
+  path_provider: ^2.0.8
+  better_player: ^0.0.81
 
 dev_dependencies:
   flutter_test:
