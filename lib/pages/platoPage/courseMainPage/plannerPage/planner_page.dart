@@ -5,12 +5,11 @@ class PlannerPage extends StatelessWidget {
   final String title;
   final Uri uri;
 
-  InAppWebViewController? _webViewController;
-
-  PlannerPage({Key? key, required this.title, required this.uri}) : super(key: key);
+  const PlannerPage({Key? key, required this.title, required this.uri}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    late final InAppWebViewController _webViewController;
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
@@ -18,8 +17,8 @@ class PlannerPage extends StatelessWidget {
       ),
       body: WillPopScope(
         onWillPop: () async {
-          if (await _webViewController!.canGoBack()) {
-            _webViewController!.goBack();
+          if (await _webViewController.canGoBack()) {
+            _webViewController.goBack();
             return false;
           } else {
             return true;

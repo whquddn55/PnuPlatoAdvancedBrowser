@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/courseController.dart';
-import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 
 class OnlineAbsencePage extends StatelessWidget {
   final String courseId;

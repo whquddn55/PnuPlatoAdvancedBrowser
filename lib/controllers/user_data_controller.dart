@@ -1,12 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
-import 'package:dio/dio.dart' as Dio;
+import 'package:dio/dio.dart' as dio;
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/notificationController.dart';
 import 'package:pnu_plato_advanced_browser/data/notification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,8 +21,6 @@ class UserDataController extends GetxController {
   String _imgUrl = CommonUrl.defaultAvatarUrl;
   String _lastSyncTime = DateTime(1946, 05, 15).toString();
 
-  String get username => _username;
-  String get password => _password;
   bool get loginStatus => _loginStatus;
   String get sessionKey => _sessionKey;
   String get moodleSessionKey => _moodleSessionKey;
@@ -50,11 +45,11 @@ class UserDataController extends GetxController {
     }
 
     String body = 'username=$_username&password=${Uri.encodeQueryComponent(_password)}';
-    Dio.Response response;
+    dio.Response response;
     try {
-      response = await Dio.Dio().post(CommonUrl.loginUrl,
+      response = await dio.Dio().post(CommonUrl.loginUrl,
           data: body,
-          options: Dio.Options(followRedirects: false, contentType: 'application/x-www-form-urlencoded', headers: {
+          options: dio.Options(followRedirects: false, contentType: 'application/x-www-form-urlencoded', headers: {
             'Host': 'plato.pusan.ac.kr',
             'Connection': 'close',
             'Content-Length': body.length.toString(),
@@ -77,7 +72,7 @@ class UserDataController extends GetxController {
       _loginMsg = 'login failed with UnknownError';
       /* TODO: popup error report */
       return _loginStatus = false;
-    } on Dio.DioError catch (e, _) {
+    } on dio.DioError catch (e, _) {
       /* successfully login */
       if (e.response!.statusCode == 303) {
         response = e.response!;
@@ -134,7 +129,7 @@ class UserDataController extends GetxController {
     if (sessionkeyRes == false) {
       return false;
     }
-    await Dio.Dio().get(CommonUrl.logoutUrl + _sessionKey);
+    await dio.Dio().get(CommonUrl.logoutUrl + _sessionKey);
 
     final preference = await SharedPreferences.getInstance();
     await preference.clear();
@@ -156,11 +151,11 @@ class UserDataController extends GetxController {
   }
 
   Future<bool> getNotifications() async {
-    var options = Dio.Options(headers: {'Cookie': _moodleSessionKey});
+    var options = dio.Options(headers: {'Cookie': _moodleSessionKey});
     var response = await request(CommonUrl.notificationUrl, options: options, callback: login);
 
     if (response == null) {
-      /* TODO: ERR */
+      /* TODO: 에러 */
 
       return false;
     }
@@ -168,13 +163,13 @@ class UserDataController extends GetxController {
     Document document = parse(response.data);
     int i = 0;
     /* TODO: 파일 추가해야 됨 */
-    const TYPENAMES = {'ubboard': '공지사항', 'assign': '과제', 'vod': '동영상', 'quiz': '퀴즈'};
+    const typeNames = {'ubboard': '공지사항', 'assign': '과제', 'vod': '동영상', 'quiz': '퀴즈'};
     for (var element in document.getElementsByClassName("well wellnopadding")[0].children) {
       if (element.localName == 'a') {
         String url = element.attributes['href']!;
         String title = element.getElementsByClassName('media-heading')[0].text.split(' ')[0];
         String timeago = element.getElementsByClassName('timeago')[0].innerHtml;
-        String type = TYPENAMES[url.split('/')[4]]!;
+        String type = typeNames[url.split('/')[4]]!;
         String body = await _getBody(url, type);
         var noti = Notification(id: ++i, title: '$title($timeago)', body: '[$type]$body', url: url);
         print('$url, $title, $timeago, $type');
@@ -191,11 +186,11 @@ class UserDataController extends GetxController {
   }
 
   Future<bool> _getInformation() async {
-    var options = Dio.Options(headers: {'Cookie': _moodleSessionKey});
+    var options = dio.Options(headers: {'Cookie': _moodleSessionKey});
     var response = await request(CommonUrl.platoUserInformationUrl, options: options);
 
     if (response == null) {
-      /* TODO: ERR */
+      /* TODO: 에러 */
 
       return false;
     }
@@ -209,7 +204,7 @@ class UserDataController extends GetxController {
   }
 
   Future<String> _getBody(String url, String type) async {
-    var options = Dio.Options(headers: {'Cookie': _moodleSessionKey});
+    var options = dio.Options(headers: {'Cookie': _moodleSessionKey});
     var response = await request(url, options: options, callback: login);
     if (response == null) {
       return 'Undefined1';
@@ -220,18 +215,18 @@ class UserDataController extends GetxController {
     } else if (type == '과제' || type == '동영상' || type == '퀴즈') {
       return document.getElementsByClassName('breadcrumb')[0].children.last.children[0].text;
     }
-    /* TODO: Error */
+    /* TODO: 에러 */
 
     return 'Undefined2';
   }
 
   Future<bool> _getSessionKey() async {
-    var options = Dio.Options(headers: {'Cookie': _moodleSessionKey});
+    var options = dio.Options(headers: {'Cookie': _moodleSessionKey});
 
     var response = await request(CommonUrl.platoCalendarUrl, options: options);
 
     if (response == null) {
-      /* TODO: ERR */
+      /* TODO: 에러 */
 
       return false;
     }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
+import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/sections/drawer.dart';
 
 class ChatPage extends StatelessWidget {
@@ -35,7 +35,7 @@ class ChatPage extends StatelessWidget {
             });
           } else {
             return ListView(
-              children: [],
+              children: const [],
             );
           }
         },

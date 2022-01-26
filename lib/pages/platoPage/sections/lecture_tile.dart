@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/courseMainPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
 
 class LectureTile extends StatelessWidget {
   final int videoCnt;
@@ -83,12 +82,7 @@ class LectureTile extends StatelessWidget {
       trailing: Text('[${course.sub}]'),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0), side: const BorderSide(color: Colors.black)),
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => CourseMainPage(
-                      course: course,
-                    )));
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => CourseMainPage(course: course)));
       },
     );
   }

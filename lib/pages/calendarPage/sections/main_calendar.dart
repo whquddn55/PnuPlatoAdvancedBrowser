@@ -109,19 +109,19 @@ class _MainCalendarState extends State<MainCalendar> {
         int videoCnt = 0;
         int assignCnt = 0;
         int zoomCnt = 0;
-        for (Activity event in events) {
-          // switch (event.type) {
-          //   case ActivityTime.video:
-          //     videoCnt++;
-          //     break;
-          //   case ActivityTime.assign:
-          //   case ActivityTime.quiz:
-          //     assignCnt++;
-          //     break;
-          //   case ActivityTime.zoom:
-          //     zoomCnt++;
-          // }
-        }
+        // for (Activity event in events) {
+        //   switch (event.type) {
+        //     case ActivityTime.video:
+        //       videoCnt++;
+        //       break;
+        //     case ActivityTime.assign:
+        //     case ActivityTime.quiz:
+        //       assignCnt++;
+        //       break;
+        //     case ActivityTime.zoom:
+        //       zoomCnt++;
+        //   }
+        // }
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [

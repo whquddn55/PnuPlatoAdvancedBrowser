@@ -5,11 +5,14 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 class GradePage extends StatelessWidget {
   final String courseId;
 
-  const GradePage({Key? key, required this.courseId}) : super(key: key);
+  const GradePage({
+    Key? key,
+    required this.courseId,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    InAppWebViewController? _webViewController;
+    late final InAppWebViewController _webViewController;
     return Scaffold(
       appBar: AppBar(
         title: const Text('성적'),
@@ -18,8 +21,8 @@ class GradePage extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body: WillPopScope(
         onWillPop: () async {
-          if (await _webViewController!.canGoBack()) {
-            _webViewController!.goBack();
+          if (await _webViewController.canGoBack()) {
+            _webViewController.goBack();
             return false;
           } else {
             return true;

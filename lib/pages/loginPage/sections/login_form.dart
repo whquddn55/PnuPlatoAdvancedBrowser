@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
+import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
 class LoginForm extends StatefulWidget {

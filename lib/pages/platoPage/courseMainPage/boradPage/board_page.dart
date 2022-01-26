@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/courseController.dart';
-import 'package:pnu_plato_advanced_browser/data/courseArticle.dart';
-import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/articlePage.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/data/course_article.dart';
+import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/article_page.dart';
 
 class BoardPage extends StatefulWidget {
   final String boardId;
@@ -169,7 +169,7 @@ class _BoardPageState extends State<BoardPage> {
             ),
           );
         } else {
-          return const LoadingPage(msg: '로딩중 ...');
+          return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '로딩중 ...'));
         }
       },
     );

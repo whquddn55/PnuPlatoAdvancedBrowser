@@ -6,7 +6,7 @@ import 'package:html/parser.dart';
 import 'package:get/get.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:marquee/marquee.dart';
-import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
+import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 
 abstract class CommonUrl {
   static const String platoMainUrl = 'https://plato.pusan.ac.kr/';

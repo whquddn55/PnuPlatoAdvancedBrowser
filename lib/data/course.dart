@@ -1,6 +1,6 @@
 import 'package:pnu_plato_advanced_browser/data/activity.dart';
-import 'package:pnu_plato_advanced_browser/data/courseArticle.dart';
-import 'package:pnu_plato_advanced_browser/data/courseAssistant.dart';
+import 'package:pnu_plato_advanced_browser/data/course_article.dart';
+import 'package:pnu_plato_advanced_browser/data/course_assistant.dart';
 import 'package:pnu_plato_advanced_browser/data/professor.dart';
 
 class Course {

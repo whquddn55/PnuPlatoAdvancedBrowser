@@ -4,12 +4,14 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 
 class SmartAbsencePage extends StatelessWidget {
   final String courseId;
-
-  SmartAbsencePage({Key? key, required this.courseId}) : super(key: key);
+  const SmartAbsencePage({
+    Key? key,
+    required this.courseId,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    InAppWebViewController? _webViewController;
+    late final InAppWebViewController _webViewController;
     return Scaffold(
       appBar: AppBar(
         title: const Text('스마트 출석부'),
@@ -18,8 +20,8 @@ class SmartAbsencePage extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body: WillPopScope(
         onWillPop: () async {
-          if (await _webViewController!.canGoBack()) {
-            _webViewController!.goBack();
+          if (await _webViewController.canGoBack()) {
+            _webViewController.goBack();
             return false;
           } else {
             return true;

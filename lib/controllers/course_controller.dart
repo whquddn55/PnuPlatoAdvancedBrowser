@@ -1,20 +1,17 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart' as dio;
-import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
+import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
-import 'package:pnu_plato_advanced_browser/data/courseArticle.dart';
-import 'package:pnu_plato_advanced_browser/data/courseAssistant.dart';
+import 'package:pnu_plato_advanced_browser/data/course_article.dart';
+import 'package:pnu_plato_advanced_browser/data/course_assistant.dart';
 import 'package:pnu_plato_advanced_browser/data/professor.dart';
 
 class CourseController {
-  List<Course> _currentSemesterCourseList = <Course>[];
+  final List<Course> _currentSemesterCourseList = <Course>[];
 
   List<Course> get currentSemesterCourseList => _currentSemesterCourseList;
 
@@ -116,7 +113,7 @@ class CourseController {
     var response = await request(CommonUrl.courseOnlineAbsenceUrl + courseId, options: options, callback: Get.find<UserDataController>().login);
 
     if (response == null) {
-      /* TODO: error */
+      /* TODO: 에러 */
       return <String, bool>{};
     }
 
@@ -159,7 +156,7 @@ class CourseController {
         options: options, callback: Get.find<UserDataController>().login);
 
     if (response == null) {
-      /* TODO: error */
+      /* TODO: 에러 */
       return <String, String>{};
     }
 
@@ -190,10 +187,10 @@ class CourseController {
   Future<Map<String, dynamic>> getBoardInfo(final String boardId, final int page) async {
     var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
     var response =
-        await request(CommonUrl.courseBoardUrl + 'id=${boardId}&page=${page}', options: options, callback: Get.find<UserDataController>().login);
+        await request(CommonUrl.courseBoardUrl + 'id=$boardId&page=$page', options: options, callback: Get.find<UserDataController>().login);
 
     if (response == null) {
-      /* TODO: error */
+      /* TODO: 에러 */
       return <String, dynamic>{};
     }
     Map<String, dynamic> res = <String, dynamic>{};
@@ -234,10 +231,9 @@ class CourseController {
     var response = await request(CommonUrl.vodViewerUrl + activityId, options: options, callback: Get.find<UserDataController>().login);
 
     if (response == null) {
-      /* TODO: error */
+      /* TODO: 에러 */
       return Uri.parse('');
     }
-    Map<String, dynamic> res = <String, dynamic>{};
     Document document = parse(response.data);
     return Uri.parse(document.getElementsByTagName('source')[0].attributes['src'] ?? '');
   }
@@ -363,7 +359,7 @@ class CourseController {
     var response =
         await request(CommonUrl.courseListUrl + 'year=$year&semester=$semester', options: options, callback: Get.find<UserDataController>().login);
     if (response == null) {
-      /* TODO: 에러메시지 */
+      /* TODO: 에러 */
       return null;
     }
 

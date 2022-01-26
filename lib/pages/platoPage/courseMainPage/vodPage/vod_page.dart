@@ -11,12 +11,12 @@ class VodPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    InAppWebViewController? webViewController;
+    late final InAppWebViewController webViewController;
     return WillPopScope(
       onWillPop: () async {
-        bool isFull = await webViewController!.evaluateJavascript(source: "document.fullscreen");
+        bool isFull = await webViewController.evaluateJavascript(source: "document.fullscreen");
         if (isFull) {
-          await webViewController!.evaluateJavascript(source: "document.exitFullscreen();");
+          await webViewController.evaluateJavascript(source: "document.exitFullscreen();");
           return false;
         }
         /* TODO: Show Dialog */

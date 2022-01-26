@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/courseController.dart';
-import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
-import 'package:pnu_plato_advanced_browser/pages/loadingPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/sections/drawer.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/sections/lectureTile.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/sections/lecture_tile.dart';
 
-class PlatoPage extends StatefulWidget {
+class PlatoPage extends StatelessWidget {
   const PlatoPage({Key? key}) : super(key: key);
 
   @override
-  State<PlatoPage> createState() => _PlatoPageState();
-}
-
-class _PlatoPageState extends State<PlatoPage> {
-  final ExpandedTileController _expandedTileController = ExpandedTileController(isExpanded: true);
-
-  @override
   Widget build(BuildContext context) {
+    final ExpandedTileController _expandedTileController = ExpandedTileController(isExpanded: true);
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,

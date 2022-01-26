@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/pages/loginPage/sections/loginForm.dart';
+import 'package:pnu_plato_advanced_browser/pages/loginPage/sections/find_information_page.dart';
+import 'package:pnu_plato_advanced_browser/pages/loginPage/sections/login_form.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -30,13 +31,13 @@ class LoginPage extends StatelessWidget {
                         TextButton(
                           child: const Text('아이디 찾기'),
                           onPressed: () {
-                            Get.toNamed('/login/findInformation/id');
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const FindInformationPage(target: 'id')));
                           },
                         ),
                         TextButton(
                           child: const Text('비밀번호 찾기'),
                           onPressed: () {
-                            Get.toNamed('/login/findInformation/pw');
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const FindInformationPage(target: 'pw')));
                           },
                         )
                       ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/pages/LandingPage/sections/bottomTypography.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/platoPage.dart';
+import 'package:pnu_plato_advanced_browser/pages/LandingPage/sections/bottom_typography.dart';
+import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LandingPage extends StatefulWidget {
@@ -16,7 +15,6 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Future.delayed(const Duration(seconds: 10), () {
       setState(() {
@@ -69,7 +67,7 @@ class _LandingPageState extends State<LandingPage> {
                       ),
                       onPressed: () async {
                         (await SharedPreferences.getInstance()).setBool('isFirst', false);
-                        Get.offNamed('/navigator');
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const NavigatorPage()));
                       },
                     ),
                   ),
