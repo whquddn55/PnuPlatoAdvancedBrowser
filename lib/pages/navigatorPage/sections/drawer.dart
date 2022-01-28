@@ -1,11 +1,12 @@
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({Key? key}) : super(key: key);
@@ -23,7 +24,6 @@ class MainDrawer extends StatelessWidget {
                 ),
                 accountEmail: Text(controller.department),
                 accountName: Text(controller.name),
-                decoration: BoxDecoration(color: Get.theme.primaryColor),
               ),
               ListTile(
                 title: Text('동기화 시간: ${controller.lastSyncTime}'),
@@ -33,35 +33,8 @@ class MainDrawer extends StatelessWidget {
               ListTile(
                   trailing: const Icon(Icons.logout),
                   title: const Text('로그아웃'),
-                  onTap: () async {
-                    var message = await showModalActionSheet(
-                      context: context,
-                      title: '로그아웃',
-                      message: '로그아웃 시 모든 세팅이 초기화 됩니다.',
-                      actions: [
-                        const SheetAction(icon: Icons.logout, label: '로그아웃', key: true, isDefaultAction: true),
-                        const SheetAction(icon: Icons.cancel, label: '취소', key: false, isDestructiveAction: true),
-                      ],
-                    );
-                    if (message == true) {
-                      late final BuildContext dialogContext;
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          dialogContext = context;
-                          return AlertDialog(
-                              content: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: const [
-                              CircularProgressIndicator(),
-                              Text('로그아웃 중입니다...'),
-                            ],
-                          ));
-                        },
-                      );
-                      await controller.logout();
-                      Navigator.pop(dialogContext);
-                    }
+                  onTap: () {
+                    showModalBottomSheet(context: context, builder: (context) => _logoutBottomSheet(context), useRootNavigator: true);
                   }),
               const Divider(height: 0),
               ListTile(
@@ -79,12 +52,8 @@ class MainDrawer extends StatelessWidget {
                     showBugReport('123');
                   }),
               ListTile(
-                onTap: () async {
-                  if (Get.theme.brightness == Brightness.dark) {
-                    Get.changeThemeMode(ThemeMode.light);
-                  } else {
-                    Get.changeThemeMode(ThemeMode.dark);
-                  }
+                onTap: () {
+                  Get.find<AppSettingController>().toggleTheme();
                 },
               ),
               ListTile(
@@ -130,6 +99,44 @@ class MainDrawer extends StatelessWidget {
             ]);
           }
         },
+      ),
+    );
+  }
+
+  _logoutBottomSheet(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      child: Wrap(
+        runSpacing: 20,
+        children: [
+          Text('로그아웃 시 모든 세팅이 초기화 됩니다.', style: Get.textTheme.bodyText1),
+          const Divider(height: 0, thickness: 1.5),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextButton.icon(
+                icon: const Icon(Icons.logout),
+                label: const Text('로그아웃'),
+                onPressed: () async {
+                  var pd = ProgressDialog(context: context);
+                  pd.show(max: 1, msg: '로그아웃 중입니다...', progressBgColor: Colors.transparent, barrierDismissible: true);
+                  await Get.find<UserDataController>().logout();
+                  pd.close();
+                  Navigator.pop(context);
+                },
+                style: TextButton.styleFrom(primary: Colors.black),
+              ),
+              TextButton.icon(
+                icon: const Icon(Icons.cancel_outlined),
+                label: const Text('취소'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: TextButton.styleFrom(primary: Get.textTheme.bodyText1!.color),
+              )
+            ],
+          )
+        ],
       ),
     );
   }

@@ -149,7 +149,7 @@ class CourseMainPage extends StatelessWidget {
   Widget _articleButton(BuildContext context, CourseArticle article) {
     return TextButton(
       onPressed: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => ArticlePage(article: article)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ArticlePage(article: article)));
       },
       style: TextButton.styleFrom(
         padding: EdgeInsets.zero,
@@ -199,7 +199,7 @@ class CourseMainPage extends StatelessWidget {
           ? null
           : () {
               if (activity.type == 'ubboard') {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => BoardPage(boardId: activity.id)));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => BoardPage(boardId: activity.id)));
               } else if (activity.type == 'vod') {
                 showModalBottomSheet(
                   context: context,
@@ -284,10 +284,9 @@ class CourseMainPage extends StatelessWidget {
 
   Widget _vodBottomSheet(BuildContext context, Activity activity) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.3,
       padding: const EdgeInsets.all(20.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Wrap(
+        runSpacing: 20,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -374,18 +373,11 @@ class CourseMainPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextButton.icon(
-                icon: Icon(
-                  Icons.download,
-                  color: Get.textTheme.bodyText1!.color,
-                ),
-                label: Text(
-                  '다운로드',
-                  style: TextStyle(
-                    color: Get.textTheme.bodyText1!.color,
-                  ),
-                ),
+                icon: const Icon(Icons.download),
+                label: const Text('다운로드'),
                 style: TextButton.styleFrom(
                   alignment: Alignment.centerLeft,
+                  primary: Get.textTheme.bodyText1!.color,
                 ),
                 onPressed: () async {
                   Uri uri = await Get.find<CourseController>().getM3u8Uri(activity.id);
@@ -401,39 +393,25 @@ class CourseMainPage extends StatelessWidget {
                 },
               ),
               TextButton.icon(
-                icon: Icon(
-                  Icons.videocam,
-                  color: Get.textTheme.bodyText1!.color,
-                ),
-                label: Text(
-                  '재생',
-                  style: TextStyle(
-                    color: Get.textTheme.bodyText1!.color,
-                  ),
-                ),
+                icon: const Icon(Icons.videocam),
+                label: const Text('재생'),
                 style: TextButton.styleFrom(
                   alignment: Alignment.centerLeft,
+                  primary: Get.textTheme.bodyText1!.color,
                 ),
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => VodPage(id: activity.id)));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => VodPage(id: activity.id)));
                 },
               ),
               TextButton.icon(
-                icon: Icon(
-                  Icons.cancel_outlined,
-                  color: Get.textTheme.bodyText1!.color,
-                ),
-                label: Text(
-                  '취소',
-                  style: TextStyle(
-                    color: Get.textTheme.bodyText1!.color,
-                  ),
-                ),
+                icon: const Icon(Icons.cancel_outlined),
+                label: const Text('취소'),
                 style: TextButton.styleFrom(
                   alignment: Alignment.centerLeft,
+                  primary: Get.textTheme.bodyText1!.color,
                 ),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.pop(context);
                 },
               ),
             ],
@@ -502,7 +480,8 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             title: const Text('국문 계획표'),
             onTap: () {
-              Navigator.of(context).push(
+              Navigator.push(
+                context,
                 MaterialPageRoute(
                   builder: (context) => PlannerPage(
                     title: '국문 계획표',
@@ -515,7 +494,8 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             title: const Text('영문 계획표'),
             onTap: () {
-              Navigator.of(context).push(
+              Navigator.push(
+                context,
                 MaterialPageRoute(
                   builder: (context) => PlannerPage(
                     title: '영문 계획표',
@@ -529,7 +509,8 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             title: const Text('온라인 출석부'),
             onTap: () {
-              Navigator.of(context).push(
+              Navigator.push(
+                context,
                 MaterialPageRoute(
                   builder: (context) => OnlineAbsencePage(courseId: course.id),
                 ),
@@ -539,7 +520,8 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             title: const Text('스마트 출석부'),
             onTap: () {
-              Navigator.of(context).push(
+              Navigator.push(
+                context,
                 MaterialPageRoute(
                   builder: (context) => SmartAbsencePage(courseId: course.id),
                 ),
@@ -549,9 +531,11 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             title: const Text('성적부'),
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => GradePage(courseId: course.id),
-              ));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GradePage(courseId: course.id),
+                  ));
             },
           ),
         ],

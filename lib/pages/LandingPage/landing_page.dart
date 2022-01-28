@@ -67,7 +67,7 @@ class _LandingPageState extends State<LandingPage> {
                       ),
                       onPressed: () async {
                         (await SharedPreferences.getInstance()).setBool('isFirst', false);
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const NavigatorPage()));
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const NavigatorPage()));
                       },
                     ),
                   ),

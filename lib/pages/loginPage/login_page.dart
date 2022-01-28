@@ -31,13 +31,13 @@ class LoginPage extends StatelessWidget {
                         TextButton(
                           child: const Text('아이디 찾기'),
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const FindInformationPage(target: 'id')));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const FindInformationPage(target: 'id')));
                           },
                         ),
                         TextButton(
                           child: const Text('비밀번호 찾기'),
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const FindInformationPage(target: 'pw')));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const FindInformationPage(target: 'pw')));
                           },
                         )
                       ],

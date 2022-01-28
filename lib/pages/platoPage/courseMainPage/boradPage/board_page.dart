@@ -177,6 +177,6 @@ class _BoardPageState extends State<BoardPage> {
 
   void _inkwllTouchEvent(BuildContext context, final CourseArticle article) {
     if (article.id == '') return;
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => ArticlePage(article: article)));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => ArticlePage(article: article)));
   }
 }

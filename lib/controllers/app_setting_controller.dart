@@ -1,11 +1,14 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AppSettingController extends GetxController {
-  bool _isDarkMode = false;
+  ThemeMode _themeMode = ThemeMode.light;
 
-  bool get isDarkMode => _isDarkMode;
-  set isDarkMode(bool isDarkMode) {
-    _isDarkMode = isDarkMode;
-    update();
+  ThemeMode get themeMode => _themeMode;
+
+  Future<void> toggleTheme() async {
+    _themeMode = (_themeMode == ThemeMode.light) ? ThemeMode.dark : ThemeMode.light;
+    Get.changeThemeMode(_themeMode);
+    await Get.forceAppUpdate();
   }
 }

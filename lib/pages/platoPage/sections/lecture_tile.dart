@@ -24,66 +24,70 @@ class LectureTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      dense: true,
-      leading: Column(
-        children: [
-          if (videoCnt != 0)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 10,
-                  width: 10,
-                  margin: const EdgeInsets.only(right: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: videoColor,
+    return Card(
+      elevation: 8.0,
+      margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+      child: ListTile(
+        dense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+        leading: Column(
+          children: [
+            if (videoCnt != 0)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 10,
+                    width: 10,
+                    margin: const EdgeInsets.only(right: 5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: videoColor,
+                    ),
                   ),
-                ),
-                Text('$videoCnt'),
-              ],
-            ),
-          if (assignCnt != 0)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 10,
-                  width: 10,
-                  margin: const EdgeInsets.only(right: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: assignColor,
+                  Text('$videoCnt'),
+                ],
+              ),
+            if (assignCnt != 0)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 10,
+                    width: 10,
+                    margin: const EdgeInsets.only(right: 5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: assignColor,
+                    ),
                   ),
-                ),
-                Text('$assignCnt'),
-              ],
-            ),
-          if (zoomCnt != 0)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 10,
-                  width: 10,
-                  margin: const EdgeInsets.only(right: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: zoomColor,
+                  Text('$assignCnt'),
+                ],
+              ),
+            if (zoomCnt != 0)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 10,
+                    width: 10,
+                    margin: const EdgeInsets.only(right: 5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: zoomColor,
+                    ),
                   ),
-                ),
-                Text('$zoomCnt'),
-              ],
-            ),
-        ],
+                  Text('$zoomCnt'),
+                ],
+              ),
+          ],
+        ),
+        title: Text(course.title),
+        trailing: Text('[${course.sub}]'),
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course)));
+        },
       ),
-      title: Text(course.title),
-      trailing: Text('[${course.sub}]'),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0), side: const BorderSide(color: Colors.black)),
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => CourseMainPage(course: course)));
-      },
     );
   }
 }

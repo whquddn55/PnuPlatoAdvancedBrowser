@@ -31,14 +31,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'PnuPlatoAdvancedBrowser',
-      theme: ThemeData(
-        primaryColor: Colors.lightBlue,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        primaryColor: Colors.lightBlue,
-        brightness: Brightness.dark,
-      ),
+      theme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.light, fontFamily: 'DoHyeonRegular'),
+      darkTheme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.dark, fontFamily: 'DoHyeonRegular'),
+      themeMode: Get.find<AppSettingController>().themeMode,
       home: FutureBuilder(
         future: _getIsFirst(),
         builder: (context, snapshot) {
