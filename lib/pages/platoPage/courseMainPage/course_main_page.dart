@@ -5,11 +5,14 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/m3u8_downloader.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
+import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.dart';
+import 'package:pnu_plato_advanced_browser/pages/navigatorPage/sections/navigator_body.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/article_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/boradPage/board_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/gradePage/grade_page.dart';
@@ -39,9 +42,115 @@ class CourseMainPage extends StatelessWidget {
               centerTitle: true,
               leading: const BackButton(),
             ),
-            endDrawer: Builder(builder: (context) {
-              return MainDrawer(course: course);
-            }),
+            endDrawer: Drawer(
+              child: ListView(
+                children: [
+                  UserAccountsDrawerHeader(
+                    accountName: Text(course.professor!.name),
+                    accountEmail: null,
+                    currentAccountPicture: CircleAvatar(backgroundImage: CachedNetworkImageProvider(course.professor!.iconUri.toString())),
+                    otherAccountsPictures: [
+                      IconButton(
+                        icon: Icon(Icons.email, color: Get.theme.primaryIconTheme.color),
+                        onPressed: () {
+                          /* TODO: 메시지 페이지로 이동 */
+                        },
+                      ),
+                    ],
+                  ),
+                  ExpansionTile(
+                    title: const Text('팀티칭/조교'),
+                    expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: course.assistantList.map((assistant) {
+                      return TextButton.icon(
+                        icon: CircleAvatar(
+                          backgroundImage: CachedNetworkImageProvider(assistant.iconUri.toString()),
+                        ),
+                        label: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              assistant.name,
+                              style: TextStyle(color: Get.textTheme.bodyText1!.color),
+                            ),
+                            Text(
+                              assistant.type,
+                              style: TextStyle(color: Get.textTheme.bodyText1!.color),
+                            ),
+                          ],
+                        ),
+                        style: TextButton.styleFrom(
+                          alignment: Alignment.centerLeft,
+                        ),
+                        onPressed: () {},
+                      );
+                    }).toList(),
+                  ),
+                  const Divider(height: 0, thickness: 1),
+                  ListTile(
+                    title: const Text('국문 계획표'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlannerPage(
+                            title: '국문 계획표',
+                            uri: course.koreanPlanUri,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('영문 계획표'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlannerPage(
+                            title: '영문 계획표',
+                            uri: course.englishPlanUri,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const Divider(height: 0, thickness: 1),
+                  ListTile(
+                    title: const Text('온라인 출석부'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OnlineAbsencePage(courseId: course.id),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('스마트 출석부'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SmartAbsencePage(courseId: course.id),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('성적부'),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GradePage(courseId: course.id),
+                          ));
+                    },
+                  ),
+                ],
+              ),
+            ),
             body: SingleChildScrollView(
               controller: _scrollController,
               child: Column(
@@ -197,15 +306,46 @@ class CourseMainPage extends StatelessWidget {
     return InkWell(
       onTap: avilablity == false
           ? null
-          : () {
+          : () async {
               if (activity.type == 'ubboard') {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => BoardPage(boardId: activity.id)));
               } else if (activity.type == 'vod') {
-                showModalBottomSheet(
+                Get.find<RouteController>().showBottomNavBar = false;
+                await showModalBottomSheet(
                   context: context,
-                  builder: (context) => _vodBottomSheet(context, activity),
-                  useRootNavigator: true,
+                  builder: (context) => _activityBottomSheet(
+                    context: context,
+                    activity: activity,
+                    viewHandler: () async {
+                      await Navigator.push(context, MaterialPageRoute(builder: (context) => VodPage(id: activity.id)));
+                    },
+                    downloadHandler: () async {
+                      Uri uri = await Get.find<CourseController>().getM3u8Uri(activity.id);
+                      if (uri.toString() == '') {
+                      } else {
+                        bool res = await M3u8Downloader(url: uri.toString(), title: activity.title, courseTitle: course.title).download();
+                        if (res) {
+                          print('downloaded!');
+                        } else {
+                          print('failed!');
+                        }
+                      }
+                    },
+                  ),
                 );
+                Get.find<RouteController>().showBottomNavBar = true;
+              } else if (activity.type == 'ubfile') {
+                Get.find<RouteController>().showBottomNavBar = false;
+                await showModalBottomSheet(
+                  context: context,
+                  builder: (context) => _activityBottomSheet(
+                    context: context,
+                    activity: activity,
+                    downloadHandler: () {},
+                    viewHandler: () {},
+                  ),
+                );
+                Get.find<RouteController>().showBottomNavBar = true;
               }
             },
       child: Padding(
@@ -282,7 +422,16 @@ class CourseMainPage extends StatelessWidget {
     );
   }
 
-  Widget _vodBottomSheet(BuildContext context, Activity activity) {
+  Widget _activityBottomSheet({
+    required BuildContext context,
+    required Activity activity,
+    required Function downloadHandler,
+    required Function viewHandler,
+    Icon downloadIcon = const Icon(Icons.download),
+    Icon viewIcon = const Icon(Icons.open_in_new),
+    String downloadText = "다운로드",
+    String viewText = "열기",
+  }) {
     return Container(
       padding: const EdgeInsets.all(20.0),
       child: Wrap(
@@ -373,35 +522,22 @@ class CourseMainPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextButton.icon(
-                icon: const Icon(Icons.download),
-                label: const Text('다운로드'),
+                icon: downloadIcon,
+                label: Text(downloadText),
                 style: TextButton.styleFrom(
                   alignment: Alignment.centerLeft,
                   primary: Get.textTheme.bodyText1!.color,
                 ),
-                onPressed: () async {
-                  Uri uri = await Get.find<CourseController>().getM3u8Uri(activity.id);
-                  if (uri.toString() == '') {
-                  } else {
-                    bool res = await M3u8Downloader(url: uri.toString(), title: activity.title, courseTitle: course.title).download();
-                    if (res) {
-                      print('downloaded!');
-                    } else {
-                      print('failed!');
-                    }
-                  }
-                },
+                onPressed: () => downloadHandler(),
               ),
               TextButton.icon(
-                icon: const Icon(Icons.videocam),
-                label: const Text('재생'),
+                icon: viewIcon,
+                label: Text(viewText),
                 style: TextButton.styleFrom(
                   alignment: Alignment.centerLeft,
                   primary: Get.textTheme.bodyText1!.color,
                 ),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => VodPage(id: activity.id)));
-                },
+                onPressed: () => viewHandler(),
               ),
               TextButton.icon(
                 icon: const Icon(Icons.cancel_outlined),
@@ -415,128 +551,6 @@ class CourseMainPage extends StatelessWidget {
                 },
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class MainDrawer extends StatelessWidget {
-  const MainDrawer({
-    Key? key,
-    required this.course,
-  }) : super(key: key);
-
-  final Course course;
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        children: [
-          UserAccountsDrawerHeader(
-            accountName: Text(course.professor!.name),
-            accountEmail: null,
-            currentAccountPicture: CircleAvatar(backgroundImage: CachedNetworkImageProvider(course.professor!.iconUri.toString())),
-            otherAccountsPictures: [
-              IconButton(
-                icon: Icon(Icons.email, color: Get.theme.primaryIconTheme.color),
-                onPressed: () {
-                  /* TODO: 메시지 페이지로 이동 */
-                },
-              ),
-            ],
-          ),
-          ExpansionTile(
-            title: const Text('팀티칭/조교'),
-            expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
-            children: course.assistantList.map((assistant) {
-              return TextButton.icon(
-                icon: CircleAvatar(
-                  backgroundImage: CachedNetworkImageProvider(assistant.iconUri.toString()),
-                ),
-                label: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      assistant.name,
-                      style: TextStyle(color: Get.textTheme.bodyText1!.color),
-                    ),
-                    Text(
-                      assistant.type,
-                      style: TextStyle(color: Get.textTheme.bodyText1!.color),
-                    ),
-                  ],
-                ),
-                style: TextButton.styleFrom(
-                  alignment: Alignment.centerLeft,
-                ),
-                onPressed: () {},
-              );
-            }).toList(),
-          ),
-          const Divider(height: 0, thickness: 1),
-          ListTile(
-            title: const Text('국문 계획표'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PlannerPage(
-                    title: '국문 계획표',
-                    uri: course.koreanPlanUri,
-                  ),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('영문 계획표'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PlannerPage(
-                    title: '영문 계획표',
-                    uri: course.englishPlanUri,
-                  ),
-                ),
-              );
-            },
-          ),
-          const Divider(height: 0, thickness: 1),
-          ListTile(
-            title: const Text('온라인 출석부'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => OnlineAbsencePage(courseId: course.id),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('스마트 출석부'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SmartAbsencePage(courseId: course.id),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('성적부'),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GradePage(courseId: course.id),
-                  ));
-            },
           ),
         ],
       ),

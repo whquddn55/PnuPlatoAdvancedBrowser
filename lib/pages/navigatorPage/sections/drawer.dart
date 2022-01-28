@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
@@ -33,8 +34,10 @@ class MainDrawer extends StatelessWidget {
               ListTile(
                   trailing: const Icon(Icons.logout),
                   title: const Text('로그아웃'),
-                  onTap: () {
-                    showModalBottomSheet(context: context, builder: (context) => _logoutBottomSheet(context), useRootNavigator: true);
+                  onTap: () async {
+                    Get.find<RouteController>().showBottomNavBar = false;
+                    await showModalBottomSheet(context: context, builder: (context) => _logoutBottomSheet(context));
+                    Get.find<RouteController>().showBottomNavBar = true;
                   }),
               const Divider(height: 0),
               ListTile(

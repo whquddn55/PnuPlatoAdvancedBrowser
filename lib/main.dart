@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:pnu_plato_advanced_browser/controllers/activity_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/LandingPage/landing_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.dart';
@@ -16,6 +17,7 @@ void main() async {
   Get.put(AppSettingController());
   Get.put(CourseController());
   Get.put(ActivityController());
+  Get.put(RouteController());
 
   runApp(const MyApp());
 }
