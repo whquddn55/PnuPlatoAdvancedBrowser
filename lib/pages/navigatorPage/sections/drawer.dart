@@ -61,17 +61,14 @@ class MainDrawer extends StatelessWidget {
               ),
               ListTile(
                 onTap: () async {
-                  var t = [10, 11, 20, 21];
-                  for (int i = 2014; i <= 2021; ++i) {
-                    for (int j in t) {
-                      var list = await Get.find<CourseController>().fetchCourseList(i, j);
-                      if (list != null) {
-                        for (var course in list) {
-                          await Get.find<CourseController>().updateCourseSpecification(course);
-                        }
-                      }
-                    }
-                  }
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const AlertDialog(
+                        content: Text("앱 세팅 화면에서 권한을 모두 허용으로 바꾸어 주세요."),
+                      );
+                    },
+                  );
                 },
               )
             ]);

@@ -9,7 +9,7 @@ class RouteController extends GetxController {
   late final _navigatedPages;
   final _navigatorKeyList = List.generate(3, (index) => GlobalKey<NavigatorState>());
   int _currentIndex = 0;
-  bool _showBottomNavBar = false;
+  bool _showBottomNavBar = true;
 
   RouteController() {
     _navigatedPages = _pages.map(

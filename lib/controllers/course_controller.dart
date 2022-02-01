@@ -20,7 +20,7 @@ class CourseController {
   }
 
   Future<bool> updateCurrentSemesterCourseList() async {
-    var res = await _fetchCourseList(year: 2021, semester: 10);
+    var res = await _fetchCourseList(year: 2021, semester: 20);
     if (res == null) {
       return false;
     }

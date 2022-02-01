@@ -1,18 +1,22 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
-import 'package:pnu_plato_advanced_browser/m3u8_downloader.dart';
+import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
-import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.dart';
-import 'package:pnu_plato_advanced_browser/pages/navigatorPage/sections/navigator_body.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/article_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/boradPage/board_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/gradePage/grade_page.dart';
@@ -323,11 +327,28 @@ class CourseMainPage extends StatelessWidget {
                       Uri uri = await Get.find<CourseController>().getM3u8Uri(activity.id);
                       if (uri.toString() == '') {
                       } else {
-                        bool res = await M3u8Downloader(url: uri.toString(), title: activity.title, courseTitle: course.title).download();
-                        if (res) {
-                          print('downloaded!');
+                        var downloadResult = await Get.find<DownloadController>().enQueue(
+                          url: uri.toString(),
+                          title: activity.title,
+                          courseTitle: course.title,
+                          courseId: course.id,
+                          type: DownloadType.m3u8,
+                        );
+                        if (downloadResult == DownloadQueueingStatus.denied) {
+                          Fluttertoast.showToast(msg: '다운 받기 위해서는 권한이 필요합니다.');
+                        } else if (downloadResult == DownloadQueueingStatus.permanentlyDenied) {
+                          await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return const AlertDialog(
+                                content: Text("앱 세팅 화면에서 권한을 모두 허용으로 바꾸어 주세요."),
+                              );
+                            },
+                          );
+                          openAppSettings();
                         } else {
-                          print('failed!');
+                          Fluttertoast.cancel();
+                          Fluttertoast.showToast(msg: "다운로드 대기중입니다...");
                         }
                       }
                     },
@@ -341,8 +362,43 @@ class CourseMainPage extends StatelessWidget {
                   builder: (context) => _activityBottomSheet(
                     context: context,
                     activity: activity,
-                    downloadHandler: () {},
-                    viewHandler: () {},
+                    downloadHandler: () async {
+                      var downloadResult = await Get.find<DownloadController>().enQueue(
+                          url: CommonUrl.fileViewerUrl + activity.id,
+                          headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
+                          courseTitle: course.title,
+                          courseId: course.id,
+                          type: DownloadType.normal);
+
+                      if (downloadResult == DownloadQueueingStatus.denied) {
+                        Fluttertoast.showToast(msg: '다운 받기 위해서는 권한이 필요합니다.');
+                      } else if (downloadResult == DownloadQueueingStatus.permanentlyDenied) {
+                        await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const AlertDialog(
+                              content: Text("앱 세팅 화면에서 권한을 모두 허용으로 바꾸어 주세요."),
+                            );
+                          },
+                        );
+                        openAppSettings();
+                      } else {
+                        Fluttertoast.cancel();
+                        Fluttertoast.showToast(msg: "다운로드 대기중입니다...");
+                      }
+                    },
+                    viewHandler: () async {
+                      var cachedFile = await DefaultCacheManager().getSingleFile(
+                        CommonUrl.fileViewerUrl + activity.id,
+                        headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
+                        key: '123',
+                      );
+                      var result = await OpenFile.open(cachedFile.path);
+                      if (result.type != ResultType.done) {
+                        Fluttertoast.cancel();
+                        Fluttertoast.showToast(msg: result.message);
+                      }
+                    },
                   ),
                 );
                 Get.find<RouteController>().showBottomNavBar = true;
