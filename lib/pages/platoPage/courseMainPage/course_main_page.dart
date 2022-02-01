@@ -346,9 +346,6 @@ class CourseMainPage extends StatelessWidget {
                             },
                           );
                           openAppSettings();
-                        } else {
-                          Fluttertoast.cancel();
-                          Fluttertoast.showToast(msg: "다운로드 대기중입니다...");
                         }
                       }
                     },
@@ -382,9 +379,6 @@ class CourseMainPage extends StatelessWidget {
                           },
                         );
                         openAppSettings();
-                      } else {
-                        Fluttertoast.cancel();
-                        Fluttertoast.showToast(msg: "다운로드 대기중입니다...");
                       }
                     },
                     viewHandler: () async {

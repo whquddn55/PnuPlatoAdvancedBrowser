@@ -5,7 +5,7 @@ import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -13,7 +13,7 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/permission_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 
-enum DownloadQueueingStatus { denied, permanentlyDenied, downloading }
+enum DownloadQueueingStatus { denied, permanentlyDenied, downloading, duplicated }
 
 class DownloadController {
   late final Isolate _downloadIsolate;
@@ -28,6 +28,9 @@ class DownloadController {
     receivePort.listen((message) {
       if (message["port"] != null) {
         _downloadIsolateSendPort = message["port"];
+      } else if (message["message"] != null) {
+        Fluttertoast.cancel();
+        Fluttertoast.showToast(msg: message["message"]);
       } else {
         _streamController.add(message["data"] as List<DownloadInformation>);
         //print(message);
@@ -79,6 +82,10 @@ class DownloadController {
     final receivePort = ReceivePort();
     sendPort.send({"port": receivePort.sendPort});
     receivePort.listen((downloadInformation) async {
+      if (_pendingQueue.length >= 30) {
+        sendPort.send({"message": "최대 30개까지 등록할 수 있습니다"});
+        return;
+      }
       try {
         final Options options =
             Options(headers: downloadInformation.headers, followRedirects: false, validateStatus: (status) => status == 303 || status == 200);
@@ -89,6 +96,12 @@ class DownloadController {
         /* TODO : 에러 */
         print("[ERROR]$e");
       }
+      if (_pendingQueue.any((element) => element.url == downloadInformation.url) ||
+          _downloadingQueue.any((element) => element.url == downloadInformation.url)) {
+        sendPort.send({"message": "이미 등록된 파일입니다."});
+        return;
+      }
+      sendPort.send({"message": "다운로드 대기열에 추가하였습니다."});
       _pendingQueue.add(downloadInformation);
     });
   }
