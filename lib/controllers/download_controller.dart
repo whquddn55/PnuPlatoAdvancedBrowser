@@ -19,7 +19,9 @@ class DownloadController {
   late final Isolate _downloadIsolate;
   late final SendPort _downloadIsolateSendPort;
 
-  late final Stream<List<DownloadInformation>> stream;
+  final StreamController<List<DownloadInformation>> _streamController = StreamController<List<DownloadInformation>>.broadcast();
+
+  Stream<List<DownloadInformation>> get stream => _streamController.stream;
 
   DownloadController() {
     ReceivePort receivePort = ReceivePort();
@@ -27,7 +29,8 @@ class DownloadController {
       if (message["port"] != null) {
         _downloadIsolateSendPort = message["port"];
       } else {
-        print(message);
+        _streamController.add(message["data"] as List<DownloadInformation>);
+        //print(message);
       }
     });
     Isolate.spawn(_isolateBody, receivePort.sendPort).then((isolate) => _downloadIsolate = isolate);
@@ -51,18 +54,15 @@ class DownloadController {
     } else {
       String externalDir = (await getExternalStorageDirectory())!.path;
       String saveDir = type == DownloadType.normal ? '$externalDir/$courseTitle\$$courseId' : '$externalDir/$courseTitle\$$courseId/$title';
-      _downloadIsolateSendPort.send(
-        DownloadInformation(
-          url: url,
-          courseTitle: courseTitle,
-          type: type,
-          saveDir: saveDir,
-          title: title,
-          headers: headers,
-          status: DownloadStatus.queueing,
-        )
-      );
-      print("Queueing $url");
+      _downloadIsolateSendPort.send(DownloadInformation(
+        url: url,
+        courseTitle: courseTitle,
+        type: type,
+        saveDir: saveDir,
+        title: title,
+        headers: headers,
+        status: DownloadStatus.queueing,
+      ));
       return DownloadQueueingStatus.downloading;
     }
   }
@@ -77,9 +77,18 @@ class DownloadController {
     });
 
     final receivePort = ReceivePort();
-    sendPort.send({"port" : receivePort.sendPort});
+    sendPort.send({"port": receivePort.sendPort});
     receivePort.listen((downloadInformation) async {
-      print(downloadInformation);
+      try {
+        final Options options =
+            Options(headers: downloadInformation.headers, followRedirects: false, validateStatus: (status) => status == 303 || status == 200);
+        var temp = await Dio().request(downloadInformation.url, options: options);
+        downloadInformation.url = temp.headers.value('location')!.split('?')[0];
+        downloadInformation.title = Uri.decodeFull(downloadInformation.url.split('/').last);
+      } catch (e) {
+        /* TODO : 에러 */
+        print("[ERROR]$e");
+      }
       _pendingQueue.add(downloadInformation);
     });
   }
@@ -90,8 +99,6 @@ class DownloadController {
       downloadingQueue.add(downloadInformation);
       downloadInformation.status = DownloadStatus.downloading;
       pendingQueue.removeFirst();
-
-      print("Run ${downloadInformation.url}");
       await _runDownloadObject(downloadInformation);
 
       downloadingQueue.remove(downloadInformation);
@@ -99,32 +106,27 @@ class DownloadController {
   }
 
   Future<void> _runDownloadObject(final DownloadInformation downloadInformation) async {
-    var res;
+    var res = true;
     if (downloadInformation.type == DownloadType.normal) {
-      res = await _downloadNormal(downloadInformation);
+      res &= await _downloadNormal(downloadInformation);
     } else {
-      res = await _downloadM3u8(downloadInformation);
+      res &= await _downloadM3u8(downloadInformation);
     }
 
     return;
   }
 
   Future<bool> _downloadNormal(final DownloadInformation downloadInformation) async {
-    final Map<String, String> headers = downloadInformation.headers;
-    final String url = downloadInformation.url;
+    final Options options =
+        Options(headers: downloadInformation.headers, followRedirects: false, validateStatus: (status) => status == 303 || status == 200);
     try {
       Directory(downloadInformation.saveDir).createSync(recursive: true);
 
-      Options options = Options(headers: headers, followRedirects: false, validateStatus: (status) => status == 303 || status == 200);
-      var temp = await Dio().request(url, options: options);
-      final String realUrl = temp.headers.value('location')!.split('?')[0];
-      final String fileName = Uri.decodeFull(realUrl.split('/').last);
-
       await Dio().download(
-        realUrl,
-        '${downloadInformation.saveDir}/$fileName',
+        downloadInformation.url,
+        '${downloadInformation.saveDir}/${downloadInformation.title}',
         onReceiveProgress: (count, total) async {
-          downloadInformation.current = formatBytes(count, 10);
+          downloadInformation.current = formatBytes(count, 2);
           downloadInformation.total = "0";
         },
         options: options,
@@ -264,7 +266,9 @@ class DownloadController {
   }
 
   void _sendStatus(final SendPort sendPort, final Queue<DownloadInformation> pendingQueue, final List<DownloadInformation> downloadingQueue) {
-    sendPort.send({"downloading" : downloadingQueue, "pending": pendingQueue});
+    sendPort.send({
+      "data": [...downloadingQueue, ...pendingQueue]
+    });
   }
 
   Future<PermissionStatus> _requestPermission() {

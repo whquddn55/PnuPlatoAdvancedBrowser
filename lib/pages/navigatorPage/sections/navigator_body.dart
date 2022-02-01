@@ -46,6 +46,10 @@ class NavigatorBody extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Tab(child: Column(children: const [Icon(Icons.email), Text('쪽지')])),
                           ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Tab(child: Column(children: const [Icon(Icons.download_rounded), Text('저장소')])),
+                          ),
                         ],
                       ),
               ),

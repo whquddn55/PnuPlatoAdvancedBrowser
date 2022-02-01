@@ -2,12 +2,12 @@ enum DownloadType { normal, m3u8 }
 enum DownloadStatus { queueing, downloading, complete, fail }
 
 class DownloadInformation {
-  final String url;
   final String courseTitle;
   final DownloadType type;
-  final String title;
   final String saveDir;
   final Map<String, String> headers;
+  String url;
+  String title;
   String current = '';
   String total = '';
   DownloadStatus status;
