@@ -62,6 +62,7 @@ class DownloadCard extends StatelessWidget {
               Flexible(
                 flex: 8,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(downloadInformation.title),
                     const SizedBox(height: 20),

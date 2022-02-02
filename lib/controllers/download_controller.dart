@@ -13,7 +13,7 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/permission_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 
-enum DownloadQueueingStatus { denied, permanentlyDenied, downloading, duplicated }
+enum DownloadQueueingStatus { denied, permanentlyDenied, downloading }
 
 class DownloadController {
   late final Isolate _downloadIsolate;
@@ -33,9 +33,9 @@ class DownloadController {
         Fluttertoast.showToast(msg: message["message"]);
       } else {
         _streamController.add(message["data"] as List<DownloadInformation>);
-        //print(message);
       }
     });
+
     Isolate.spawn(_isolateBody, receivePort.sendPort).then((isolate) => _downloadIsolate = isolate);
   }
 
@@ -87,22 +87,25 @@ class DownloadController {
         return;
       }
       try {
-        final Options options =
-            Options(headers: downloadInformation.headers, followRedirects: false, validateStatus: (status) => status == 303 || status == 200);
-        var temp = await Dio().request(downloadInformation.url, options: options);
-        downloadInformation.url = temp.headers.value('location')!.split('?')[0];
-        downloadInformation.title = Uri.decodeFull(downloadInformation.url.split('/').last);
+        if (downloadInformation.type == DownloadType.normal) {
+          final Options options =
+              Options(headers: downloadInformation.headers, followRedirects: false, validateStatus: (status) => status == 303 || status == 200);
+          var temp = await Dio().request(downloadInformation.url, options: options);
+          downloadInformation.url = temp.headers.value('location')!.split('?')[0];
+          downloadInformation.title = Uri.decodeFull(downloadInformation.url.split('/').last);
+        }
+
+        if (_pendingQueue.any((element) => element.url == downloadInformation.url) ||
+            _downloadingQueue.any((element) => element.url == downloadInformation.url)) {
+          sendPort.send({"message": "이미 등록된 파일입니다."});
+          return;
+        }
+        sendPort.send({"message": "다운로드 대기열에 추가하였습니다."});
+        _pendingQueue.add(downloadInformation);
       } catch (e) {
         /* TODO : 에러 */
         print("[ERROR]$e");
       }
-      if (_pendingQueue.any((element) => element.url == downloadInformation.url) ||
-          _downloadingQueue.any((element) => element.url == downloadInformation.url)) {
-        sendPort.send({"message": "이미 등록된 파일입니다."});
-        return;
-      }
-      sendPort.send({"message": "다운로드 대기열에 추가하였습니다."});
-      _pendingQueue.add(downloadInformation);
     });
   }
 
@@ -193,6 +196,9 @@ class DownloadController {
       if (tsUrlList.isNotEmpty) {
         Directory(downloadInformation.saveDir).createSync(recursive: true);
 
+        /* downlaod .ts */
+        result &= await _downloadTs(tsUrlList, downloadInformation);
+
         /* download key */
         var keyFile = File('${downloadInformation.saveDir}/key');
         if (keyFile.existsSync()) {
@@ -202,15 +208,12 @@ class DownloadController {
         result &= keyFile.lengthSync() == aesConf['key'].length;
 
         /* download index */
-        var indexFile = File('${downloadInformation.saveDir}/index');
+        var indexFile = File('${downloadInformation.saveDir}/index.m3u8');
         if (indexFile.existsSync()) {
           indexFile.deleteSync();
         }
         indexFile.writeAsStringSync(m3u8Str);
         result &= indexFile.lengthSync() == m3u8Str.length;
-
-        /* downlaod .ts */
-        result &= await _downloadTs(tsUrlList, downloadInformation);
       }
       return result;
     } catch (e) {
@@ -241,21 +244,15 @@ class DownloadController {
       int retry = 0;
       while (retry < 5) {
         try {
-          final String url = tsUrlList[i];
-
           List<Future> futureList = <Future>[];
           for (int j = i; j < min(tsUrlList.length, i + junkSize); ++j) {
-            futureList.add(_downloadOneTs(url, j, downloadInformation.saveDir));
+            futureList.add(_downloadOneTs(tsUrlList[j], j, downloadInformation.saveDir));
           }
           var resultList = await Future.wait(futureList);
           for (var r in resultList) {
             res &= r;
           }
 
-          var bytes = Uint8List.fromList((await http.get(Uri.parse(url))).body.codeUnits);
-          var tsFile = File('${downloadInformation.saveDir}/$i.ts');
-          tsFile.writeAsBytesSync(bytes);
-          res &= tsFile.lengthSync() == bytes.length;
           downloadInformation.current = i.toString();
           downloadInformation.total = (tsUrlList.length - 1).toString();
           break;
