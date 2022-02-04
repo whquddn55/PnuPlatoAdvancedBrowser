@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:html/parser.dart';
 import 'package:get/get.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -203,4 +204,76 @@ String formatBytes(int bytes, int decimals) {
   const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   var i = (log(bytes) / log(1024)).floor();
   return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) + ' ' + suffixes[i];
+}
+
+Widget iconFromExtension(String fileExtension) {
+  switch (fileExtension) {
+    case 'asf':
+    case 'avi':
+    case '3gp':
+    case 'm4u':
+    case 'm4v':
+    case 'mov':
+    case 'mp4':
+    case 'mpc':
+    case 'mpe':
+    case 'mpeg':
+    case 'mpg':
+    case 'mpg4':
+      return SvgPicture.asset('assets/icons/video.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+    case 'mpga':
+    case 'ogg':
+    case 'm3u':
+    case 'm4a':
+    case 'm4b':
+    case 'm4p':
+    case 'mp2':
+    case 'mp3':
+    case 'rmvb':
+    case 'wav':
+    case 'wma':
+    case 'wmv':
+      return SvgPicture.asset('assets/icons/mp3.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+    case 'bmp':
+    case 'gif':
+    case 'jpeg':
+    case 'jpg':
+    case 'png':
+      return SvgPicture.asset('assets/icons/image.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'pdf':
+      return SvgPicture.asset('assets/icons/pdf.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'doc':
+    case 'docx':
+      return SvgPicture.asset('assets/icons/word.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'xls':
+    case 'xlsx':
+    case 'csv':
+      return SvgPicture.asset('assets/icons/excel.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'pps':
+    case 'ppt':
+    case 'pptx':
+      return SvgPicture.asset('assets/icons/powerpoint.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'htm':
+    case 'html':
+      return SvgPicture.asset('assets/icons/html.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'zip':
+    case 'gzip':
+    case 'gtar':
+    case 'tgz':
+    case 'tar':
+    case 'z':
+      return SvgPicture.asset('assets/icons/zip.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'txt':
+      return SvgPicture.asset('assets/icons/text.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    default:
+      return SvgPicture.asset('assets/icons/file.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+  }
 }

@@ -19,12 +19,10 @@ class DownloadPage extends StatelessWidget {
               child: Text("다운로드 중인 파일이 없습니다."),
             );
           } else {
-            return SingleChildScrollView(
-              child: Column(
-                children: list.map((information) {
-                  return DownloadCard(downloadInformation: information);
-                }).toList(),
-              ),
+            return ListView(
+              children: list.map((information) {
+                return DownloadCard(downloadInformation: information);
+              }).toList(),
             );
           }
         } else {

@@ -54,6 +54,7 @@ class StoragePage extends StatelessWidget {
           ),
         ),
         body: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             FutureBuilder(
                 future: getExternalStorageDirectory(),
@@ -64,7 +65,7 @@ class StoragePage extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator());
                   }
                 }),
-            DownloadPage()
+            const DownloadPage()
           ],
         ),
       ),
