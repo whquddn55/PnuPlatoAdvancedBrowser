@@ -6,14 +6,16 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/permission_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 
-enum DownloadQueueingStatus { denied, permanentlyDenied, downloading }
+enum DownloadQueueingStatus { denied, permanentlyDenied, downloading, duplicated }
 
 class DownloadController {
   late final Isolate _downloadIsolate;
@@ -40,12 +42,13 @@ class DownloadController {
   }
 
   Future<DownloadQueueingStatus> enQueue(
-      {required final String url,
+      {required String url,
       required final String courseTitle,
       required final String courseId,
       required final DownloadType type,
-      final String title = '',
-      final Map<String, String> headers = const {}}) async {
+      String title = '',
+      final Map<String, String> headers = const {},
+      final bool force = false}) async {
     assert(type == DownloadType.normal ? headers != const {} : true);
     assert(type == DownloadType.m3u8 ? title != '' : true);
 
@@ -55,8 +58,26 @@ class DownloadController {
     } else if (permissionStatus != PermissionStatus.granted) {
       return DownloadQueueingStatus.denied;
     } else {
-      String externalDir = (await getExternalStorageDirectory())!.path;
-      String saveDir = type == DownloadType.normal ? '$externalDir/$courseTitle\$$courseId' : '$externalDir/$courseTitle\$$courseId/$title';
+      final String externalDir = (await getExternalStorageDirectory())!.path;
+      final String saveDir = (type == DownloadType.normal) ? '$externalDir/$courseTitle\$$courseId' : '$externalDir/$courseTitle\$$courseId/$title';
+
+      if (type == DownloadType.normal) {
+        final Options options = Options(headers: headers, followRedirects: false, validateStatus: (status) => status == 303 || status == 200);
+        var responseTemp = await request(url, options: options, callback: Get.find<UserDataController>().login);
+        if (responseTemp == null) {
+          /* TODO: 에러 */
+
+        } else {
+          url = responseTemp.headers.value('location')!.split('?')[0];
+          title = Uri.decodeFull(url.split('/').last);
+        }
+      }
+
+      if (!force) {
+        bool isExists = await _checkDuplication(type, saveDir, title);
+        if (isExists) return DownloadQueueingStatus.duplicated;
+      }
+
       _downloadIsolateSendPort.send(DownloadInformation(
         url: url,
         courseTitle: courseTitle,
@@ -67,6 +88,14 @@ class DownloadController {
         status: DownloadStatus.queueing,
       ));
       return DownloadQueueingStatus.downloading;
+    }
+  }
+
+  Future<bool> _checkDuplication(final DownloadType type, final String saveDir, final String title) async {
+    if (type == DownloadType.normal) {
+      return File('$saveDir/$title').exists();
+    } else {
+      return Directory(saveDir).exists();
     }
   }
 
@@ -87,14 +116,6 @@ class DownloadController {
         return;
       }
       try {
-        if (downloadInformation.type == DownloadType.normal) {
-          final Options options =
-              Options(headers: downloadInformation.headers, followRedirects: false, validateStatus: (status) => status == 303 || status == 200);
-          var temp = await Dio().request(downloadInformation.url, options: options);
-          downloadInformation.url = temp.headers.value('location')!.split('?')[0];
-          downloadInformation.title = Uri.decodeFull(downloadInformation.url.split('/').last);
-        }
-
         if (_pendingQueue.any((element) => element.url == downloadInformation.url) ||
             _downloadingQueue.any((element) => element.url == downloadInformation.url)) {
           sendPort.send({"message": "이미 등록된 파일입니다."});
@@ -136,7 +157,12 @@ class DownloadController {
     final Options options =
         Options(headers: downloadInformation.headers, followRedirects: false, validateStatus: (status) => status == 303 || status == 200);
     try {
-      Directory(downloadInformation.saveDir).createSync(recursive: true);
+      await Directory(downloadInformation.saveDir).create(recursive: true);
+
+      var file = File('${downloadInformation.saveDir}/${downloadInformation.title}');
+      if (await file.exists()) {
+        await file.delete();
+      }
 
       await Dio().download(
         downloadInformation.url,
@@ -194,24 +220,24 @@ class DownloadController {
       /* download .ts, key, index file */
       bool result = true;
       if (tsUrlList.isNotEmpty) {
-        Directory(downloadInformation.saveDir).createSync(recursive: true);
+        /* delete exist folder */
+        var dir = Directory(downloadInformation.saveDir);
+        if (await dir.exists()) {
+          await dir.delete(recursive: true);
+        }
+
+        await dir.create(recursive: true);
 
         /* downlaod .ts */
         result &= await _downloadTs(tsUrlList, downloadInformation);
 
         /* download key */
         var keyFile = File('${downloadInformation.saveDir}/key');
-        if (keyFile.existsSync()) {
-          keyFile.deleteSync();
-        }
         keyFile.writeAsBytesSync(aesConf['key']);
         result &= keyFile.lengthSync() == aesConf['key'].length;
 
         /* download index */
         var indexFile = File('${downloadInformation.saveDir}/index.m3u8');
-        if (indexFile.existsSync()) {
-          indexFile.deleteSync();
-        }
         indexFile.writeAsStringSync(m3u8Str);
         result &= indexFile.lengthSync() == m3u8Str.length;
       }

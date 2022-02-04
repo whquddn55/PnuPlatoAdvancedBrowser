@@ -346,6 +346,35 @@ class CourseMainPage extends StatelessWidget {
                             },
                           );
                           openAppSettings();
+                        } else if (downloadResult == DownloadQueueingStatus.duplicated) {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                content: const Text("이미 존재하는 파일입니다. 다시 다운로드 받으시겠습니까?"),
+                                actions: [
+                                  TextButton(
+                                    child: const Text("취소"),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                  TextButton(
+                                    child: const Text("덮어쓰기"),
+                                    onPressed: () async {
+                                      await Get.find<DownloadController>().enQueue(
+                                        url: uri.toString(),
+                                        title: activity.title,
+                                        courseTitle: course.title,
+                                        courseId: course.id,
+                                        type: DownloadType.m3u8,
+                                        force: true,
+                                      );
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         }
                       }
                     },
@@ -361,13 +390,15 @@ class CourseMainPage extends StatelessWidget {
                     activity: activity,
                     downloadHandler: () async {
                       var downloadResult = await Get.find<DownloadController>().enQueue(
-                          url: CommonUrl.fileViewerUrl + activity.id,
-                          headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
-                          courseTitle: course.title,
-                          courseId: course.id,
-                          type: DownloadType.normal);
+                        url: CommonUrl.fileViewerUrl + activity.id,
+                        headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
+                        courseTitle: course.title,
+                        courseId: course.id,
+                        type: DownloadType.normal,
+                      );
 
                       if (downloadResult == DownloadQueueingStatus.denied) {
+                        Fluttertoast.cancel();
                         Fluttertoast.showToast(msg: '다운 받기 위해서는 권한이 필요합니다.');
                       } else if (downloadResult == DownloadQueueingStatus.permanentlyDenied) {
                         await showDialog(
@@ -379,6 +410,35 @@ class CourseMainPage extends StatelessWidget {
                           },
                         );
                         openAppSettings();
+                      } else if (downloadResult == DownloadQueueingStatus.duplicated) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              content: const Text("이미 존재하는 파일입니다. 다시 다운로드 받으시겠습니까?"),
+                              actions: [
+                                TextButton(
+                                  child: const Text("취소"),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                                TextButton(
+                                  child: const Text("덮어쓰기"),
+                                  onPressed: () async {
+                                    await Get.find<DownloadController>().enQueue(
+                                      url: CommonUrl.fileViewerUrl + activity.id,
+                                      headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
+                                      courseTitle: course.title,
+                                      courseId: course.id,
+                                      type: DownloadType.normal,
+                                      force: true,
+                                    );
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       }
                     },
                     viewHandler: () async {
