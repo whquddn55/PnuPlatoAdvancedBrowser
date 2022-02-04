@@ -1,14 +1,17 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:html/parser.dart';
 import 'package:get/get.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:marquee/marquee.dart';
-import 'package:pnu_plato_advanced_browser/controllers/userDataController.dart';
+import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 
-class CommonUrl {
+abstract class CommonUrl {
   static const String platoMainUrl = 'https://plato.pusan.ac.kr/';
   static const String platoUserInformationUrl = 'https://plato.pusan.ac.kr/user/user_edit.php';
   static const String platoCalendarUrl = 'https://plato.pusan.ac.kr/calendar/export.php';
@@ -28,6 +31,14 @@ class CommonUrl {
   static const String courseFolderUrl = 'https://plato.pusan.ac.kr/mod/folder/index.php?id=';
   static const String courseReportUrl = 'https://plato.pusan.ac.kr/grade/report/user/index.php?id=';
   static const String courseVideoProgressUrl = 'https://plato.pusan.ac.kr/report/ubcompletion/user_progress_a.php?id=';
+  static const String courseOnlineAbsenceUrl = 'https://plato.pusan.ac.kr/report/ubcompletion/progress.php?id=';
+  static const String courseSmartAbsenceUrl = 'https://plato.pusan.ac.kr/local/ubattendance/my_status.php?id=';
+  static const String courseGradeUrl = 'https://plato.pusan.ac.kr/grade/report/user/index.php?id=';
+  static const String courseArticleUrl = 'https://plato.pusan.ac.kr/mod/ubboard/article.php?';
+  static const String courseBoardUrl = 'https://plato.pusan.ac.kr/mod/ubboard/view.php?';
+
+  static const String vodViewerUrl = 'https://plato.pusan.ac.kr/mod/vod/viewer.php?id=';
+  static const String fileViewerUrl = 'https://plato.pusan.ac.kr/mod/ubfile/view.php?id=';
 
   static const String academicCalendarUrl = 'https://www.pusan.ac.kr/kor/CMS/Haksailjung/PopupView.do';
   static const String findIdUrl = 'https://u-pip.pusan.ac.kr/rSSO/popup/FindID_step1.asp';
@@ -49,6 +60,7 @@ class NFMarquee extends StatelessWidget {
     this.blankSpace = 65.0,
     this.startAfter = const Duration(milliseconds: 2000),
     this.pauseAfterRound = const Duration(milliseconds: 2000),
+    this.color = Colors.black,
   }) : super(key: key);
 
   final String text;
@@ -58,6 +70,7 @@ class NFMarquee extends StatelessWidget {
   final double blankSpace;
   final Duration startAfter;
   final Duration pauseAfterRound;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +83,10 @@ class NFMarquee extends StatelessWidget {
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: fontWeight,
-          height: 1.7,
+          color: color,
         ),
         overflowReplacement: Marquee(
+          crossAxisAlignment: CrossAxisAlignment.start,
           text: text,
           blankSpace: blankSpace,
           accelerationCurve: Curves.easeOutCubic,
@@ -82,6 +96,7 @@ class NFMarquee extends StatelessWidget {
           style: TextStyle(
             fontSize: fontSize,
             fontWeight: fontWeight,
+            color: color,
           ),
         ),
       ),
@@ -132,6 +147,11 @@ Html renderHtml(String html) {
         );
       },
     },
+    style: {
+      ".badge": Style(
+        color: Colors.transparent,
+      )
+    },
   );
 }
 
@@ -177,4 +197,83 @@ void showBugReport(String msg) {
           Get.back();
         },
       ));
+}
+
+String formatBytes(int bytes, int decimals) {
+  if (bytes <= 0) return "0 B";
+  const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  var i = (log(bytes) / log(1024)).floor();
+  return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) + ' ' + suffixes[i];
+}
+
+Widget iconFromExtension(String fileExtension) {
+  switch (fileExtension) {
+    case 'asf':
+    case 'avi':
+    case '3gp':
+    case 'm4u':
+    case 'm4v':
+    case 'mov':
+    case 'mp4':
+    case 'mpc':
+    case 'mpe':
+    case 'mpeg':
+    case 'mpg':
+    case 'mpg4':
+      return SvgPicture.asset('assets/icons/video.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+    case 'mpga':
+    case 'ogg':
+    case 'm3u':
+    case 'm4a':
+    case 'm4b':
+    case 'm4p':
+    case 'mp2':
+    case 'mp3':
+    case 'rmvb':
+    case 'wav':
+    case 'wma':
+    case 'wmv':
+      return SvgPicture.asset('assets/icons/mp3.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+    case 'bmp':
+    case 'gif':
+    case 'jpeg':
+    case 'jpg':
+    case 'png':
+      return SvgPicture.asset('assets/icons/image.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'pdf':
+      return SvgPicture.asset('assets/icons/pdf.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'doc':
+    case 'docx':
+      return SvgPicture.asset('assets/icons/word.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'xls':
+    case 'xlsx':
+    case 'csv':
+      return SvgPicture.asset('assets/icons/excel.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'pps':
+    case 'ppt':
+    case 'pptx':
+      return SvgPicture.asset('assets/icons/powerpoint.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'htm':
+    case 'html':
+      return SvgPicture.asset('assets/icons/html.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'zip':
+    case 'gzip':
+    case 'gtar':
+    case 'tgz':
+    case 'tar':
+    case 'z':
+      return SvgPicture.asset('assets/icons/zip.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    case 'txt':
+      return SvgPicture.asset('assets/icons/text.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+
+    default:
+      return SvgPicture.asset('assets/icons/file.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+  }
 }

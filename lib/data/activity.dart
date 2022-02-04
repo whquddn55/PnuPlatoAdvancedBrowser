@@ -4,12 +4,14 @@ class Activity {
   final String id;
   final String courseId;
   final String description;
-  final String? info;
+  final String info;
   final DateTime? startDate;
   final DateTime? endDate;
   final DateTime? lateDate;
   final Uri? iconUri;
-  bool done;
+  final String availablilityInfo;
+  final bool availablility;
+
   Activity({
     required this.type,
     required this.title,
@@ -19,8 +21,9 @@ class Activity {
     this.endDate,
     this.lateDate,
     required this.description,
-    this.info,
+    required this.info,
     this.iconUri,
-    this.done = false,
+    this.availablilityInfo = '',
+    this.availablility = true,
   });
 }
