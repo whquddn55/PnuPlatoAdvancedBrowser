@@ -63,7 +63,7 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(dirText == '' ? '/' : dirText),
-              Text('총 ${formatBytes(dirStatSync(widget.rootDirectory), 2)} 사용중'),
+              Text('총 ${formatBytes(_dirStatSync(widget.rootDirectory), 2)} 사용중'),
             ],
           ),
           Expanded(
@@ -90,6 +90,20 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
                           ),
                           icon: const Icon(Icons.folder_open),
                           onPressed: () async => await _updateCurrentDirectory(e),
+                          onLongPress: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  content: Text("${basename(e.path).split('\$')[0]}(${basename(e.path).split('\$')[1]})를 삭제합니다"),
+                                  actions: [
+                                    TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context)),
+                                    TextButton(child: const Text("확인"), onPressed: () async => await _deleteFile(context, e)),
+                                  ],
+                                );
+                              },
+                            );
+                          },
                         );
                       } else {
                         /* m3u8파일 */
@@ -120,11 +134,25 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
                               Navigator.of(context, rootNavigator: true)
                                   .push(MaterialPageRoute(builder: (context) => Player(url: e.path + '/index.m3u8')));
                             },
+                            onLongPress: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    content: Text("${basename(e.path)}를 삭제합니다"),
+                                    actions: [
+                                      TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context)),
+                                      TextButton(child: const Text("확인"), onPressed: () async => await _deleteFile(context, e)),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                           );
                         } else {
                           return ElevatedButton.icon(
                             icon: const Icon(Icons.videocam),
-                            label: Text(basename(e.path)),
+                            label: Text(basename(e.path) + "(다운중...)"),
                             style: ElevatedButton.styleFrom(
                               alignment: Alignment.centerLeft,
                               primary: Get.theme.cardColor,
@@ -157,6 +185,20 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
                             Fluttertoast.showToast(msg: result.message);
                           }
                         },
+                        onLongPress: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                content: Text("${basename(e.path)}를 삭제합니다"),
+                                actions: [
+                                  TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context)),
+                                  TextButton(child: const Text("확인"), onPressed: () async => await _deleteFile(context, e)),
+                                ],
+                              );
+                            },
+                          );
+                        },
                       );
                     }
                   }).toList()
@@ -184,7 +226,7 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
     setState(() {});
   }
 
-  int dirStatSync(Directory dir) {
+  int _dirStatSync(Directory dir) {
     int totalSize = 0;
     try {
       if (dir.existsSync()) {
@@ -199,5 +241,28 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
     }
 
     return totalSize;
+  }
+
+  Future<void> _deleteFile(BuildContext context, FileSystemEntity file) async {
+    Navigator.pop(context);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+
+    try {
+      await file.delete(recursive: true);
+
+      Fluttertoast.cancel();
+      Fluttertoast.showToast(msg: "삭제되었습니다.");
+    } catch (e) {
+      Fluttertoast.cancel();
+      Fluttertoast.showToast(msg: e.toString());
+    }
+
+    Navigator.pop(context);
+    await _refreshFileList();
   }
 }
