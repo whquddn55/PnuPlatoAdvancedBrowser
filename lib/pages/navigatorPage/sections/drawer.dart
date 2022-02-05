@@ -2,11 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
+import 'package:pnu_plato_advanced_browser/pages/settingPage/setting_page.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -44,8 +43,7 @@ class MainDrawer extends StatelessWidget {
                   trailing: const Icon(Icons.settings),
                   title: const Text('세팅'),
                   onTap: () {
-                    /* TODO: 세팅 화면으로 이동 */
-                    //Get.toNamed('/setting');
+                    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => const SettingPage()));
                   }),
               const Divider(height: 0),
               ListTile(
@@ -56,7 +54,7 @@ class MainDrawer extends StatelessWidget {
                   }),
               ListTile(
                 onTap: () {
-                  Get.find<AppSettingController>().toggleTheme();
+                  //Get.find<AppSettingController>().toggleTheme();
                 },
               ),
               ListTile(

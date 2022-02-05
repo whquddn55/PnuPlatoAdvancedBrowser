@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:restart_app/restart_app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class AppSettingController extends GetxController {
-  ThemeMode _themeMode = ThemeMode.light;
+abstract class AppSettingController {
+  static ThemeMode _themeMode = ThemeMode.system;
+  static late SharedPreferences _preference;
 
-  ThemeMode get themeMode => _themeMode;
+  static ThemeMode get themeMode => _themeMode;
 
-  Future<void> toggleTheme() async {
-    _themeMode = (_themeMode == ThemeMode.light) ? ThemeMode.dark : ThemeMode.light;
-    Get.changeThemeMode(_themeMode);
-    await Get.forceAppUpdate();
+  static Future<void> initiate() async {
+    _preference = await SharedPreferences.getInstance();
+    int? themeIndex = _preference.getInt("theme");
+    if (themeIndex == null) {
+      _preference.setInt("theme", themeMode.index);
+    } else {
+      _themeMode = ThemeMode.values.elementAt(themeIndex);
+    }
+  }
+
+  static void setTheme(final ThemeMode themeMode) {
+    _themeMode = themeMode;
+    Get.changeThemeMode(themeMode);
+    _preference.setInt("theme", themeMode.index);
+    Restart.restartApp();
   }
 }

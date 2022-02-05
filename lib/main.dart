@@ -15,11 +15,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting();
   Get.put(UserDataController());
-  Get.put(AppSettingController());
   Get.put(CourseController());
   Get.put(ActivityController());
   Get.put(RouteController());
   Get.put(DownloadController());
+  await AppSettingController.initiate();
 
   runApp(const MyApp());
 }
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       title: 'PnuPlatoAdvancedBrowser',
       theme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.light, fontFamily: 'DoHyeonRegular'),
       darkTheme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.dark, fontFamily: 'DoHyeonRegular'),
-      themeMode: Get.find<AppSettingController>().themeMode,
+      themeMode: AppSettingController.themeMode,
       home: FutureBuilder(
         future: _getIsFirst(),
         builder: (context, snapshot) {

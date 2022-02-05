@@ -1,7 +1,6 @@
 import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/storagePage/directoryPage/sections/speed_slider.dart';
 
 class Player extends StatefulWidget {
