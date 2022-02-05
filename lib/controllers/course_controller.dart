@@ -108,16 +108,16 @@ class CourseController {
     return true;
   }
 
-  Future<Map<String, bool>> getVodStatus(final String courseId) async {
+  Future<Map<int, List<Map<String, dynamic>>>> getVodStatus(final String courseId) async {
     var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
     var response = await request(CommonUrl.courseOnlineAbsenceUrl + courseId, options: options, callback: Get.find<UserDataController>().login);
 
     if (response == null) {
       /* TODO: 에러 */
-      return <String, bool>{};
+      return <int, List<Map<String, String>>>{};
     }
 
-    Map<String, bool> res = <String, bool>{};
+    Map<int, List<Map<String, dynamic>>> res = <int, List<Map<String, dynamic>>>{};
     Document document = parse(response.data);
     if (response.realUri.toString().contains('user_progress_a')) {
       for (var tr in document.getElementsByClassName('user_progress_table')[0].children[2].getElementsByTagName('tr')) {
@@ -129,7 +129,12 @@ class CourseController {
               status = true;
             }
           }
-          res[title] = status;
+          int week = int.parse(tr.getElementsByClassName('track_detail')[0].attributes['data-eterm']!);
+
+          if (res[week] == null) {
+            res[week] = [];
+          }
+          res[week]!.add({"title": title, "status": status});
         }
       }
     } else if (response.realUri.toString().contains('user_progress')) {
@@ -142,7 +147,12 @@ class CourseController {
               status = true;
             }
           }
-          res[title] = status;
+          int week = int.parse(tr.getElementsByClassName('track_detail')[0].attributes['data-eterm']!);
+
+          if (res[week] == null) {
+            res[week] = [];
+          }
+          res[week]!.add({title: status});
         }
       }
     }
