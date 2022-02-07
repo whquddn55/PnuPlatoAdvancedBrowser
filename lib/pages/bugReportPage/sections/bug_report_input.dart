@@ -12,19 +12,24 @@ class BugReportInput extends StatefulWidget {
 
 class _BugReportInputState extends State<BugReportInput> {
   final _controller = TextEditingController();
-  String _message = '';
+  bool _isEmpty = true;
 
   void _buttonEvent() async {
     await FirebaseFirestore.instance.collection('chats').doc(widget.studentId).collection('messages').add({
       "isUser": !widget.isAdmin,
-      "text": _message,
+      "text": _controller.text,
       "time": Timestamp.now(),
     });
+
+    setState(() {
+      _controller.clear();
+      _isEmpty = true;
+    });
+
     await FirebaseFirestore.instance.collection('chats').doc(widget.studentId).update({
       "time": Timestamp.now(),
       (widget.isAdmin ? "unread" : "adminUnread"): FieldValue.increment(1),
     });
-    _controller.clear();
   }
 
   @override
@@ -40,14 +45,14 @@ class _BugReportInputState extends State<BugReportInput> {
               maxLines: null,
               decoration: const InputDecoration(labelText: "Send new message..."),
               onChanged: (value) => setState(() {
-                _message = value;
+                _isEmpty = value.trim().isEmpty;
               }),
             ),
           ),
           IconButton(
             icon: const Icon(Icons.send),
             color: Colors.blue,
-            onPressed: _message.trim().isEmpty ? null : _buttonEvent,
+            onPressed: _isEmpty ? null : _buttonEvent,
           ),
         ],
       ),

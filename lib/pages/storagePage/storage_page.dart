@@ -1,12 +1,15 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:badges/badges.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
+import 'package:pnu_plato_advanced_browser/main_drawer.dart';
 import 'package:pnu_plato_advanced_browser/pages/storagePage/directoryPage/directory_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/storagePage/downloadPage/download_page.dart';
 
@@ -31,6 +34,25 @@ class StoragePage extends StatelessWidget {
               },
             ),
           ],
+          leading: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            //Get.find<UserDataController>().studentId.toString()
+            stream: FirebaseFirestore.instance.collection("chats").doc("1234").snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.active) {
+                return IconButton(icon: const Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer());
+              }
+
+              int unread = snapshot.data!["unread"];
+              return IconButton(
+                icon: Badge(
+                  child: const Icon(Icons.menu),
+                  badgeContent: Text(unread.toString()),
+                  showBadge: unread != 0,
+                ),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              );
+            },
+          ),
           bottom: TabBar(
             tabs: [
               const Tab(icon: Icon(Icons.folder)),
@@ -53,6 +75,7 @@ class StoragePage extends StatelessWidget {
             ],
           ),
         ),
+        drawer: const MainDrawer(),
         body: TabBarView(
           physics: const NeverScrollableScrollPhysics(),
           children: [

@@ -54,13 +54,11 @@ class MainDrawer extends StatelessWidget {
                   trailing: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                       stream: FirebaseFirestore.instance.collection("chats").doc(studentId).snapshots(),
                       builder: (context, snapshot) {
-                        Widget? badgeContent;
+                        int unread = 0;
                         if (snapshot.connectionState == ConnectionState.active) {
-                          if (snapshot.data!["unread"] != 0) {
-                            badgeContent = Text(snapshot.data!["unread"].toString());
-                          }
+                          unread = snapshot.data!["unread"];
                         }
-                        return Badge(child: const Icon(Icons.bug_report_outlined), badgeContent: badgeContent, showBadge: false);
+                        return Badge(child: const Icon(Icons.bug_report_outlined), badgeContent: Text(unread.toString()), showBadge: unread != 0);
                       }),
                   title: const Text('버그리포트'),
                   onTap: () async {
