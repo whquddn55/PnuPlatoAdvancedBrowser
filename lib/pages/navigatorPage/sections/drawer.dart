@@ -56,9 +56,11 @@ class MainDrawer extends StatelessWidget {
                       builder: (context, snapshot) {
                         Widget? badgeContent;
                         if (snapshot.connectionState == ConnectionState.active) {
-                          badgeContent = Text(snapshot.data!["unread"].toString());
+                          if (snapshot.data!["unread"] != 0) {
+                            badgeContent = Text(snapshot.data!["unread"].toString());
+                          }
                         }
-                        return Badge(child: const Icon(Icons.bug_report_outlined), badgeContent: badgeContent);
+                        return Badge(child: const Icon(Icons.bug_report_outlined), badgeContent: badgeContent, showBadge: false);
                       }),
                   title: const Text('버그리포트'),
                   onTap: () async {

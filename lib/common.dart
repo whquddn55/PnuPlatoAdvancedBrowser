@@ -147,10 +147,24 @@ Html renderHtml(String html) {
         );
       },
     },
+    customRender: {
+      "table": (context, child) {
+        final _scrollController = ScrollController();
+        return Scrollbar(
+          controller: _scrollController,
+          isAlwaysShown: true,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            child: (context.tree as TableLayoutElement).toWidget(context),
+          ),
+        );
+      }
+    },
     style: {
       ".badge": Style(
         color: Colors.transparent,
-      )
+      ),
     },
   );
 }

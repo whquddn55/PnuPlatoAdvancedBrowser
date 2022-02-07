@@ -32,7 +32,6 @@ class CourseMainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _scrollController = ScrollController();
     final _articleTileController = ExpandedTileController();
     final _weekTileControllerList = List<ExpandedTileController>.empty(growable: true);
 
@@ -156,7 +155,6 @@ class CourseMainPage extends StatelessWidget {
               ),
             ),
             body: SingleChildScrollView(
-              controller: _scrollController,
               child: Column(
                 children: [
                   ExpandedTile(
