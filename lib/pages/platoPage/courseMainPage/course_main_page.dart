@@ -595,28 +595,34 @@ class CourseMainPage extends StatelessWidget {
                 future: Get.find<CourseController>().getVodStatus(activity.courseId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-                    var data = snapshot.data as Map<String, bool>;
-                    Widget status;
-                    if (data.containsKey(activity.title)) {
-                      if (data[activity.title] == true) {
-                        status = const Icon(
-                          Icons.check,
-                          color: Colors.lightGreen,
-                        );
-                      } else {
-                        status = const Icon(
-                          Icons.close,
-                          color: Colors.red,
-                        );
+                    var data = snapshot.data as Map<int, List<Map<String, dynamic>>>;
+                    Widget? status;
+                    for (var weeks in data.values) {
+                      for (var activities in weeks) {
+                        if (activities["title"] == activity.title) {
+                          if (activities["status"] == true) {
+                            status = const Icon(
+                              Icons.check,
+                              color: Colors.lightGreen,
+                            );
+                          } else {
+                            status = const Icon(
+                              Icons.close,
+                              color: Colors.red,
+                            );
+                          }
+                        }
                       }
+                    }
+                    if (status == null) {
+                      return const SizedBox.shrink();
+                    } else {
                       return Row(
                         children: [
                           const Text('출석 상태: '),
                           status,
                         ],
                       );
-                    } else {
-                      return const SizedBox.shrink();
                     }
                   } else {
                     return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
