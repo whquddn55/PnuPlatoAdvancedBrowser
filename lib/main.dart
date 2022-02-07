@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -14,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting();
+  await Firebase.initializeApp();
   Get.put(UserDataController());
   Get.put(CourseController());
   Get.put(ActivityController());
@@ -27,10 +29,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  Future<bool> _getIsFirst() async {
-    return (await SharedPreferences.getInstance()).getBool('isFirst') ?? true;
-  }
-
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -38,18 +36,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.light, fontFamily: 'DoHyeonRegular'),
       darkTheme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.dark, fontFamily: 'DoHyeonRegular'),
       themeMode: AppSettingController.themeMode,
-      home: FutureBuilder(
-        future: _getIsFirst(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data == true) {
-              return const LandingPage();
-            }
-            return const NavigatorPage();
-          }
-          return Scaffold(body: Container());
-        },
-      ),
+      home: AppSettingController.isFirst ? const LandingPage() : const NavigatorPage(),
     );
   }
 }

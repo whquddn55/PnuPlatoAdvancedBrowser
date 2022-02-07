@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/LandingPage/sections/bottom_typography.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,7 +67,7 @@ class _LandingPageState extends State<LandingPage> {
                         minimumSize: const Size(300, 50),
                       ),
                       onPressed: () async {
-                        (await SharedPreferences.getInstance()).setBool('isFirst', false);
+                        AppSettingController.isFirst = false;
                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const NavigatorPage()));
                       },
                     ),

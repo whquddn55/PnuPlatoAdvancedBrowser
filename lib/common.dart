@@ -155,50 +155,6 @@ Html renderHtml(String html) {
   );
 }
 
-void showBugReport(String msg) {
-  var _controller = TextEditingController();
-  Get.defaultDialog(
-      title: '버그리포트',
-      barrierDismissible: false,
-      content: Column(
-        children: [
-          SizedBox(
-            width: Get.width,
-            height: 300,
-            child: TextFormField(
-              maxLines: null,
-              minLines: null,
-              controller: _controller,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                labelText: '상세한 상황을 설명해주세요.\n(ex: A를 하려하다가 B버튼을 누르니 C에러가 떴습니다.)',
-              ),
-              autofocus: true,
-              expands: true,
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text('작성하신 내용과 내부 버그 정보를 포함하여 서버에 전송하게 됩니다.'),
-          )
-        ],
-      ),
-      cancel: TextButton(
-        child: Text('취소', style: TextStyle(color: Get.theme.disabledColor)),
-        onPressed: () => Get.back(),
-      ),
-      confirm: TextButton(
-        child: const Text('전송'),
-        onPressed: () {
-          /* TODO: 버그 전송 */
-          print(_controller.text);
-          Get.back();
-        },
-      ));
-}
-
 String formatBytes(int bytes, int decimals) {
   if (bytes <= 0) return "0 B";
   const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];

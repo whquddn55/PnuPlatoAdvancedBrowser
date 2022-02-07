@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "787538153538",
+    "project_id": "pnuplatoadvancedbrowser",
+    "storage_bucket": "pnuplatoadvancedbrowser.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:787538153538:android:0b1b2976e86cf42d1f9ddb",
+        "android_client_info": {
+          "package_name": "com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "787538153538-g8n5fq6epqtqi8evtc3187318m1pv7db.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBk2kkjI0nFzCNleqtH_r5u95H4JeTEC80"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "787538153538-g8n5fq6epqtqi8evtc3187318m1pv7db.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

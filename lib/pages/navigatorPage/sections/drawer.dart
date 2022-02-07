@@ -1,9 +1,12 @@
+import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/pages/bugReportPage/admin_bug_report_page.dart';
+import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/settingPage/setting_page.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
@@ -17,6 +20,7 @@ class MainDrawer extends StatelessWidget {
       child: GetBuilder<UserDataController>(
         builder: (controller) {
           if (controller.loginStatus) {
+            final String studentId = "1234"; //controller.studentId.toString();
             return ListView(children: [
               UserAccountsDrawerHeader(
                 currentAccountPicture: CircleAvatar(
@@ -47,28 +51,61 @@ class MainDrawer extends StatelessWidget {
                   }),
               const Divider(height: 0),
               ListTile(
-                  trailing: const Icon(Icons.bug_report_outlined),
+                  trailing: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                      stream: FirebaseFirestore.instance.collection("chats").doc(studentId).snapshots(),
+                      builder: (context, snapshot) {
+                        Widget? badgeContent;
+                        if (snapshot.connectionState == ConnectionState.active) {
+                          badgeContent = Text(snapshot.data!["unread"].toString());
+                        }
+                        return Badge(child: const Icon(Icons.bug_report_outlined), badgeContent: badgeContent);
+                      }),
                   title: const Text('버그리포트'),
-                  onTap: () {
-                    showBugReport('123');
-                  }),
-              ListTile(
-                onTap: () {
-                  //Get.find<AppSettingController>().toggleTheme();
-                },
-              ),
-              ListTile(
-                onTap: () async {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return const AlertDialog(
-                        content: Text("앱 세팅 화면에서 권한을 모두 허용으로 바꾸어 주세요."),
+                  onTap: () async {
+                    var doc = await FirebaseFirestore.instance.collection("chats").doc(studentId).get();
+                    if (doc.exists == false) {
+                      var res = await showDialog(
+                        context: context,
+                        useRootNavigator: true,
+                        builder: (context) {
+                          return AlertDialog(
+                            content: const Text("버그리포트를 위해서 [학번] 의 정보가 서버로 전송됩니다. 채팅으로 피드백을 드리기 위해서만 사용됩니다."),
+                            actions: [
+                              TextButton(
+                                child: const Text("취소"),
+                                onPressed: () {
+                                  Navigator.pop(context, false);
+                                },
+                              ),
+                              TextButton(
+                                child: const Text("동의"),
+                                onPressed: () {
+                                  Navigator.pop(context, true);
+                                },
+                              ),
+                            ],
+                          );
+                        },
                       );
-                    },
-                  );
-                },
-              )
+                      if (res) {
+                        FirebaseFirestore.instance.collection("chats").doc(studentId).set({
+                          "unread": 0,
+                          "adminUnread": 0,
+                          "time": Timestamp.now(),
+                        });
+                        Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => BugReportPage(studentId, false)));
+                      }
+                    } else {
+                      Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => BugReportPage(studentId, false)));
+                    }
+                  }),
+              const Divider(height: 0),
+              ListTile(
+                  trailing: const Icon(Icons.settings),
+                  title: const Text('세팅2'),
+                  onTap: () {
+                    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => const AdminBugReportPage()));
+                  }),
             ]);
           } else {
             return ListView(children: [
@@ -92,7 +129,8 @@ class MainDrawer extends StatelessWidget {
                   trailing: const Icon(Icons.bug_report_outlined),
                   title: const Text('버그리포트'),
                   onTap: () {
-                    showBugReport('123');
+                    var studentId = "123"; //Get.find<UserDataController>().studentId.toString();
+                    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => BugReportPage(studentId, false)));
                   }),
             ]);
           }

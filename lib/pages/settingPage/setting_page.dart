@@ -44,11 +44,11 @@ class SettingPage extends StatelessWidget {
                 child: const Text("확인"),
                 onPressed: () {
                   if (index == 0) {
-                    AppSettingController.setTheme(ThemeMode.light);
+                    AppSettingController.themeMode = ThemeMode.light;
                   } else if (index == 1) {
-                    AppSettingController.setTheme(ThemeMode.dark);
+                    AppSettingController.themeMode = ThemeMode.dark;
                   } else if (index == 2) {
-                    AppSettingController.setTheme(ThemeMode.system);
+                    AppSettingController.themeMode = ThemeMode.system;
                   }
                   Navigator.pop(context, true);
                 },
