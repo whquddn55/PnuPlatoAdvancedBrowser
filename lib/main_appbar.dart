@@ -12,26 +12,33 @@ class MainAppbar extends AppBar {
           elevation: 0.0,
           title: Text(titleText),
           centerTitle: true,
-          leading: GetBuilder<NoticeController>(builder: (controller) {
-            return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-              stream: FirebaseFirestore.instance.collection("users").doc(Get.find<UserDataController>().studentId.toString()).snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.active) {
-                  return IconButton(icon: const Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer());
-                }
-                int unread = snapshot.data!["unread"] + controller.unreadCount();
-                return IconButton(
-                  icon: Badge(
-                    child: const Icon(Icons.menu),
-                    badgeContent: Text(unread.toString()),
-                    showBadge: unread != 0,
-                  ),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
+          leading: GetBuilder<UserDataController>(builder: (userDataController) {
+            if (userDataController.loginStatus == true) {
+              Get.find<NoticeController>().updateReadMap();
+              return GetBuilder<NoticeController>(builder: (controller) {
+                return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance.collection("users").doc(Get.find<UserDataController>().studentId.toString()).snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.active) {
+                      return IconButton(icon: const Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer());
+                    }
+                    int unread = snapshot.data!["unread"] + controller.unreadCount();
+                    return IconButton(
+                      icon: Badge(
+                        child: const Icon(Icons.menu),
+                        badgeContent: Text(unread.toString()),
+                        showBadge: unread != 0,
+                      ),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    );
+                  },
                 );
-              },
-            );
+              });
+            } else {
+              return Builder(builder: (context) {
+                return IconButton(icon: const Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer());
+              });
+            }
           }),
-        ) {
-    Get.find<NoticeController>().updateReadMap();
-  }
+        );
 }
