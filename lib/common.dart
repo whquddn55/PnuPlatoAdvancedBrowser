@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart' as dio;
@@ -37,7 +38,8 @@ abstract class CommonUrl {
   static const String courseSmartAbsenceUrl = 'https://plato.pusan.ac.kr/local/ubattendance/my_status.php?id=';
   static const String courseGradeUrl = 'https://plato.pusan.ac.kr/grade/report/user/index.php?id=';
   static const String courseArticleUrl = 'https://plato.pusan.ac.kr/mod/ubboard/article.php?';
-  static const String courseBoardUrl = 'https://plato.pusan.ac.kr/mod/ubboard/view.php?';
+  static const String courseBoardUrl = 'https://plato.pusan.ac.kr/mod/ubboard/view.php?id=';
+  static const String courseBoardWriteUrl = 'https://plato.pusan.ac.kr/mod/ubboard/write.php?id=';
 
   static const String vodViewerUrl = 'https://plato.pusan.ac.kr/mod/vod/viewer.php?id=';
   static const String fileViewerUrl = 'https://plato.pusan.ac.kr/mod/ubfile/view.php?id=';
@@ -247,5 +249,27 @@ Widget iconFromExtension(String fileExtension) {
 
     default:
       return SvgPicture.asset('assets/icons/file.svg', color: Get.textTheme.bodyText2!.color, height: 20);
+  }
+}
+
+class BetaBadge extends StatelessWidget {
+  final Widget child;
+  const BetaBadge({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        child,
+        Positioned(
+          right: -10,
+          child: Transform.rotate(
+            angle: 45 * pi / 180,
+            child: const Text("Beta", style: TextStyle(backgroundColor: Colors.red)),
+          ),
+        ),
+      ],
+    );
   }
 }

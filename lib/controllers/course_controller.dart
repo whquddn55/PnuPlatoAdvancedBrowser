@@ -195,9 +195,14 @@ class CourseController {
   }
 
   Future<Map<String, dynamic>> getBoardInfo(final String boardId, final int page) async {
+    /*
+      title: 게시판 이름
+      articleList: 게시글 목록
+      pageLength: 게시판 페이지 수
+      writable: 글쓰기 권한 확인
+    */
     var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
-    var response =
-        await request(CommonUrl.courseBoardUrl + 'id=$boardId&page=$page', options: options, callback: Get.find<UserDataController>().login);
+    var response = await request(CommonUrl.courseBoardUrl + '$boardId&page=$page', options: options, callback: Get.find<UserDataController>().login);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -233,6 +238,13 @@ class CourseController {
       }
       res['articleList'].add(CourseArticle(title: title, date: date, boardId: boardId, id: id, writer: writer));
     }
+
+    if (document.getElementsByClassName('pull-right').length == 1) {
+      res["writable"] = true;
+    } else {
+      res["writable"] = false;
+    }
+
     return res;
   }
 

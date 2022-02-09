@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/article_page.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/boradPage/boardWritePage/board_write_page.dart';
 
 class BoardPage extends StatefulWidget {
   final String boardId;
@@ -33,36 +35,50 @@ class _BoardPageState extends State<BoardPage> {
                 child: Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.keyboard_arrow_left),
-                          padding: EdgeInsets.zero,
-                          splashRadius: 16,
-                          onPressed: () {
-                            setState(() {
-                              page--;
-                              if (page == 0) {
-                                page = 1;
-                              }
-                            });
-                          },
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.keyboard_arrow_left),
+                              padding: EdgeInsets.zero,
+                              splashRadius: 16,
+                              onPressed: () {
+                                setState(() {
+                                  page--;
+                                  if (page == 0) {
+                                    page = 1;
+                                  }
+                                });
+                              },
+                            ),
+                            Text('$page / ${data['pageLength']}'),
+                            IconButton(
+                              icon: const Icon(Icons.keyboard_arrow_right),
+                              padding: EdgeInsets.zero,
+                              splashRadius: 16,
+                              onPressed: () {
+                                int pg = data['pageLength'];
+                                setState(() {
+                                  page++;
+                                  if (page > pg) {
+                                    page = pg;
+                                  }
+                                });
+                              },
+                            ),
+                          ],
                         ),
-                        Text('$page / ${data['pageLength']}'),
-                        IconButton(
-                          icon: const Icon(Icons.keyboard_arrow_right),
-                          padding: EdgeInsets.zero,
-                          splashRadius: 16,
-                          onPressed: () {
-                            int pg = data['pageLength'];
-                            setState(() {
-                              page++;
-                              if (page > pg) {
-                                page = pg;
-                              }
-                            });
-                          },
-                        ),
+                        data["writable"] == true
+                            ? BetaBadge(
+                                child: ElevatedButton(
+                                  child: const Text("글 쓰기"),
+                                  onPressed: () {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => BoardWritePage(widget.boardId)));
+                                  },
+                                ),
+                              )
+                            : const SizedBox.shrink()
                       ],
                     ),
                     Table(
