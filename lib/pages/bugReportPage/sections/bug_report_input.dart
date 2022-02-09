@@ -15,7 +15,7 @@ class _BugReportInputState extends State<BugReportInput> {
   bool _isEmpty = true;
 
   void _buttonEvent() async {
-    await FirebaseFirestore.instance.collection('chats').doc(widget.studentId).collection('messages').add({
+    await FirebaseFirestore.instance.collection('users').doc(widget.studentId).collection('chats').add({
       "isUser": !widget.isAdmin,
       "text": _controller.text,
       "time": Timestamp.now(),
@@ -26,7 +26,7 @@ class _BugReportInputState extends State<BugReportInput> {
       _isEmpty = true;
     });
 
-    await FirebaseFirestore.instance.collection('chats').doc(widget.studentId).update({
+    await FirebaseFirestore.instance.collection('users').doc(widget.studentId).update({
       "time": Timestamp.now(),
       (widget.isAdmin ? "unread" : "adminUnread"): FieldValue.increment(1),
     });

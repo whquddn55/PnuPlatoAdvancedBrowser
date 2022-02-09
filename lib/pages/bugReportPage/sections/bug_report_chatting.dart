@@ -9,9 +9,9 @@ class BugReportChatting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userDoc = FirebaseFirestore.instance.collection('chats').doc(studentId);
+    final userDoc = FirebaseFirestore.instance.collection('users').doc(studentId);
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance.collection('chats').doc(studentId).collection('messages').orderBy("time", descending: true).snapshots(),
+        stream: userDoc.collection('chats').orderBy("time", descending: true).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const LoadingPage(msg: "채팅내역을 불러오는 중입니다...");

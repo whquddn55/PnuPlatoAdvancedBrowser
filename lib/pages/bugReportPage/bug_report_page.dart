@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/sections/bug_report_chatting.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/sections/bug_report_input.dart';

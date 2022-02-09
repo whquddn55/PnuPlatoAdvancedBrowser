@@ -14,7 +14,7 @@ class AdminBugReportPage extends StatelessWidget {
         centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance.collection("chats").orderBy("adminUnread", descending: true).orderBy("time").snapshots(),
+          stream: FirebaseFirestore.instance.collection("users").orderBy("adminUnread", descending: true).orderBy("time").snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const LoadingPage(msg: "채팅내역을 불러오는 중입니다...");

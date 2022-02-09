@@ -1,11 +1,10 @@
-import 'package:badges/badges.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
+import 'package:pnu_plato_advanced_browser/main_appbar.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/main_drawer.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/sections/lecture_tile.dart';
@@ -17,30 +16,7 @@ class PlatoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ExpandedTileController _expandedTileController = ExpandedTileController(isExpanded: true);
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0.0,
-        title: const Text('플라토'),
-        centerTitle: true,
-        leading: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          //Get.find<UserDataController>().studentId.toString()
-          stream: FirebaseFirestore.instance.collection("chats").doc("1234").snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.active) {
-              return IconButton(icon: const Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer());
-            }
-
-            int unread = snapshot.data!["unread"];
-            return IconButton(
-              icon: Badge(
-                child: const Icon(Icons.menu),
-                badgeContent: Text(unread.toString()),
-                showBadge: unread != 0,
-              ),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            );
-          },
-        ),
-      ),
+      appBar: MainAppbar("플라토"),
       drawer: const MainDrawer(),
       body: GetBuilder<UserDataController>(
         builder: (controller) {
