@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:badges/badges.dart';
@@ -250,6 +251,36 @@ Widget iconFromExtension(String fileExtension) {
     default:
       return SvgPicture.asset('assets/icons/file.svg', color: Get.textTheme.bodyText2!.color, height: 20);
   }
+}
+
+Future<BuildContext> showProgressDialog(final BuildContext context, final String msg) async {
+  final dialogContextCompleter = Completer<BuildContext>();
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (context) {
+      dialogContextCompleter.complete(context);
+      return WillPopScope(
+        onWillPop: () => Future.value(false),
+        child: AlertDialog(
+          content: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              Text(msg),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+
+  return await dialogContextCompleter.future;
+}
+
+void closeProgressModal(BuildContext context) {
+  Navigator.pop(context);
 }
 
 class BetaBadge extends StatelessWidget {

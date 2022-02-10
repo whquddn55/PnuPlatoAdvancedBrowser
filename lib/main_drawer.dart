@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
@@ -11,7 +12,6 @@ import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.d
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/noticeListPage/notice_list_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/settingPage/setting_page.dart';
-import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({Key? key}) : super(key: key);
@@ -130,23 +130,22 @@ class MainDrawer extends StatelessWidget {
           Text('로그아웃 시 모든 세팅이 초기화 됩니다.', style: Get.textTheme.bodyText1),
           const Divider(height: 0, thickness: 1.5),
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextButton.icon(
-                icon: const Icon(Icons.logout),
-                label: const Text('로그아웃'),
+              TextButton(
+                child: Row(children: const [Icon(Icons.logout), Text('로그아웃')]),
                 onPressed: () async {
-                  var pd = ProgressDialog(context: context);
-                  pd.show(max: 1, msg: '로그아웃 중입니다...', progressBgColor: Colors.transparent, barrierDismissible: true);
-                  await Get.find<UserDataController>().logout();
-                  pd.close();
                   Navigator.pop(context);
+                  var dialogContext = await showProgressDialog(context, "로그아웃 중입니다...");
+                  await Get.find<UserDataController>().logout();
+                  closeProgressModal(dialogContext);
                 },
-                style: TextButton.styleFrom(primary: Colors.black),
+                style: TextButton.styleFrom(primary: Get.textTheme.bodyText1!.color),
               ),
-              TextButton.icon(
-                icon: const Icon(Icons.cancel_outlined),
-                label: const Text('취소'),
+              TextButton(
+                child: Row(
+                  children: const [Icon(Icons.cancel_outlined), Text('취소')],
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
