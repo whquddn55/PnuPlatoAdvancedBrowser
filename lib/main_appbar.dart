@@ -12,6 +12,7 @@ class MainAppbar extends AppBar {
           elevation: 0.0,
           title: Text(titleText),
           centerTitle: true,
+          bottom: bottomWidget,
           leading: GetBuilder<UserDataController>(builder: (userDataController) {
             if (userDataController.loginStatus == true) {
               Get.find<NoticeController>().updateReadMap();
