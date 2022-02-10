@@ -260,7 +260,8 @@ class CourseMainPage extends StatelessWidget {
   Widget _articleButton(BuildContext context, CourseArticle article) {
     return TextButton(
       onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ArticlePage(article: article)));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => ArticlePage(article: article, courseTitle: course.title, courseId: course.id)));
       },
       style: TextButton.styleFrom(
         padding: EdgeInsets.zero,
@@ -310,7 +311,8 @@ class CourseMainPage extends StatelessWidget {
           ? null
           : () async {
               if (activity.type == 'ubboard') {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => BoardPage(boardId: activity.id)));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => BoardPage(boardId: activity.id, courseTitle: course.title, courseId: course.id)));
               } else if (activity.type == 'vod') {
                 Get.find<RouteController>().showBottomNavBar = false;
                 await showModalBottomSheet(
@@ -389,7 +391,6 @@ class CourseMainPage extends StatelessWidget {
                     downloadHandler: () async {
                       var downloadResult = await Get.find<DownloadController>().enQueue(
                         url: CommonUrl.fileViewerUrl + activity.id,
-                        headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
                         courseTitle: course.title,
                         courseId: course.id,
                         type: DownloadType.normal,
@@ -424,7 +425,6 @@ class CourseMainPage extends StatelessWidget {
                                   onPressed: () async {
                                     await Get.find<DownloadController>().enQueue(
                                       url: CommonUrl.fileViewerUrl + activity.id,
-                                      headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
                                       courseTitle: course.title,
                                       courseId: course.id,
                                       type: DownloadType.normal,

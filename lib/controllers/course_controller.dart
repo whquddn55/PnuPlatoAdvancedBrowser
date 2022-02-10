@@ -20,7 +20,7 @@ class CourseController {
   }
 
   Future<bool> updateCurrentSemesterCourseList() async {
-    var res = await _fetchCourseList(year: 2021, semester: 10);
+    var res = await _fetchCourseList(year: 2021, semester: 20);
     if (res == null) {
       return false;
     }
@@ -160,7 +160,7 @@ class CourseController {
     return res;
   }
 
-  Future<Map<String, String>> getArticleInfo(final CourseArticle article) async {
+  Future<Map<String, dynamic>> getArticleInfo(final CourseArticle article) async {
     var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
     var response = await request(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}',
         options: options, callback: Get.find<UserDataController>().login);
@@ -170,13 +170,18 @@ class CourseController {
       return <String, String>{};
     }
 
-    Map<String, String> res = <String, String>{};
+    Map<String, dynamic> res = <String, dynamic>{};
     Document document = parse(response.data);
     res['main'] = document.getElementsByClassName('main')[0].text.trim();
     res['title'] = document.getElementsByClassName('subject')[0].text.trim();
     res['writer'] = document.getElementsByClassName('writer')[0].text.trim();
     res['date'] = document.getElementsByClassName('date')[0].text.trim();
     res['content'] = document.getElementsByClassName('text_to_html')[0].innerHtml;
+    res['files'] = document.getElementsByClassName('files')[1].children.map((li) {
+      var img = li.getElementsByTagName('img')[0];
+      var a = li.getElementsByTagName('a')[0];
+      return [a.text.trim(), a.attributes['href']!, img.attributes['src']!];
+    }).toList();
     return res;
   }
 

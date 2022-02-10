@@ -3,7 +3,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/permission_controller.dart';
 import 'dart:io';
 
 import 'package:pnu_plato_advanced_browser/pages/storagePage/directoryPage/sections/player.dart';
@@ -179,10 +181,30 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
                           onPrimary: Get.textTheme.bodyText2!.color,
                         ),
                         onPressed: () async {
-                          var result = await OpenFile.open(e.path);
-                          if (result.type != ResultType.done) {
-                            Fluttertoast.cancel();
-                            Fluttertoast.showToast(msg: result.message);
+                          var permissionRes = await PermissionController.requestPermission();
+                          switch (permissionRes) {
+                            case PermissionStatus.denied:
+                              Fluttertoast.cancel();
+                              Fluttertoast.showToast(msg: '다운 받기 위해서는 권한이 필요합니다.');
+                              break;
+                            case PermissionStatus.permanentlyDenied:
+                              await showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return const AlertDialog(
+                                    content: Text("앱 세팅 화면에서 권한을 모두 허용으로 바꾸어 주세요."),
+                                  );
+                                },
+                              );
+                              openAppSettings();
+                              break;
+                            default:
+                              var result = await OpenFile.open(e.path);
+                              if (result.type != ResultType.done) {
+                                Fluttertoast.cancel();
+                                Fluttertoast.showToast(msg: result.message);
+                              }
+                              break;
                           }
                         },
                         onLongPress: () {

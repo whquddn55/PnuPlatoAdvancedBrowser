@@ -1,4 +1,4 @@
-enum DownloadType { normal, m3u8 }
+enum DownloadType { normal, m3u8, articleAttach }
 enum DownloadStatus { queueing, downloading, complete, fail }
 
 class DownloadInformation {

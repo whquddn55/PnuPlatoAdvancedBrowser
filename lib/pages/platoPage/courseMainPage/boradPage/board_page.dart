@@ -9,7 +9,14 @@ import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/boradP
 
 class BoardPage extends StatefulWidget {
   final String boardId;
-  const BoardPage({Key? key, required this.boardId}) : super(key: key);
+  final String courseTitle;
+  final String courseId;
+  const BoardPage({
+    Key? key,
+    required this.boardId,
+    required this.courseTitle,
+    required this.courseId,
+  }) : super(key: key);
 
   @override
   State<BoardPage> createState() => _BoardPageState();
@@ -193,6 +200,15 @@ class _BoardPageState extends State<BoardPage> {
 
   void _inkwllTouchEvent(BuildContext context, final CourseArticle article) {
     if (article.id == '') return;
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ArticlePage(article: article)));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ArticlePage(
+          article: article,
+          courseTitle: widget.courseTitle,
+          courseId: widget.courseId,
+        ),
+      ),
+    );
   }
 }

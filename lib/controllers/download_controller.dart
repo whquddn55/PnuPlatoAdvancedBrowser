@@ -47,55 +47,70 @@ class DownloadController {
       required final String courseId,
       required final DownloadType type,
       String title = '',
-      final Map<String, String> headers = const {},
       final bool force = false}) async {
-    assert(type == DownloadType.normal ? headers != const {} : true);
     assert(type == DownloadType.m3u8 ? title != '' : true);
 
     final PermissionStatus permissionStatus = await _requestPermission();
-    if (permissionStatus == PermissionStatus.permanentlyDenied) {
-      return DownloadQueueingStatus.permanentlyDenied;
-    } else if (permissionStatus != PermissionStatus.granted) {
-      return DownloadQueueingStatus.denied;
-    } else {
-      final String externalDir = (await getExternalStorageDirectory())!.path;
-      final String saveDir = (type == DownloadType.normal) ? '$externalDir/$courseTitle\$$courseId' : '$externalDir/$courseTitle\$$courseId/$title';
 
-      if (type == DownloadType.normal) {
-        final Options options = Options(headers: headers, followRedirects: false, validateStatus: (status) => status == 303 || status == 200);
-        var responseTemp = await request(url, options: options, callback: Get.find<UserDataController>().login);
-        if (responseTemp == null) {
-          /* TODO: 에러 */
+    switch (permissionStatus) {
+      case PermissionStatus.permanentlyDenied:
+        return DownloadQueueingStatus.permanentlyDenied;
+      case PermissionStatus.granted:
+        final String externalDir = (await getExternalStorageDirectory())!.path;
+        String saveDir;
+        switch (type) {
+          case DownloadType.normal:
+            saveDir = '$externalDir/$courseTitle\$$courseId';
 
-        } else {
-          url = responseTemp.headers.value('location')!.split('?')[0];
-          title = Uri.decodeFull(url.split('/').last);
+            final Options options = Options(
+              headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
+              followRedirects: false,
+              validateStatus: (status) => status == 303 || status == 200,
+            );
+            var responseTemp = await request(url, options: options, callback: Get.find<UserDataController>().login);
+            if (responseTemp == null) {
+              /* TODO: 에러 */
+
+            } else {
+              url = responseTemp.headers.value('location')!.split('?')[0];
+              title = Uri.decodeFull(url.split('/').last);
+            }
+            break;
+          case DownloadType.articleAttach:
+            saveDir = '$externalDir/$courseTitle\$$courseId';
+            break;
+          case DownloadType.m3u8:
+            saveDir = '$externalDir/$courseTitle\$$courseId/$title';
+            break;
         }
-      }
 
-      if (!force) {
-        bool isExists = await _checkDuplication(type, saveDir, title);
-        if (isExists) return DownloadQueueingStatus.duplicated;
-      }
+        if (!force) {
+          bool isExists = await _checkDuplication(type, saveDir, title);
+          if (isExists) return DownloadQueueingStatus.duplicated;
+        }
 
-      _downloadIsolateSendPort.send(DownloadInformation(
-        url: url,
-        courseTitle: courseTitle,
-        type: type,
-        saveDir: saveDir,
-        title: title,
-        headers: headers,
-        status: DownloadStatus.queueing,
-      ));
-      return DownloadQueueingStatus.downloading;
+        _downloadIsolateSendPort.send(DownloadInformation(
+          url: url,
+          courseTitle: courseTitle,
+          type: type,
+          saveDir: saveDir,
+          title: title,
+          headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
+          status: DownloadStatus.queueing,
+        ));
+        return DownloadQueueingStatus.downloading;
+      default:
+        return DownloadQueueingStatus.denied;
     }
   }
 
   Future<bool> _checkDuplication(final DownloadType type, final String saveDir, final String title) async {
-    if (type == DownloadType.normal) {
-      return File('$saveDir/$title').exists();
-    } else {
-      return Directory(saveDir).exists();
+    switch (type) {
+      case DownloadType.normal:
+      case DownloadType.articleAttach:
+        return File('$saveDir/$title').exists();
+      case DownloadType.m3u8:
+        return Directory(saveDir).exists();
     }
   }
 
@@ -144,10 +159,13 @@ class DownloadController {
 
   Future<void> _runDownloadObject(final DownloadInformation downloadInformation) async {
     var res = true;
-    if (downloadInformation.type == DownloadType.normal) {
-      res &= await _downloadNormal(downloadInformation);
-    } else {
-      res &= await _downloadM3u8(downloadInformation);
+    switch (downloadInformation.type) {
+      case DownloadType.m3u8:
+        res &= await _downloadM3u8(downloadInformation);
+        break;
+      default:
+        res &= await _downloadNormal(downloadInformation);
+        break;
     }
 
     return;
@@ -164,7 +182,7 @@ class DownloadController {
         await file.delete();
       }
 
-      await Dio().download(
+      var res = await Dio().download(
         downloadInformation.url,
         '${downloadInformation.saveDir}/${downloadInformation.title}',
         onReceiveProgress: (count, total) async {
