@@ -10,7 +10,7 @@ import 'package:html/parser.dart';
 import 'package:get/get.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:marquee/marquee.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 
 abstract class CommonUrl {
   static const String platoMainUrl = 'https://plato.pusan.ac.kr/';
@@ -138,7 +138,7 @@ Html renderHtml(String html) {
           child: CachedNetworkImage(
             imageUrl: attributes["src"]!,
             httpHeaders: {
-              'Cookie': Get.find<UserDataController>().moodleSessionKey,
+              'Cookie': Get.find<LoginController>().moodleSessionKey,
             },
             placeholder: (context, url) => const CircularProgressIndicator(),
             errorWidget: (context, url, error) => const Icon(Icons.error),

@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/admin_bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
@@ -20,7 +20,7 @@ class MainDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: GetBuilder<UserDataController>(
+      child: GetBuilder<LoginController>(
         builder: (controller) {
           if (controller.loginStatus) {
             final String studentId = controller.studentId.toString();
@@ -142,7 +142,7 @@ class MainDrawer extends StatelessWidget {
                 onPressed: () async {
                   Navigator.pop(context);
                   var dialogContext = await showProgressDialog(context, "로그아웃 중입니다...");
-                  await Get.find<UserDataController>().logout();
+                  await Get.find<LoginController>().logout();
                   closeProgressModal(dialogContext);
                 },
                 style: TextButton.styleFrom(primary: Get.textTheme.bodyText1!.color),

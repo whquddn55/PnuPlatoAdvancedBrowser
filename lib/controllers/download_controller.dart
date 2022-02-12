@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/permission_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 
 enum DownloadQueueingStatus { denied, permanentlyDenied, downloading, duplicated }
@@ -63,11 +63,11 @@ class DownloadController {
             saveDir = '$externalDir/$courseTitle\$$courseId';
 
             final Options options = Options(
-              headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
+              headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
               followRedirects: false,
               validateStatus: (status) => status == 303 || status == 200,
             );
-            var responseTemp = await request(url, options: options, callback: Get.find<UserDataController>().login);
+            var responseTemp = await request(url, options: options, callback: Get.find<LoginController>().login);
             if (responseTemp == null) {
               /* TODO: 에러 */
 
@@ -95,7 +95,7 @@ class DownloadController {
           type: type,
           saveDir: saveDir,
           title: title,
-          headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
+          headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
           status: DownloadStatus.queueing,
         ));
         return DownloadQueueingStatus.downloading;

@@ -7,7 +7,7 @@ import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/LandingPage/landing_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
@@ -16,16 +16,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting();
   await Firebase.initializeApp();
-  Get.put(UserDataController());
+  Get.put(LoginController());
   Get.put(CourseController());
   Get.put(RouteController());
   Get.put(DownloadController());
   Get.put(NoticeController());
   await AppSettingController.initiate();
 
-  var backgroudnService = BackgroundService();
-  await backgroudnService.initializeService();
-  Get.put(backgroudnService);
+  await BackgroundService.initializeService();
 
   runApp(const MyApp());
 }

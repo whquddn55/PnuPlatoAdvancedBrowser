@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 
 class NoticeController extends GetxController {
   final Map<String, bool> _readMap = <String, bool>{};
 
   Future<void> updateReadMap() async {
-    final studentId = Get.find<UserDataController>().studentId.toString();
+    final studentId = Get.find<LoginController>().studentId.toString();
     final noticeList = (await FirebaseFirestore.instance.collection("notices").get()).docs;
     final readList = (await FirebaseFirestore.instance.collection("users").doc(studentId).get())["readList"] as List;
     for (var notice in noticeList) {
@@ -21,7 +21,7 @@ class NoticeController extends GetxController {
   }
 
   Future<void> markRead(final String noticeId) async {
-    final studentId = Get.find<UserDataController>().studentId.toString();
+    final studentId = Get.find<LoginController>().studentId.toString();
     final noticeRef = FirebaseFirestore.instance.collection("notices").doc(noticeId);
     await FirebaseFirestore.instance.collection("users").doc(studentId).update({
       "readList": FieldValue.arrayUnion([noticeRef])

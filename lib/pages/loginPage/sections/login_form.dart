@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -24,7 +24,7 @@ class _LoginFormState extends State<LoginForm> {
     var dialogContext = await showProgressDialog(context, "로그인 중입니다...");
     _formKey.currentState!.save();
 
-    final _userDataController = Get.find<UserDataController>();
+    final _userDataController = Get.find<LoginController>();
     await _userDataController.login(autologin: false, username: _username, password: _password);
     closeProgressModal(dialogContext);
 

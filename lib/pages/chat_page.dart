@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/main_appbar.dart';
 import 'package:pnu_plato_advanced_browser/main_drawer.dart';
 
@@ -12,7 +12,7 @@ class ChatPage extends StatelessWidget {
     return Scaffold(
       appBar: MainAppbar("쪽지"),
       drawer: const MainDrawer(),
-      body: GetBuilder<UserDataController>(
+      body: GetBuilder<LoginController>(
         builder: (controller) {
           if (controller.loginStatus == false) {
             return Builder(builder: (context) {

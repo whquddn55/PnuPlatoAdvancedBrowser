@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/main_appbar.dart';
@@ -18,7 +18,7 @@ class PlatoPage extends StatelessWidget {
     return Scaffold(
       appBar: MainAppbar("플라토"),
       drawer: const MainDrawer(),
-      body: GetBuilder<UserDataController>(
+      body: GetBuilder<LoginController>(
         builder: (controller) {
           if (controller.loginStatus == false) {
             return Builder(builder: (context) {

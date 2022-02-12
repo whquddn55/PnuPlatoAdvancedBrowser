@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/sections/navigator_body.dart';
 
@@ -10,7 +10,7 @@ class NavigatorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _loginFuture = Get.find<UserDataController>().login(autologin: true);
+    final _loginFuture = Get.find<LoginController>().login(autologin: true);
 
     Future<void> _dbInitFuture(final String? studentId) async {
       if (studentId == null) {
@@ -37,8 +37,8 @@ class NavigatorPage extends StatelessWidget {
 
         String? studentId;
 
-        if (Get.find<UserDataController>().loginStatus == true) {
-          Get.find<UserDataController>().studentId.toString();
+        if (Get.find<LoginController>().loginStatus == true) {
+          Get.find<LoginController>().studentId.toString();
         }
 
         return FutureBuilder<void>(

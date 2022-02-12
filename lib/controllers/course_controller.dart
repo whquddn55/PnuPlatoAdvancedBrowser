@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
@@ -49,8 +49,8 @@ class CourseController {
   }
 
   Future<bool> updateCourseSpecification(final Course course) async {
-    var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseMainUrl + course.id, options: options, callback: Get.find<UserDataController>().login);
+    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
+    var response = await request(CommonUrl.courseMainUrl + course.id, options: options, callback: Get.find<LoginController>().login);
     if (response == null) {
       /* TODO : 에러 */
       return false;
@@ -110,8 +110,8 @@ class CourseController {
   }
 
   Future<Map<int, List<Map<String, dynamic>>>> getVodStatus(final String courseId) async {
-    var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseOnlineAbsenceUrl + courseId, options: options, callback: Get.find<UserDataController>().login);
+    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
+    var response = await request(CommonUrl.courseOnlineAbsenceUrl + courseId, options: options, callback: Get.find<LoginController>().login);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -162,9 +162,9 @@ class CourseController {
   }
 
   Future<Map<String, dynamic>> getArticleInfo(final CourseArticle article) async {
-    var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
+    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
     var response = await request(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}',
-        options: options, callback: Get.find<UserDataController>().login);
+        options: options, callback: Get.find<LoginController>().login);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -207,8 +207,8 @@ class CourseController {
       pageLength: 게시판 페이지 수
       writable: 글쓰기 권한 확인
     */
-    var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseBoardUrl + '$boardId&page=$page', options: options, callback: Get.find<UserDataController>().login);
+    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
+    var response = await request(CommonUrl.courseBoardUrl + '$boardId&page=$page', options: options, callback: Get.find<LoginController>().login);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -255,8 +255,8 @@ class CourseController {
   }
 
   Future<Uri> getM3u8Uri(final String activityId) async {
-    var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
-    var response = await request(CommonUrl.vodViewerUrl + activityId, options: options, callback: Get.find<UserDataController>().login);
+    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
+    var response = await request(CommonUrl.vodViewerUrl + activityId, options: options, callback: Get.find<LoginController>().login);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -383,9 +383,9 @@ class CourseController {
   Future<List<Course>?> _fetchCourseList({int year = 0, int semester = 0}) async {
     final List<Course> courseList = <Course>[];
 
-    var options = dio.Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
+    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
     var response =
-        await request(CommonUrl.courseListUrl + 'year=$year&semester=$semester', options: options, callback: Get.find<UserDataController>().login);
+        await request(CommonUrl.courseListUrl + 'year=$year&semester=$semester', options: options, callback: Get.find<LoginController>().login);
     if (response == null) {
       /* TODO: 에러 */
       return null;

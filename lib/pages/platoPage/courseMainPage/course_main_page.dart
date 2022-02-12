@@ -11,7 +11,7 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
@@ -442,7 +442,7 @@ class CourseMainPage extends StatelessWidget {
                     viewHandler: () async {
                       var cachedFile = await DefaultCacheManager().getSingleFile(
                         CommonUrl.fileViewerUrl + activity.id,
-                        headers: {"Cookie": Get.find<UserDataController>().moodleSessionKey},
+                        headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
                         key: '123',
                       );
                       var result = await OpenFile.open(cachedFile.path);

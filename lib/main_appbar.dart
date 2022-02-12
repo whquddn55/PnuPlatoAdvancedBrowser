@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 
 class MainAppbar extends AppBar {
   MainAppbar(final String titleText, {Key? key, final PreferredSizeWidget? bottomWidget})
@@ -13,12 +13,12 @@ class MainAppbar extends AppBar {
           title: Text(titleText),
           centerTitle: true,
           bottom: bottomWidget,
-          leading: GetBuilder<UserDataController>(builder: (userDataController) {
+          leading: GetBuilder<LoginController>(builder: (userDataController) {
             if (userDataController.loginStatus == true) {
               Get.find<NoticeController>().updateReadMap();
               return GetBuilder<NoticeController>(builder: (controller) {
                 return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance.collection("users").doc(Get.find<UserDataController>().studentId.toString()).snapshots(),
+                  stream: FirebaseFirestore.instance.collection("users").doc(Get.find<LoginController>().studentId.toString()).snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState != ConnectionState.active) {
                       return IconButton(icon: const Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer());
