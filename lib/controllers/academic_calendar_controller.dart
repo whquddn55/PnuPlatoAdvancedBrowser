@@ -3,7 +3,7 @@ import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/acamedic_calendar_item.dart';
 
-class AcademicCalendarController {
+abstract class AcademicCalendarController {
   static Future<List<AcademicCalendarItem>?> getAcademicCalendar() async {
     var response = await request(CommonUrl.academicCalendarUrl);
     if (response == null) {

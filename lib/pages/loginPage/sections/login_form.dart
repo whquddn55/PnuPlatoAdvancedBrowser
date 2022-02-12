@@ -12,9 +12,10 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
-  final _userDataController = Get.find<UserDataController>();
   final _idFocusNode = FocusNode();
   final _pwFocusNode = FocusNode();
+  String _username = '';
+  String _password = '';
   bool _passwordVisible = false;
   String _loginMsg = '';
 
@@ -22,9 +23,12 @@ class _LoginFormState extends State<LoginForm> {
     FocusScope.of(context).unfocus();
     var dialogContext = await showProgressDialog(context, "로그인 중입니다...");
     _formKey.currentState!.save();
-    bool loginResult = await _userDataController.login();
+
+    final _userDataController = Get.find<UserDataController>();
+    await _userDataController.login(autologin: false, username: _username, password: _password);
     closeProgressModal(dialogContext);
-    if (loginResult == false) {
+
+    if (_userDataController.loginStatus == false) {
       setState(() {
         _loginMsg = _userDataController.loginMsg;
       });
@@ -53,7 +57,7 @@ class _LoginFormState extends State<LoginForm> {
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                       labelText: 'Plato 아이디'),
-                  onSaved: (value) => _userDataController.username = value ?? '',
+                  onSaved: (value) => _username = value ?? '',
                   onFieldSubmitted: (_) => _pwFocusNode.requestFocus(),
                 ),
                 const SizedBox(height: 10),
@@ -75,7 +79,7 @@ class _LoginFormState extends State<LoginForm> {
                         },
                       )),
                   obscureText: !_passwordVisible,
-                  onSaved: (value) => _userDataController.password = value ?? '',
+                  onSaved: (value) => _password = value ?? '',
                   onFieldSubmitted: (_) => _submit(),
                 ),
               ],

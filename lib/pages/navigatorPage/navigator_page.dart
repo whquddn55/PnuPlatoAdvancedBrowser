@@ -10,7 +10,7 @@ class NavigatorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _loginFuture = Get.find<UserDataController>().login();
+    final _loginFuture = Get.find<UserDataController>().login(autologin: true);
 
     Future<void> _dbInitFuture(final String? studentId) async {
       if (studentId == null) {
@@ -28,7 +28,7 @@ class NavigatorPage extends StatelessWidget {
       }
     }
 
-    return FutureBuilder<bool>(
+    return FutureBuilder<void>(
       future: _loginFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
@@ -37,8 +37,8 @@ class NavigatorPage extends StatelessWidget {
 
         String? studentId;
 
-        if (snapshot.data! == true) {
-          studentId = Get.find<UserDataController>().studentId.toString();
+        if (Get.find<UserDataController>().loginStatus == true) {
+          Get.find<UserDataController>().studentId.toString();
         }
 
         return FutureBuilder<void>(

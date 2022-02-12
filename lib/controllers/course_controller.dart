@@ -10,6 +10,7 @@ import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assistant.dart';
 import 'package:pnu_plato_advanced_browser/data/professor.dart';
 
+/* TODO: abstract, static */
 class CourseController {
   final List<Course> _currentSemesterCourseList = <Course>[];
 
@@ -152,7 +153,7 @@ class CourseController {
           if (res[week] == null) {
             res[week] = [];
           }
-          res[week]!.add({title: status});
+          res[week]!.add({"title": title, "status": status});
         }
       }
     }

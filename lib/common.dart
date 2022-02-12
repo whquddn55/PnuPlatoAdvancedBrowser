@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -12,7 +10,6 @@ import 'package:html/parser.dart';
 import 'package:get/get.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:marquee/marquee.dart';
-import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 
 abstract class CommonUrl {
@@ -26,7 +23,7 @@ abstract class CommonUrl {
   static const String logoutUrl = 'https://plato.pusan.ac.kr/login/logout.php?sesskey=';
   static const String courseListUrl = 'https://plato.pusan.ac.kr/local/ubion/user/index.php?';
   static const String courseMainUrl = 'https://plato.pusan.ac.kr/course/view.php?id=';
-  static const String courseVideoUrl = 'https://plato.pusan.ac.kr/mod/vod/index.php?id=';
+  static const String courseVodUrl = 'https://plato.pusan.ac.kr/mod/vod/index.php?id=';
   static const String courseAssignUrl = 'https://plato.pusan.ac.kr/mod/assign/index.php?id=';
   static const String courseZoomUrl = 'https://plato.pusan.ac.kr/mod/zoom/index.php?id=';
   static const String courseQuizUrl = 'https://plato.pusan.ac.kr/mod/quiz/index.php?id=';

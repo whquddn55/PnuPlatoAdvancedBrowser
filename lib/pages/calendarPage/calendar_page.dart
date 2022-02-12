@@ -5,6 +5,8 @@ import 'package:pnu_plato_advanced_browser/main_appbar.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage/sections/academic_calendar.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage/sections/main_calendar.dart';
 import 'package:pnu_plato_advanced_browser/main_drawer.dart';
+import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
+import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
 class CalendarPage extends StatelessWidget {
   const CalendarPage({Key? key}) : super(key: key);
@@ -37,10 +39,16 @@ class CalendarPage extends StatelessWidget {
               child: Column(
                 children: [
                   const AcademicCalendar(),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: MainCalendar(),
-                  ),
+                  // Padding(
+                  //     padding: const EdgeInsets.all(8.0),
+                  //     child: StreamBuilder<Map<String, dynamic>?>(
+                  //         stream: BackgroundService.service.onDataReceived,
+                  //         builder: (context, snapshot) {
+                  //           if (!snapshot.hasData) {
+                  //             return const LoadingPage(msg: "데이터를 불러오는 중입니다...");
+                  //           }
+                  //           return MainCalendar(snapshot.data!["todoList"]);
+                  //         })),
                 ],
               ),
             );

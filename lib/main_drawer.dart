@@ -12,6 +12,7 @@ import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.d
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/noticeListPage/notice_list_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/settingPage/setting_page.dart';
+import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({Key? key}) : super(key: key);
@@ -34,6 +35,10 @@ class MainDrawer extends StatelessWidget {
               ListTile(
                 title: Text('동기화 시간: ${controller.lastSyncTime}'),
                 dense: true,
+                onTap: () {
+                  //BackgroundService.sendData(BackgroundServiceAction.fetchTodoListAll);
+                  //Get.find<TodoController>().fetchTodoListAll();
+                },
               ),
               const Divider(height: 0),
               ListTile(

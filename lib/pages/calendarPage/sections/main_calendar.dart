@@ -1,41 +1,11 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/data/activity.dart';
+import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class MainCalendar extends StatefulWidget {
-  final Map<DateTime, List<Activity>> _events =
-      HashMap(equals: isSameDay, hashCode: (DateTime key) => key.day * 10000000 + key.month * 10000 + key.year)
-        ..addAll({
-          DateTime.now(): [
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.zoom),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.quiz),
-            // ],
-            // DateTime(2022, 1, 17): [
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.zoom),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.quiz),
-            // ],
-            // DateTime(2022, 1, 19): [
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.assign),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.video),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.zoom),
-            //   Activity(id: '1', title: 'test', courseId: '1', endDate: DateTime.now(), type: ActivityTime.quiz),
-          ]
-        });
-
-  MainCalendar({Key? key}) : super(key: key);
+  final List<Todo> todoList;
+  const MainCalendar(this.todoList, {Key? key}) : super(key: key);
 
   @override
   _MainCalendarState createState() => _MainCalendarState();
@@ -51,7 +21,7 @@ class _MainCalendarState extends State<MainCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    return TableCalendar(
+    return TableCalendar<Todo>(
       focusedDay: _focusedDay,
       firstDay: DateTime(2020, 01, 01),
       lastDay: DateTime(2025, 12, 31),
@@ -102,26 +72,31 @@ class _MainCalendarState extends State<MainCalendar> {
         });
       },
       eventLoader: (day) {
-        return widget._events[day] ?? <Activity>[];
+        var eventList = <Todo>[];
+        for (var todo in widget.todoList) {
+          if (_isSameDay(todo.dueDate, day)) {
+            eventList.add(todo);
+          }
+        }
+        return eventList;
       },
       calendarBuilders: CalendarBuilders(markerBuilder: (context, day, events) {
-        events as List<Activity>;
         int videoCnt = 0;
         int assignCnt = 0;
         int zoomCnt = 0;
-        // for (Activity event in events) {
-        //   switch (event.type) {
-        //     case ActivityTime.video:
-        //       videoCnt++;
-        //       break;
-        //     case ActivityTime.assign:
-        //     case ActivityTime.quiz:
-        //       assignCnt++;
-        //       break;
-        //     case ActivityTime.zoom:
-        //       zoomCnt++;
-        //   }
-        // }
+        for (Todo event in events) {
+          switch (event.type) {
+            case TodoType.vod:
+              videoCnt++;
+              break;
+            case TodoType.assign:
+            case TodoType.quiz:
+              assignCnt++;
+              break;
+            case TodoType.zoom:
+              zoomCnt++;
+          }
+        }
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [

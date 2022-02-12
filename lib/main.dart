@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:pnu_plato_advanced_browser/controllers/activity_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
@@ -11,6 +10,7 @@ import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/user_data_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/LandingPage/landing_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.dart';
+import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,11 +18,14 @@ void main() async {
   await Firebase.initializeApp();
   Get.put(UserDataController());
   Get.put(CourseController());
-  Get.put(ActivityController());
   Get.put(RouteController());
   Get.put(DownloadController());
   Get.put(NoticeController());
   await AppSettingController.initiate();
+
+  var backgroudnService = BackgroundService();
+  await backgroudnService.initializeService();
+  Get.put(backgroudnService);
 
   runApp(const MyApp());
 }

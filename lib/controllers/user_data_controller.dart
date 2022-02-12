@@ -5,10 +5,10 @@ import 'package:html/parser.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/notification.dart';
+import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserDataController extends GetxController {
-  String _username = '', _password = '';
   bool _loginStatus = false;
   String _sessionKey = '';
   String _moodleSessionKey = '';
@@ -33,95 +33,25 @@ class UserDataController extends GetxController {
   String get imgUrl => _imgUrl;
   String get lastSyncTime => _lastSyncTime;
 
-  set username(String username) => _username = username;
-  set password(String password) => _password = password;
+  Future<void> login({required final bool autologin, String? username, String? password}) async {
+    var backgroundService = Get.find<BackgroundService>();
+    backgroundService.sendData(BackgroundServiceAction.login, data: {"autologin": autologin, "username": username, "password": password});
+    var res = await backgroundService.loginCompleter.future;
 
-  Future<bool> login() async {
-    final preference = await SharedPreferences.getInstance();
-    _username = preference.getString('username') ?? _username;
-    _password = preference.getString('password') ?? _password;
-    if (_username == '' || _password == '') {
-      return false;
+    print(res);
+
+    _loginStatus = res["loginStatus"];
+    _loginMsg = res["loginMsg"];
+    _debugMsg = res["debugMsg"];
+    if (_loginStatus == true) {
+      _moodleSessionKey = res["moodleSessionKey"];
+      _studentId = res["studentId"];
+      _department = res["department"];
+      _name = res["name"];
+      _imgUrl = res["imgUrl"];
     }
 
-    String body = 'username=$_username&password=${Uri.encodeQueryComponent(_password)}';
-    dio.Response response;
-    try {
-      response = await dio.Dio().post(CommonUrl.loginUrl,
-          data: body,
-          options: dio.Options(followRedirects: false, contentType: 'application/x-www-form-urlencoded', headers: {
-            'Host': 'plato.pusan.ac.kr',
-            'Connection': 'close',
-            'Content-Length': body.length.toString(),
-            'Cache-Control': 'max-age=0',
-            'sec-ch-ua': 'Chromium;v="88", "Google Chrome";v="88", ";Not A Brand";v="99"',
-            'sec-ch-ua-mobile': '?0',
-            'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36',
-            'Origin': 'https://plato.pusan.ac.kr',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept':
-                'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'Referer': 'https://plato.pusan.ac.kr/',
-            'Accept-Encoding': 'gzip, deflate',
-            'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-          }));
-
-      /* always return 303 */
-      _debugMsg = 'does not return 303';
-      _loginMsg = 'login failed with UnknownError';
-      /* TODO: popup error report */
-      return _loginStatus = false;
-    } on dio.DioError catch (e, _) {
-      /* successfully login */
-      if (e.response!.statusCode == 303) {
-        response = e.response!;
-      }
-      /* unknownError */
-      else {
-        _debugMsg = e.toString();
-        _loginMsg = 'login failed with UnknownError';
-        /* TODO: popup error report */
-        return _loginStatus = false;
-      }
-    }
-    /* unknownError */
-    catch (e) {
-      _debugMsg = e.toString();
-      _loginMsg = 'login failed with UnknownError';
-      /* TODO: popup error report */
-      return _loginStatus = false;
-    }
-
-    /* wrong id/pw */
-    if (response.headers.map['location']![0] == CommonUrl.loginErrorUrl) {
-      _debugMsg = 'login failed with wrong ID/PW';
-      _loginMsg = 'wrong ID/PW';
-      return _loginStatus = false;
-    }
-
-    /* successfully login */
-    _moodleSessionKey = response.headers.map['set-cookie']![1];
-    _debugMsg = 'login success';
-    _loginMsg = 'login success';
-
-    print("Synced with Plato");
-
-    _updateSyncTime();
-    await _getInformation();
-    await preference.setString('username', _username);
-    await preference.setString('password', _password);
-    CookieManager cookieManager = CookieManager.instance();
-    await cookieManager.deleteAllCookies();
-    await cookieManager.setCookie(
-      url: Uri.parse('https://plato.pusan.ac.kr'),
-      name: 'MoodleSession',
-      value: _moodleSessionKey.split('=')[1],
-      domain: 'plato.pusan.ac.kr',
-      path: '/',
-    );
     update();
-    return _loginStatus = true;
   }
 
   Future<bool> logout() async {
@@ -133,8 +63,6 @@ class UserDataController extends GetxController {
 
     final preference = await SharedPreferences.getInstance();
     await preference.clear();
-    _username = '';
-    _password = '';
     _loginStatus = false;
     _sessionKey = '';
     _moodleSessionKey = '';
