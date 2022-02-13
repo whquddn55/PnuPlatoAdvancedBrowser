@@ -1,25 +1,27 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
+import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_todo_controller.dart';
 
-enum BackgroundServiceAction { login, logout, fetchTodoList, fetchTodoListAll, none }
+enum BackgroundServiceAction { login, logout, fetchTodoList, none }
 
 /* APP 부분 */
 abstract class BackgroundService {
-  static final FlutterBackgroundService service = FlutterBackgroundService();
-  static Completer<Map<String, dynamic>> loginCompleter = Completer<Map<String, dynamic>>();
-  static Completer<bool> logoutCompleter = Completer<bool>();
+  static final FlutterBackgroundService _service = FlutterBackgroundService();
+  static final Map<int, Completer> _completerMap = <int, Completer>{};
 
   static Future<void> initializeService() async {
-    await service.configure(
+    await _service.configure(
       androidConfiguration: AndroidConfiguration(
         // this will executed when app is in foreground or background in separated isolate
         onStart: _onStart,
         // auto start service
         autoStart: true,
-        isForegroundMode: true,
+        isForegroundMode: false,
       ),
       iosConfiguration: IosConfiguration(
         // auto start service
@@ -31,10 +33,12 @@ abstract class BackgroundService {
       ),
     );
 
-    service.onDataReceived.listen((data) {
+    _service.onDataReceived.listen((data) {
       if (data == null) {
         return;
       }
+
+      print("[DEBUG] recevied app: $data");
 
       BackgroundServiceAction action = BackgroundServiceAction.none;
       for (var a in BackgroundServiceAction.values) {
@@ -45,37 +49,34 @@ abstract class BackgroundService {
 
       switch (action) {
         case BackgroundServiceAction.login:
-          loginCompleter.complete(data["data"]);
+          _completerMap[data["hashCode"]]!.complete(data["data"]);
           break;
         case BackgroundServiceAction.logout:
-          logoutCompleter.complete(data["data"]);
+          _completerMap[data["hashCode"]]!.complete(data["data"]);
           break;
-
-        case BackgroundServiceAction.fetchTodoListAll:
+        case BackgroundServiceAction.fetchTodoList:
+          _completerMap[data["hashCode"]]!.complete(jsonDecode(data["data"]).map((map) => Todo.fromJson(map)).toList());
           break;
 
         case BackgroundServiceAction.none:
+          print("[DEBUG] ERROR!!! $data");
           assert(false);
           break;
       }
     });
   }
 
-  static void sendData(final BackgroundServiceAction action, {Map<String, dynamic>? data}) {
-    switch (action) {
-      case BackgroundServiceAction.login:
-        loginCompleter = Completer();
-        break;
-      case BackgroundServiceAction.logout:
-        logoutCompleter = Completer();
-        break;
-    }
+  static Future<dynamic> sendData(final BackgroundServiceAction action, {Map<String, dynamic>? data}) {
+    var completer = Completer();
+    _completerMap[completer.hashCode] = completer;
 
     if (data == null) {
-      service.sendData({"action": action.toString()});
+      _service.sendData({"action": action.toString(), "hashCode": completer.hashCode});
     } else {
-      service.sendData({"action": action.toString(), ...data});
+      _service.sendData({"action": action.toString(), "hashCode": completer.hashCode, ...data});
     }
+
+    return completer.future;
   }
 }
 
@@ -100,9 +101,9 @@ void _onStart() {
       }
     }
 
-    print("[DEBUG] $data");
+    print("[DEBUG] receive service: $data");
 
-    var res = <String, dynamic>{"action": data["action"]};
+    var res = <String, dynamic>{"action": data["action"], "hashCode": data["hashCode"]};
 
     switch (action) {
       case BackgroundServiceAction.login:
@@ -113,16 +114,12 @@ void _onStart() {
         res["data"] = await BackgroundLoginController.logout();
         service.sendData(res);
         break;
-      // case BackgroundServiceAction.fetchTodoList:
-      //   var courseId = data["courseId"] as String;
-      //   await _TodoController.fetchTodoListByCourseId(courseId);
-      //   service.sendData({"todoList": _TodoController.todoList});
-      //   break;
-
-      // case BackgroundServiceAction.fetchTodoListAll:
-      //   await _TodoController.fetchTodoListAll();
-      //   service.sendData({"todoList": _TodoController.todoList});
-      //   break;
+      case BackgroundServiceAction.fetchTodoList:
+        var courseIdList = List<String>.from(data["courseIdList"]);
+        var vodStatusList = List<Map<String, dynamic>>.from(data["vodStatusList"]);
+        res["data"] = jsonEncode((await BackgroundTodoController.fetchTodoList(courseIdList, vodStatusList)).map((todo) => todo.toJson()).toList());
+        service.sendData(res);
+        break;
 
       case BackgroundServiceAction.none:
         assert(false);

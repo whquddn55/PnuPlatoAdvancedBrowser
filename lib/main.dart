@@ -8,6 +8,7 @@ import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart'
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/LandingPage/landing_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
@@ -21,6 +22,7 @@ void main() async {
   Get.put(RouteController());
   Get.put(DownloadController());
   Get.put(NoticeController());
+  Get.put(TodoController());
   await AppSettingController.initiate();
 
   await BackgroundService.initializeService();

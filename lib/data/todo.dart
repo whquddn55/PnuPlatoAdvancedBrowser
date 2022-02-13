@@ -21,4 +21,27 @@ class Todo {
     required this.iconUri,
     required this.status,
   });
+
+  Todo.fromJson(Map<String, dynamic> json)
+      : id = json["id"],
+        title = json["title"],
+        courseId = json["courseId"],
+        dueDate = DateTime.parse(json["dueDate"]),
+        type = TodoType.values.byName(json["type"]),
+        availability = json["availability"],
+        iconUri = Uri.parse(json["iconUri"]),
+        status = TodoStatus.values.byName(json["status"]);
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "title": title,
+      "courseId": courseId,
+      "dueDate": dueDate.toString(),
+      "type": type.name,
+      "availability": availability,
+      "iconUri": iconUri.toString(),
+      "status": status.name,
+    };
+  }
 }

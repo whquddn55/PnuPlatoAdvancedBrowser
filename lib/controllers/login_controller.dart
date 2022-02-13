@@ -28,8 +28,8 @@ class LoginController extends GetxController {
   String get lastSyncTime => _lastSyncTime;
 
   Future<void> login({required final bool autologin, String? username, String? password}) async {
-    BackgroundService.sendData(BackgroundServiceAction.login, data: {"autologin": autologin, "username": username, "password": password});
-    var res = await BackgroundService.loginCompleter.future;
+    var res =
+        await BackgroundService.sendData(BackgroundServiceAction.login, data: {"autologin": autologin, "username": username, "password": password});
 
     _loginStatus = res["loginStatus"];
     _loginMsg = res["loginMsg"];
@@ -46,8 +46,7 @@ class LoginController extends GetxController {
   }
 
   Future<void> logout() async {
-    BackgroundService.sendData(BackgroundServiceAction.logout);
-    var res = await BackgroundService.logoutCompleter.future;
+    var res = await BackgroundService.sendData(BackgroundServiceAction.logout);
 
     if (res == false) {
       /* TODO: 에러 */

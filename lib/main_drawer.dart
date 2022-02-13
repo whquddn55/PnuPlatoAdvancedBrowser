@@ -4,15 +4,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/admin_bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/noticeListPage/notice_list_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/settingPage/setting_page.dart';
-import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({Key? key}) : super(key: key);
@@ -35,9 +36,19 @@ class MainDrawer extends StatelessWidget {
               ListTile(
                 title: Text('동기화 시간: ${controller.lastSyncTime}'),
                 dense: true,
-                onTap: () {
-                  //BackgroundService.sendData(BackgroundServiceAction.fetchTodoListAll);
-                  //Get.find<TodoController>().fetchTodoListAll();
+                onTap: () async {
+                  var courseIdList = Get.find<CourseController>().currentSemesterCourseList.map((course) => course.id).toList();
+                  var vodStatusList = <Map<String, dynamic>>[];
+                  for (var courseId in courseIdList) {
+                    for (var values in (await Get.find<CourseController>().getVodStatus(courseId)).values) {
+                      for (var vodStatus in values) {
+                        vodStatusList.add(vodStatus);
+                      }
+                    }
+                  }
+                  // BackgroundService.sendData(BackgroundServiceAction.fetchTodoList,
+                  //     data: {"courseIdList": courseIdList, "vodStatusList": vodStatusList});
+                  Get.find<TodoController>().updateTodoList(courseIdList, vodStatusList);
                 },
               ),
               const Divider(height: 0),

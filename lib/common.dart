@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:marquee/marquee.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 
 abstract class CommonUrl {
   static const String platoMainUrl = 'https://plato.pusan.ac.kr/';
@@ -106,17 +107,33 @@ class NFMarquee extends StatelessWidget {
   }
 }
 
-Future<dio.Response?> request(String url, {dio.Options? options, Function? callback}) async {
+Future<dio.Response?> request(final String url, {dio.Options? options, bool? isFront}) async {
   dio.Response? response;
   int retry = 0;
+
+  options ??= dio.Options();
+  options.headers ??= {};
   while (retry < 5) {
+    if (isFront != null) {
+      if (isFront == true) {
+        options.headers!["Cookie"] = Get.find<LoginController>().moodleSessionKey;
+      } else {
+        options.headers!["Cookie"] = BackgroundLoginController.moodleSessionKey;
+      }
+
+      print(options.headers!["Cookie"]);
+    }
     try {
       response = await dio.Dio().get(url, options: options);
       if (parse(response.data).children[0].attributes['class'] == 'html_login') {
         retry++;
-        if (callback != null) {
-          await callback();
-        }
+        // if (isFront != null) {
+        //   if (isFront == true) {
+        //     await Get.find<LoginController>().login(autologin: true);
+        //   } else {
+        //     await BackgroundLoginController.login(autologin: true);
+        //   }
+        // }
       } else {
         break;
       }

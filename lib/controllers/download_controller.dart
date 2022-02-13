@@ -67,7 +67,7 @@ class DownloadController {
               followRedirects: false,
               validateStatus: (status) => status == 303 || status == 200,
             );
-            var responseTemp = await request(url, options: options, callback: Get.find<LoginController>().login);
+            var responseTemp = await request(url, options: options, isFront: true);
             if (responseTemp == null) {
               /* TODO: 에러 */
 

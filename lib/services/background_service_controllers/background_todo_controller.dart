@@ -1,51 +1,39 @@
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:html/dom.dart' as html;
 import 'package:html/parser.dart';
 
-abstract class _TodoController {
-  static final List<Todo> todoList = <Todo>[];
-
-  static Future<void> fetchTodoListAll() async {
-    for (var course in Get.find<CourseController>().currentSemesterCourseList) {
-      await _fetchVod(course.id);
-      await _fetchAssign(course.id);
-      await _fetchQuiz(course.id);
-      await _fetchZoom(course.id);
+abstract class BackgroundTodoController {
+  static Future<List<Todo>> fetchTodoList(final List<String> courseIdList, final List<Map<String, dynamic>> vodStatusList) async {
+    final List<Todo> todoList = <Todo>[];
+    for (var courseId in courseIdList) {
+      print(courseId);
+      todoList.addAll(await _fetchVod(courseId, vodStatusList));
+      todoList.addAll(await _fetchAssign(courseId));
+      todoList.addAll(await _fetchQuiz(courseId));
+      todoList.addAll(await _fetchZoom(courseId));
     }
+
+    return todoList;
   }
 
-  static Future<void> fetchTodoListByCourseId(final String courseId) async {
-    print("[DEBUG] $courseId");
-    await _fetchVod(courseId);
-    print("[DEBUG] $courseId");
-    await _fetchAssign(courseId);
-    print("[DEBUG] $courseId");
-    await _fetchQuiz(courseId);
-    print("[DEBUG] $courseId");
-    await _fetchZoom(courseId);
-    print("[DEBUG] $courseId");
-  }
-
-  static Future<void> _fetchVod(final String courseId) async {
-    var vodStatusList = (await Get.find<CourseController>().getVodStatus(courseId)).values;
+  static Future<List<Todo>> _fetchVod(final String courseId, final List<Map<String, dynamic>> vodStatusList) async {
     if (vodStatusList.isEmpty) {
-      return;
+      return [];
     }
-    List<Map<String, dynamic>> vodList = vodStatusList.reduce((value, element) => value + element);
 
-    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseMainUrl + courseId, options: options, callback: Get.find<LoginController>().login);
+    var response = await request(CommonUrl.courseMainUrl + courseId, isFront: false);
     if (response == null) {
       /* TODO : 에러 */
-      return;
+      return [];
     }
-    html.Document document = parse(response.data);
 
+    final List<Todo> todoList = <Todo>[];
+
+    html.Document document = parse(response.data);
     for (var activity in document.getElementsByClassName('activity')) {
       final TodoType? type = _getType(activity);
       if (type == null) {
@@ -54,7 +42,7 @@ abstract class _TodoController {
 
       final String title = _getTitle(activity);
       bool? done;
-      for (var vod in vodList) {
+      for (var vod in vodStatusList) {
         if (vod.containsKey(title)) {
           done = vod["status"];
         }
@@ -83,16 +71,19 @@ abstract class _TodoController {
         status: done ? TodoStatus.done : TodoStatus.undone,
       ));
     }
+    return todoList;
   }
 
-  static Future<void> _fetchAssign(String courseId) async {
-    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseAssignUrl + courseId, options: options, callback: Get.find<LoginController>().login);
+  static Future<List<Todo>> _fetchAssign(String courseId) async {
+    var response = await request(CommonUrl.courseAssignUrl + courseId, isFront: false);
 
     if (response == null) {
       /* TODO : 에러 */
-      return;
+      return [];
     }
+
+    final List<Todo> todoList = <Todo>[];
+
     html.Document document = parse(response.data);
     for (var tr in document.getElementsByTagName('tr')) {
       if (tr.getElementsByClassName('cell c1').isNotEmpty) {
@@ -114,16 +105,19 @@ abstract class _TodoController {
         ));
       }
     }
+    return todoList;
   }
 
-  static Future<void> _fetchQuiz(String courseId) async {
-    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseQuizUrl + courseId, options: options, callback: Get.find<LoginController>().login);
+  static Future<List<Todo>> _fetchQuiz(String courseId) async {
+    var response = await request(CommonUrl.courseQuizUrl + courseId, isFront: false);
 
     if (response == null) {
       /* TODO : 에러 */
-      return;
+      return [];
     }
+
+    final List<Todo> todoList = <Todo>[];
+
     html.Document document = parse(response.data);
     for (var tr in document.getElementsByTagName('tr')) {
       if (tr.getElementsByClassName('cell c1').isNotEmpty) {
@@ -146,9 +140,11 @@ abstract class _TodoController {
         ));
       }
     }
+    return todoList;
   }
 
-  static Future<void> _fetchZoom(String courseId) async {
+  static Future<List<Todo>> _fetchZoom(String courseId) async {
+    return [];
     /* TODO: 줌 강의 열리면 새로 짜야함 */
 
     // var options = Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
@@ -158,6 +154,7 @@ abstract class _TodoController {
     //   /* TODO : 에러 */
     //   return;
     // }
+    // final List<Todo> todoList = <Todo>[];
     // Document document = parse(response.data);
     // for (var tr in document.getElementsByTagName('tr')) {
     //   if (tr.getElementsByClassName('cell c1').isNotEmpty) {
@@ -180,6 +177,7 @@ abstract class _TodoController {
     //     ));
     //   }
     // }
+    // return todoList;
   }
 
   static String _getTitle(html.Element activity) {

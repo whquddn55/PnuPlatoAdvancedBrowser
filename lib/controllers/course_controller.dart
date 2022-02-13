@@ -50,7 +50,7 @@ class CourseController {
 
   Future<bool> updateCourseSpecification(final Course course) async {
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseMainUrl + course.id, options: options, callback: Get.find<LoginController>().login);
+    var response = await request(CommonUrl.courseMainUrl + course.id, options: options, isFront: true);
     if (response == null) {
       /* TODO : 에러 */
       return false;
@@ -111,7 +111,7 @@ class CourseController {
 
   Future<Map<int, List<Map<String, dynamic>>>> getVodStatus(final String courseId) async {
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseOnlineAbsenceUrl + courseId, options: options, callback: Get.find<LoginController>().login);
+    var response = await request(CommonUrl.courseOnlineAbsenceUrl + courseId, options: options, isFront: true);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -163,8 +163,7 @@ class CourseController {
 
   Future<Map<String, dynamic>> getArticleInfo(final CourseArticle article) async {
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}',
-        options: options, callback: Get.find<LoginController>().login);
+    var response = await request(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}', options: options, isFront: true);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -178,11 +177,13 @@ class CourseController {
     res['writer'] = document.getElementsByClassName('writer')[0].text.trim();
     res['date'] = document.getElementsByClassName('date')[0].text.trim();
     res['content'] = document.getElementsByClassName('text_to_html')[0].innerHtml;
-    res['files'] = document.getElementsByClassName('files')[1].children.map((li) {
-      var img = li.getElementsByTagName('img')[0];
-      var a = li.getElementsByTagName('a')[0];
-      return [a.text.trim(), a.attributes['href']!, img.attributes['src']!];
-    }).toList();
+    if (document.getElementsByClassName('files').length >= 2) {
+      res['files'] = document.getElementsByClassName('files')[1].children.map((li) {
+        var img = li.getElementsByTagName('img')[0];
+        var a = li.getElementsByTagName('a')[0];
+        return [a.text.trim(), a.attributes['href']!, img.attributes['src']!];
+      }).toList();
+    }
     return res;
   }
 
@@ -208,7 +209,7 @@ class CourseController {
       writable: 글쓰기 권한 확인
     */
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseBoardUrl + '$boardId&page=$page', options: options, callback: Get.find<LoginController>().login);
+    var response = await request(CommonUrl.courseBoardUrl + '$boardId&page=$page', options: options, isFront: true);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -256,7 +257,7 @@ class CourseController {
 
   Future<Uri> getM3u8Uri(final String activityId) async {
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.vodViewerUrl + activityId, options: options, callback: Get.find<LoginController>().login);
+    var response = await request(CommonUrl.vodViewerUrl + activityId, options: options, isFront: true);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -384,8 +385,7 @@ class CourseController {
     final List<Course> courseList = <Course>[];
 
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response =
-        await request(CommonUrl.courseListUrl + 'year=$year&semester=$semester', options: options, callback: Get.find<LoginController>().login);
+    var response = await request(CommonUrl.courseListUrl + 'year=$year&semester=$semester', options: options, isFront: true);
     if (response == null) {
       /* TODO: 에러 */
       return null;

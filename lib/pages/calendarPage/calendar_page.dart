@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/main_appbar.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage/sections/academic_calendar.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage/sections/main_calendar.dart';
@@ -39,16 +40,14 @@ class CalendarPage extends StatelessWidget {
               child: Column(
                 children: [
                   const AcademicCalendar(),
-                  // Padding(
-                  //     padding: const EdgeInsets.all(8.0),
-                  //     child: StreamBuilder<Map<String, dynamic>?>(
-                  //         stream: BackgroundService.service.onDataReceived,
-                  //         builder: (context, snapshot) {
-                  //           if (!snapshot.hasData) {
-                  //             return const LoadingPage(msg: "데이터를 불러오는 중입니다...");
-                  //           }
-                  //           return MainCalendar(snapshot.data!["todoList"]);
-                  //         })),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GetBuilder<TodoController>(
+                      builder: (controller) {
+                        return MainCalendar(controller.todoList);
+                      },
+                    ),
+                  ),
                 ],
               ),
             );

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
@@ -90,8 +89,6 @@ abstract class BackgroundLoginController {
     res["debugMsg"] = 'login success';
     res["loginMsg"] = '로그인 성공!';
 
-    print("Synced with Plato");
-
     _updateSyncTime();
     res.addAll(await _getInformation(res["moodleSessionKey"]));
 
@@ -109,6 +106,7 @@ abstract class BackgroundLoginController {
     );
     res["loginStatus"] = true;
 
+    print("[DEBUG] Sync With Plato : ${moodleSessionKey}");
     moodleSessionKey = res["moodleSessionKey"];
     return res;
   }
@@ -129,7 +127,7 @@ abstract class BackgroundLoginController {
 
   static Future<bool> getNotifications() async {
     var options = dio.Options(headers: {'Cookie': moodleSessionKey});
-    var response = await request(CommonUrl.notificationUrl, options: options, callback: login);
+    var response = await request(CommonUrl.notificationUrl, options: options, isFront: false);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -159,7 +157,7 @@ abstract class BackgroundLoginController {
 
   static Future<String> _getBody(String url, String type) async {
     var options = dio.Options(headers: {'Cookie': moodleSessionKey});
-    var response = await request(url, options: options, callback: login);
+    var response = await request(url, options: options, isFront: false);
     if (response == null) {
       return 'Undefined1';
     }
