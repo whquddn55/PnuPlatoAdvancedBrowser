@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
@@ -6,8 +7,6 @@ import 'package:pnu_plato_advanced_browser/main_appbar.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage/sections/academic_calendar.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage/sections/main_calendar.dart';
 import 'package:pnu_plato_advanced_browser/main_drawer.dart';
-import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
-import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
 class CalendarPage extends StatelessWidget {
   const CalendarPage({Key? key}) : super(key: key);
@@ -44,6 +43,8 @@ class CalendarPage extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: GetBuilder<TodoController>(
                       builder: (controller) {
+                        Fluttertoast.cancel();
+                        Fluttertoast.showToast(msg: "캘린더가 업데이트 되었습니다.");
                         return MainCalendar(controller.todoList);
                       },
                     ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -70,6 +71,27 @@ class _MainCalendarState extends State<MainCalendar> {
           _selectedDay = selectedDay;
           _focusedDay = selectedDay;
         });
+        var eventList = widget.todoList;
+
+        showBarModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return ListView.builder(
+                shrinkWrap: true,
+                itemCount: eventList.length,
+                itemBuilder: (context, index) {
+                  return Text(eventList[index].title);
+                },
+              );
+            });
+        // showMaterialModalBottomSheet(
+        //   context: context,
+        //   expand: false,
+        //   builder: (context) {
+        //     return Text(eventList[0].title);
+
+        //   },
+        // );
       },
       eventLoader: (day) {
         var eventList = <Todo>[];
