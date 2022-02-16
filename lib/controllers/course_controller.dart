@@ -162,8 +162,7 @@ class CourseController {
   }
 
   Future<Map<String, dynamic>> getArticleInfo(final CourseArticle article) async {
-    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}', options: options, isFront: true);
+    var response = await request(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}', isFront: true);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -182,6 +181,26 @@ class CourseController {
         var img = li.getElementsByTagName('img')[0];
         var a = li.getElementsByTagName('a')[0];
         return [a.text.trim(), a.attributes['href']!, img.attributes['src']!];
+      }).toList();
+    }
+    res['commentable'] = document.getElementsByClassName('ubboard_comment').isNotEmpty;
+
+    if (document.getElementsByClassName('comment_list').isNotEmpty) {
+      res["comments"] = document.getElementsByClassName('comment_list').map((comment) {
+        var writerId = comment.getElementsByTagName('a')[0].attributes["href"]!.split("?id=")[1].split("&")[0];
+        var imgUrl = comment.getElementsByTagName('img')[0].attributes['src']!;
+        var writerName = comment.getElementsByClassName('media-body')[0].children[0].text.trim();
+        var date = comment.getElementsByClassName('media-body')[0].children[1].text.trim();
+        var contents = comment.getElementsByClassName('media-body')[0].children[3].text.trim();
+        var depth = int.parse(comment.attributes["style"]?.split("px")[0].split(":")[1] ?? '0') ~/ 25;
+        return {
+          "writerId": writerId,
+          "imgUrl": imgUrl,
+          "writerName": writerName,
+          "date": date,
+          "contents": contents,
+          "depth": depth,
+        };
       }).toList();
     }
     return res;
