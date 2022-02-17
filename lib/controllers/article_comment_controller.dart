@@ -65,6 +65,26 @@ abstract class ArticleCommentController {
     return getArticleCommentList(Document.html(res.data));
   }
 
+  static Future<List<ArticleComment>?> editComment(final String targetId, final ArticleCommentMetaData metaData, final String content) async {
+    final Options options = Options(validateStatus: (status) => status == 303 || status == 200, contentType: Headers.formUrlEncodedContentType);
+    var res = await requestPost(
+      CommonUrl.courseBoardActionUrl,
+      {
+        "comment": content,
+        "id": metaData.id,
+        "bid": metaData.bid,
+        "cid": metaData.cid,
+        "bwid": metaData.bwid,
+        "type": "comment_modify",
+        "bcid": targetId,
+      },
+      options: options,
+      isFront: true,
+    );
+    if (res == null) return null;
+    return getArticleCommentList(Document.html(res.data));
+  }
+
   static Future<List<ArticleComment>?> deleteComment(final String targetId, final ArticleCommentMetaData metaData) async {
     final Options options = Options(validateStatus: (status) => status == 303 || status == 200, contentType: Headers.formUrlEncodedContentType);
     var res = await requestPost(

@@ -18,6 +18,7 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
   List<ArticleComment> commentList = <ArticleComment>[];
   final TextEditingController controller = TextEditingController();
   int? replyTargetIndex;
+  ArticleComment? editTargetComment;
 
   @override
   void initState() {
@@ -65,7 +66,11 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
               child: const Text("작성"),
               onPressed: () async {
                 var dialogContext = await showProgressDialog(context, "댓글 작성중입니다...");
-                await _writeComment();
+                if (editTargetComment != null) {
+                  await _editComment();
+                } else {
+                  await _writeComment();
+                }
                 closeProgressDialog(dialogContext);
               },
             )
@@ -97,7 +102,7 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
       children: [
         Divider(height: 2, thickness: 1, color: Colors.grey[700]),
         _renderArticleCommentCard(comment, true),
-        const Text("의 답글"),
+        Text(editTargetComment != null ? "를 수정합니다" : "의 답글을 작성합니다"),
       ],
     );
   }
@@ -148,9 +153,10 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
                               onSelected: (index) async {
                                 switch (index) {
                                   case 0:
-                                    await _selectComment(comment);
+                                    await _selectComment(comment, false);
                                     break;
                                   case 1:
+                                    await _selectComment(comment, true);
                                     break;
                                   case 2:
                                     await _deleteComment(comment);
@@ -214,6 +220,24 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
         commentList = res;
         replyTargetIndex = null;
       });
+    } else {
+      Fluttertoast.cancel();
+      Fluttertoast.showToast(msg: "알 수 없는 이유로 작성에 실패하였습니다.");
+    }
+  }
+
+  Future<void> _editComment() async {
+    var res = await ArticleCommentController.editComment(editTargetComment!.commentId, widget.metaData, controller.text);
+
+    if (res != null) {
+      controller.clear();
+      setState(() {
+        commentList = res;
+        replyTargetIndex = null;
+      });
+    } else {
+      Fluttertoast.cancel();
+      Fluttertoast.showToast(msg: "알 수 없는 이유로 수정에 실패하였습니다.");
     }
   }
 
@@ -264,11 +288,17 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
     }
   }
 
-  Future<void> _selectComment(final ArticleComment comment) async {
+  Future<void> _selectComment(final ArticleComment comment, final bool isEdit) async {
     var res = await _clearTextField();
     if (res) {
       setState(() {
         replyTargetIndex = commentList.indexOf(comment);
+        if (isEdit) {
+          editTargetComment = comment;
+          controller.text = comment.contents;
+        } else {
+          editTargetComment = null;
+        }
       });
     }
   }
