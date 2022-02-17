@@ -4,16 +4,16 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/article_comment_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/article_comment.dart';
 
-class ArticleCommentListWidget extends StatefulWidget {
+class ArticleCommentList extends StatefulWidget {
   final ArticleCommentMetaData metaData;
   final List<ArticleComment>? commentList;
-  const ArticleCommentListWidget(this.metaData, this.commentList, {Key? key}) : super(key: key);
+  const ArticleCommentList(this.metaData, this.commentList, {Key? key}) : super(key: key);
 
   @override
-  State<ArticleCommentListWidget> createState() => _ArticleCommentListWidgetState();
+  State<ArticleCommentList> createState() => _ArticleCommentListState();
 }
 
-class _ArticleCommentListWidgetState extends State<ArticleCommentListWidget> {
+class _ArticleCommentListState extends State<ArticleCommentList> {
   List<ArticleComment> commentList = <ArticleComment>[];
   final TextEditingController controller = TextEditingController();
   int? replyTargetIndex;
@@ -34,7 +34,7 @@ class _ArticleCommentListWidgetState extends State<ArticleCommentListWidget> {
         Divider(height: 2, thickness: 1, color: Colors.grey[700]),
         const Text("댓글"),
         ..._renderCommentList(),
-        renderReplyBox(),
+        _renderReplyBox(),
         TextField(
           controller: controller,
           decoration: const InputDecoration(
@@ -79,58 +79,13 @@ class _ArticleCommentListWidgetState extends State<ArticleCommentListWidget> {
       return Row(
         children: [
           SizedBox(width: (comment.depth * 25.0)),
-          Flexible(
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 50, width: 50, child: CachedNetworkImage(imageUrl: comment.imgUrl)),
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(comment.writerName, style: const TextStyle(color: Colors.blueAccent)),
-                                  const SizedBox(width: 10.0),
-                                  Text(comment.date),
-                                ],
-                              ),
-                              OutlinedButton(
-                                child: const Text("답글"),
-                                style: OutlinedButton.styleFrom(visualDensity: VisualDensity.compact),
-                                onPressed: () async {
-                                  var res = await _clearTextField();
-                                  if (res) {
-                                    setState(() {
-                                      replyTargetIndex = commentList.indexOf(comment);
-                                    });
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                          Text(comment.contents),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
+          Flexible(child: _renderArticleCommentCard(comment, false)),
         ],
       );
     }).toList();
   }
 
-  Widget renderReplyBox() {
+  Widget _renderReplyBox() {
     if (replyTargetIndex == null) {
       return const SizedBox(height: 8.0);
     }
@@ -140,52 +95,78 @@ class _ArticleCommentListWidgetState extends State<ArticleCommentListWidget> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Divider(height: 2, thickness: 1, color: Colors.grey[700]),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 50, width: 50, child: CachedNetworkImage(imageUrl: comment.imgUrl)),
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Text(comment.writerName, style: const TextStyle(color: Colors.blueAccent)),
-                              const SizedBox(width: 10.0),
-                              Text(comment.date),
-                            ],
-                          ),
-                          OutlinedButton(
-                            child: const Text("답글"),
-                            style: OutlinedButton.styleFrom(visualDensity: VisualDensity.compact),
-                            onPressed: () async {
-                              var res = await _clearTextField();
-                              if (res) {
-                                setState(() {
-                                  replyTargetIndex = commentList.indexOf(comment);
-                                });
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      Text(comment.contents),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
+        _renderArticleCommentCard(comment, true),
         const Text("의 답글"),
       ],
+    );
+  }
+
+  Widget _renderArticleCommentCard(final ArticleComment comment, bool isReply) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 50, width: 50, child: CachedNetworkImage(imageUrl: comment.imgUrl)),
+            Flexible(
+              fit: FlexFit.tight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: comment.writerName,
+                                style: const TextStyle(color: Colors.blueAccent),
+                              ),
+                              const TextSpan(text: "   "),
+                              TextSpan(
+                                text: comment.date,
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      isReply
+                          ? const SizedBox.shrink()
+                          : PopupMenuButton(
+                              itemBuilder: (context) {
+                                return [
+                                  const PopupMenuItem(child: Text("답글"), value: 0),
+                                  const PopupMenuItem(child: Text("수정"), value: 1),
+                                  const PopupMenuItem(child: Text("삭제"), value: 2),
+                                ];
+                              },
+                              onSelected: (index) {
+                                switch (index) {
+                                  case 0:
+                                    setState(() {
+                                      replyTargetIndex = commentList.indexOf(comment);
+                                    });
+                                    break;
+                                  case 1:
+                                    break;
+                                  case 2:
+                                    break;
+                                }
+                              },
+                            )
+                    ],
+                  ),
+                  Text(comment.contents),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 

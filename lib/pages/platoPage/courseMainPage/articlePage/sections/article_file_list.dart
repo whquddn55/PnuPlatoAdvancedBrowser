@@ -7,11 +7,11 @@ import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart'
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 
-class ArticleFileListWidget extends StatelessWidget {
+class ArticleFileList extends StatelessWidget {
   final String courseTitle;
   final String courseId;
   final List<CourseArticleFile> fileList;
-  const ArticleFileListWidget(this.fileList, this.courseTitle, this.courseId, {Key? key}) : super(key: key);
+  const ArticleFileList(this.fileList, this.courseTitle, this.courseId, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

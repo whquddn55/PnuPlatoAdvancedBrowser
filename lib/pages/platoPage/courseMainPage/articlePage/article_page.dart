@@ -4,8 +4,8 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_article_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_comment_list_widget.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_file_list_widget.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_comment_list.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_file_list.dart';
 
 class ArticlePage extends StatelessWidget {
   final CourseArticleMetaData article;
@@ -69,10 +69,10 @@ class ArticlePage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    if (data.fileList != null) ArticleFileListWidget(data.fileList!, courseTitle, courseId),
+                    if (data.fileList != null) ArticleFileList(data.fileList!, courseTitle, courseId),
                     Divider(height: 0, thickness: 1, color: Colors.grey[700]),
                     renderHtml(data.content),
-                    if (data.commentable) ArticleCommentListWidget(data.commentMetaData, data.commentList),
+                    if (data.commentable) ArticleCommentList(data.commentMetaData, data.commentList),
                   ],
                 ),
               ),
