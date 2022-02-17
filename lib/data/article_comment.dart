@@ -20,6 +20,9 @@ class ArticleComment {
   final String date;
   final String contents;
   final int depth;
+  final bool repliable;
+  final bool editable;
+  final bool erasable;
 
   ArticleComment({
     required this.commentId,
@@ -29,5 +32,8 @@ class ArticleComment {
     required this.date,
     required this.contents,
     required this.depth,
+    required this.repliable,
+    required this.editable,
+    required this.erasable,
   });
 }

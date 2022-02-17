@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/article_comment_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/article_comment.dart';
@@ -139,21 +140,20 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
                           : PopupMenuButton(
                               itemBuilder: (context) {
                                 return [
-                                  const PopupMenuItem(child: Text("답글"), value: 0),
-                                  const PopupMenuItem(child: Text("수정"), value: 1),
-                                  const PopupMenuItem(child: Text("삭제"), value: 2),
+                                  if (comment.repliable) const PopupMenuItem(child: Text("답글"), value: 0),
+                                  if (comment.editable) const PopupMenuItem(child: Text("수정"), value: 1),
+                                  if (comment.erasable) const PopupMenuItem(child: Text("삭제"), value: 2),
                                 ];
                               },
-                              onSelected: (index) {
+                              onSelected: (index) async {
                                 switch (index) {
                                   case 0:
-                                    setState(() {
-                                      replyTargetIndex = commentList.indexOf(comment);
-                                    });
+                                    await _selectComment(comment);
                                     break;
                                   case 1:
                                     break;
                                   case 2:
+                                    await _deleteComment(comment);
                                     break;
                                 }
                               },
@@ -206,16 +206,69 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
 
   Future<void> _writeComment() async {
     var res = await ArticleCommentController.writeComment(
-      content: controller.text,
-      metaData: widget.metaData,
-      targetId: replyTargetIndex == null ? null : commentList[replyTargetIndex!].commentId,
-    );
+        replyTargetIndex == null ? null : commentList[replyTargetIndex!].commentId, widget.metaData, controller.text);
 
     if (res != null) {
       controller.clear();
       setState(() {
         commentList = res;
         replyTargetIndex = null;
+      });
+    }
+  }
+
+  Future<void> _deleteComment(final ArticleComment comment) async {
+    int index = commentList.indexOf(comment);
+    bool deletable = (commentList.length == index + 1) || commentList[index + 1].depth <= commentList[index].depth;
+
+    if (!deletable) {
+      Fluttertoast.cancel();
+      Fluttertoast.showToast(msg: "답글이 달린 댓글은 삭제할 수 없습니다.");
+    } else {
+      var dialogResult = await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: const Text("댓글을 삭제합니다."),
+            actions: [
+              TextButton(
+                child: const Text("취소"),
+                onPressed: () {
+                  Navigator.pop(context, false);
+                },
+              ),
+              TextButton(
+                child: const Text("삭제"),
+                onPressed: () {
+                  Navigator.pop(context, true);
+                },
+              )
+            ],
+          );
+        },
+      );
+
+      if (dialogResult == true) {
+        var dialogContext = await showProgressDialog(context, "삭제 중입니다..");
+        var deleteResult = await ArticleCommentController.deleteComment(comment.commentId, widget.metaData);
+        closeProgressDialog(dialogContext);
+        if (deleteResult == null) {
+          Fluttertoast.cancel();
+          Fluttertoast.showToast(msg: "알 수 없는 이유로 삭제에 실패하였습니다.");
+        } else {
+          setState(() {
+            commentList = deleteResult;
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> _selectComment(final ArticleComment comment) async {
+    var res = await _clearTextField();
+    if (res) {
+      setState(() {
+        replyTargetIndex = commentList.indexOf(comment);
       });
     }
   }

@@ -31,14 +31,16 @@ abstract class ArticleCommentController {
         date: element.getElementsByClassName('media-body')[0].children[1].text.trim(),
         contents: element.getElementsByClassName('media-body')[0].children[3].text.trim(),
         depth: int.parse(element.attributes["style"]?.split("px")[0].split(":")[1] ?? '0') ~/ 25,
+        repliable: element.getElementsByClassName('comment_reply').isNotEmpty,
+        editable: element.getElementsByClassName('comment_modify').isNotEmpty,
+        erasable: element.getElementsByClassName('comment_delete').isNotEmpty,
       ));
     }
 
     return articleCommentList;
   }
 
-  static Future<List<ArticleComment>?> writeComment(
-      {required final String content, required final ArticleCommentMetaData metaData, final String? targetId}) async {
+  static Future<List<ArticleComment>?> writeComment(final String? targetId, final ArticleCommentMetaData metaData, final String content) async {
     if (content.trim().isEmpty) {
       return null;
     }
@@ -59,6 +61,25 @@ abstract class ArticleCommentController {
       retry: 1,
     );
 
+    if (res == null) return null;
+    return getArticleCommentList(Document.html(res.data));
+  }
+
+  static Future<List<ArticleComment>?> deleteComment(final String targetId, final ArticleCommentMetaData metaData) async {
+    final Options options = Options(validateStatus: (status) => status == 303 || status == 200, contentType: Headers.formUrlEncodedContentType);
+    var res = await requestPost(
+      CommonUrl.courseBoardActionUrl,
+      {
+        "id": metaData.id,
+        "bid": metaData.bid,
+        "cid": metaData.cid,
+        "bwid": metaData.bwid,
+        "type": "comment_delete",
+        "bcid": targetId,
+      },
+      options: options,
+      isFront: true,
+    );
     if (res == null) return null;
     return getArticleCommentList(Document.html(res.data));
   }
