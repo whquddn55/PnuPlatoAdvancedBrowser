@@ -137,7 +137,7 @@ class _BoardPageState extends State<BoardPage> {
                             ),
                           ],
                         ),
-                        ...(data['articleList'] as List<CourseArticle>).map((CourseArticle article) {
+                        ...(data['articleList'] as List<CourseArticleMetaData>).map((CourseArticleMetaData article) {
                           return TableRow(
                             children: [
                               TableRowInkWell(
@@ -149,10 +149,10 @@ class _BoardPageState extends State<BoardPage> {
                                   child: Row(
                                     children: [
                                       Flexible(
-                                        child: Text(
-                                          article.title,
-                                        ),
+                                        child: Text(article.title, style: const TextStyle(color: Colors.blueAccent)),
                                       ),
+                                      if (article.commentCnt != 0)
+                                        Container(margin: const EdgeInsets.only(left: 8.0), child: Text("[${article.commentCnt.toString()}]")),
                                     ],
                                   ),
                                 ),
@@ -198,7 +198,7 @@ class _BoardPageState extends State<BoardPage> {
     );
   }
 
-  void _inkwllTouchEvent(BuildContext context, final CourseArticle article) {
+  void _inkwllTouchEvent(BuildContext context, final CourseArticleMetaData article) {
     if (article.id == '') return;
     Navigator.push(
       context,

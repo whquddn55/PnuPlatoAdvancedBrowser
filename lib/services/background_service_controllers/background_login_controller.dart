@@ -127,7 +127,7 @@ abstract class BackgroundLoginController {
 
   static Future<bool> getNotifications() async {
     var options = dio.Options(headers: {'Cookie': moodleSessionKey});
-    var response = await request(CommonUrl.notificationUrl, options: options, isFront: false);
+    var response = await requestGet(CommonUrl.notificationUrl, options: options, isFront: false);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -157,7 +157,7 @@ abstract class BackgroundLoginController {
 
   static Future<String> _getBody(String url, String type) async {
     var options = dio.Options(headers: {'Cookie': moodleSessionKey});
-    var response = await request(url, options: options, isFront: false);
+    var response = await requestGet(url, options: options, isFront: false);
     if (response == null) {
       return 'Undefined1';
     }
@@ -175,7 +175,7 @@ abstract class BackgroundLoginController {
   static Future<String?> _getSessionKey(final String moodleSessionKey) async {
     var options = dio.Options(headers: {'Cookie': moodleSessionKey});
 
-    var response = await request(CommonUrl.platoCalendarUrl, options: options);
+    var response = await requestGet(CommonUrl.platoCalendarUrl, options: options);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -201,7 +201,7 @@ abstract class BackgroundLoginController {
 
   static Future<Map<String, dynamic>> _getInformation(final String moddleSessionKey) async {
     var options = dio.Options(headers: {'Cookie': moddleSessionKey});
-    var response = await request(CommonUrl.platoUserInformationUrl, options: options);
+    var response = await requestGet(CommonUrl.platoUserInformationUrl, options: options);
 
     if (response == null) {
       /* TODO: 에러 */

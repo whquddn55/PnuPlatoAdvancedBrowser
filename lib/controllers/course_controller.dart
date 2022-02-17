@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/article_comment_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_article_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
@@ -50,7 +52,7 @@ class CourseController {
 
   Future<bool> updateCourseSpecification(final Course course) async {
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseMainUrl + course.id, options: options, isFront: true);
+    var response = await requestGet(CommonUrl.courseMainUrl + course.id, options: options, isFront: true);
     if (response == null) {
       /* TODO : 에러 */
       return false;
@@ -111,7 +113,7 @@ class CourseController {
 
   Future<Map<int, List<Map<String, dynamic>>>> getVodStatus(final String courseId) async {
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseOnlineAbsenceUrl + courseId, options: options, isFront: true);
+    var response = await requestGet(CommonUrl.courseOnlineAbsenceUrl + courseId, options: options, isFront: true);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -161,50 +163,36 @@ class CourseController {
     return res;
   }
 
-  Future<Map<String, dynamic>> getArticleInfo(final CourseArticle article) async {
-    var response = await request(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}', isFront: true);
+  // Future<Map<String, dynamic>> getArticleInfo(final CourseArticleMetaData article) async {
+  //   var response = await requestGet(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}', isFront: true);
 
-    if (response == null) {
-      /* TODO: 에러 */
-      return <String, String>{};
-    }
+  //   if (response == null) {
+  //     /* TODO: 에러 */
+  //     return <String, String>{};
+  //   }
 
-    Map<String, dynamic> res = <String, dynamic>{};
-    Document document = parse(response.data);
-    res['main'] = document.getElementsByClassName('main')[0].text.trim();
-    res['title'] = document.getElementsByClassName('subject')[0].text.trim();
-    res['writer'] = document.getElementsByClassName('writer')[0].text.trim();
-    res['date'] = document.getElementsByClassName('date')[0].text.trim();
-    res['content'] = document.getElementsByClassName('text_to_html')[0].innerHtml;
-    if (document.getElementsByClassName('files').length >= 2) {
-      res['files'] = document.getElementsByClassName('files')[1].children.map((li) {
-        var img = li.getElementsByTagName('img')[0];
-        var a = li.getElementsByTagName('a')[0];
-        return [a.text.trim(), a.attributes['href']!, img.attributes['src']!];
-      }).toList();
-    }
-    res['commentable'] = document.getElementsByClassName('ubboard_comment').isNotEmpty;
+  //   Map<String, dynamic> res = <String, dynamic>{};
+  //   Document document = parse(response.data);
+  //   res['main'] = document.getElementsByClassName('main')[0].text.trim();
+  //   res['title'] = document.getElementsByClassName('subject')[0].text.trim();
+  //   res['writer'] = document.getElementsByClassName('writer')[0].text.trim();
+  //   res['date'] = document.getElementsByClassName('date')[0].text.trim();
+  //   res['content'] = document.getElementsByClassName('text_to_html')[0].innerHtml;
+  //   if (document.getElementsByClassName('files').length >= 2) {
+  //     res['files'] = document.getElementsByClassName('files')[1].children.map((li) {
+  //       var img = li.getElementsByTagName('img')[0];
+  //       var a = li.getElementsByTagName('a')[0];
+  //       return [a.text.trim(), a.attributes['href']!, img.attributes['src']!];
+  //     }).toList();
+  //   }
+  //   res['commentable'] = document.getElementsByClassName('ubboard_comment').isNotEmpty;
+  //   res["commentMetaData"] = ArticleCommentController.fetchArticleCommentMetaData(document);
 
-    if (document.getElementsByClassName('comment_list').isNotEmpty) {
-      res["comments"] = document.getElementsByClassName('comment_list').map((comment) {
-        var writerId = comment.getElementsByTagName('a')[0].attributes["href"]!.split("?id=")[1].split("&")[0];
-        var imgUrl = comment.getElementsByTagName('img')[0].attributes['src']!;
-        var writerName = comment.getElementsByClassName('media-body')[0].children[0].text.trim();
-        var date = comment.getElementsByClassName('media-body')[0].children[1].text.trim();
-        var contents = comment.getElementsByClassName('media-body')[0].children[3].text.trim();
-        var depth = int.parse(comment.attributes["style"]?.split("px")[0].split(":")[1] ?? '0') ~/ 25;
-        return {
-          "writerId": writerId,
-          "imgUrl": imgUrl,
-          "writerName": writerName,
-          "date": date,
-          "contents": contents,
-          "depth": depth,
-        };
-      }).toList();
-    }
-    return res;
-  }
+  //   if (document.getElementsByClassName('comment_list').isNotEmpty) {
+  //     res["comments"] = ArticleCommentController.fetchArticleComment(document);
+  //   }
+  //   return res;
+  // }
 
   List<Activity> getBoardList(final String courseId) {
     var res = <Activity>[];
@@ -228,7 +216,7 @@ class CourseController {
       writable: 글쓰기 권한 확인
     */
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseBoardUrl + '$boardId&page=$page', options: options, isFront: true);
+    var response = await requestGet(CommonUrl.courseBoardUrl + '$boardId&page=$page', options: options, isFront: true);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -243,27 +231,7 @@ class CourseController {
     } else {
       res['pageLength'] = int.parse(document.getElementsByClassName('tp')[0].text.split('/')[1].trim());
     }
-    res['articleList'] = <CourseArticle>[];
-
-    if (document.getElementsByTagName('tr').length <= 1) {
-      return res;
-    }
-    for (var i = 1; i < document.getElementsByTagName('tr').length; ++i) {
-      var tr = document.getElementsByTagName('tr')[i];
-      if (tr.children.length < 5) {
-        return res;
-      }
-      var title = tr.children[1].children.fold<String>('', (prv, element) {
-        return prv + element.text.trim();
-      });
-      var writer = tr.children[2].text.trim();
-      var date = tr.children[3].text.trim();
-      String id = '';
-      if (tr.children[1].getElementsByTagName('a').isNotEmpty) {
-        id = tr.children[1].getElementsByTagName('a')[0].attributes['href']?.split('bwid=')[1] ?? '';
-      }
-      res['articleList'].add(CourseArticle(title: title, date: date, boardId: boardId, id: id, writer: writer));
-    }
+    res['articleList'] = CourseArticleController.fetchCourseArticleMetaDataList(document, boardId);
 
     if (document.getElementsByClassName('pull-right').length == 1) {
       res["writable"] = true;
@@ -276,7 +244,7 @@ class CourseController {
 
   Future<Uri> getM3u8Uri(final String activityId) async {
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.vodViewerUrl + activityId, options: options, isFront: true);
+    var response = await requestGet(CommonUrl.vodViewerUrl + activityId, options: options, isFront: true);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -383,14 +351,14 @@ class CourseController {
     return res;
   }
 
-  List<CourseArticle> _getArticleList(Document document) {
-    var res = <CourseArticle>[];
+  List<CourseArticleMetaData> _getArticleList(Document document) {
+    var res = <CourseArticleMetaData>[];
     if (document.getElementsByClassName('article-list-item').isEmpty) {
       return res;
     }
     for (var item in document.getElementsByClassName('article-list-item')) {
       var temp = item.children[0].attributes['href']!.split('&bwid=');
-      res.add(CourseArticle(
+      res.add(CourseArticleMetaData(
         title: item.getElementsByClassName('article-subject')[0].text,
         date: item.getElementsByClassName('article-date')[0].text,
         id: temp[1],
@@ -404,7 +372,7 @@ class CourseController {
     final List<Course> courseList = <Course>[];
 
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await request(CommonUrl.courseListUrl + 'year=$year&semester=$semester', options: options, isFront: true);
+    var response = await requestGet(CommonUrl.courseListUrl + 'year=$year&semester=$semester', options: options, isFront: true);
     if (response == null) {
       /* TODO: 에러 */
       return null;

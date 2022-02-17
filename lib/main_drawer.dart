@@ -154,7 +154,7 @@ class MainDrawer extends StatelessWidget {
                   Navigator.pop(context);
                   var dialogContext = await showProgressDialog(context, "로그아웃 중입니다...");
                   await Get.find<LoginController>().logout();
-                  closeProgressModal(dialogContext);
+                  closeProgressDialog(dialogContext);
                 },
                 style: TextButton.styleFrom(primary: Get.textTheme.bodyText1!.color),
               ),

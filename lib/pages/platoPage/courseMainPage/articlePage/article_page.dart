@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_article_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_comments.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_files.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_comment_list_widget.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_file_list_widget.dart';
 
 class ArticlePage extends StatelessWidget {
-  final CourseArticle article;
+  final CourseArticleMetaData article;
   final String courseTitle;
   final String courseId;
 
@@ -22,13 +22,13 @@ class ArticlePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Get.find<CourseController>().getArticleInfo(article),
+      future: CourseArticleController.fetchCourseArticle(article),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          Map<String, dynamic> data = snapshot.data as Map<String, dynamic>;
+          CourseArticle data = snapshot.data as CourseArticle;
           return Scaffold(
             appBar: AppBar(
-              title: Text(data['main']!),
+              title: Text(data.boardTitle),
               centerTitle: true,
             ),
             body: SingleChildScrollView(
@@ -45,7 +45,7 @@ class ArticlePage extends StatelessWidget {
                           Flexible(
                             child: Center(
                               child: Text(
-                                data['title']!,
+                                data.title,
                                 style: Get.textTheme.subtitle1,
                               ),
                             ),
@@ -64,15 +64,15 @@ class ArticlePage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(data['writer']!),
-                          Text(data['date']!),
+                          Text(data.writer),
+                          Text(data.date),
                         ],
                       ),
                     ),
-                    if (data["files"] != null) ArticleFiles(data["files"], courseTitle, courseId),
+                    if (data.fileList != null) ArticleFileListWidget(data.fileList!, courseTitle, courseId),
                     Divider(height: 0, thickness: 1, color: Colors.grey[700]),
-                    renderHtml(data['content']!),
-                    if (data["commentable"]) ArticleComments(data["comments"]),
+                    renderHtml(data.content),
+                    if (data.commentable) ArticleCommentListWidget(data.commentMetaData, data.commentList),
                   ],
                 ),
               ),

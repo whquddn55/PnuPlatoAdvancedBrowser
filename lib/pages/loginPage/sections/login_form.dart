@@ -26,7 +26,7 @@ class _LoginFormState extends State<LoginForm> {
 
     final _userDataController = Get.find<LoginController>();
     await _userDataController.login(autologin: false, username: _username, password: _password);
-    closeProgressModal(dialogContext);
+    closeProgressDialog(dialogContext);
 
     if (_userDataController.loginStatus == false) {
       setState(() {

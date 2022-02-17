@@ -257,7 +257,7 @@ class CourseMainPage extends StatelessWidget {
     );
   }
 
-  Widget _articleButton(BuildContext context, CourseArticle article) {
+  Widget _articleButton(BuildContext context, CourseArticleMetaData article) {
     return TextButton(
       onPressed: () {
         Navigator.push(

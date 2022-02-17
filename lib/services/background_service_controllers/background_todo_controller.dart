@@ -25,7 +25,7 @@ abstract class BackgroundTodoController {
       return [];
     }
 
-    var response = await request(CommonUrl.courseMainUrl + courseId, isFront: false);
+    var response = await requestGet(CommonUrl.courseMainUrl + courseId, isFront: false);
     if (response == null) {
       /* TODO : 에러 */
       return [];
@@ -75,7 +75,7 @@ abstract class BackgroundTodoController {
   }
 
   static Future<List<Todo>> _fetchAssign(String courseId) async {
-    var response = await request(CommonUrl.courseAssignUrl + courseId, isFront: false);
+    var response = await requestGet(CommonUrl.courseAssignUrl + courseId, isFront: false);
 
     if (response == null) {
       /* TODO : 에러 */
@@ -109,7 +109,7 @@ abstract class BackgroundTodoController {
   }
 
   static Future<List<Todo>> _fetchQuiz(String courseId) async {
-    var response = await request(CommonUrl.courseQuizUrl + courseId, isFront: false);
+    var response = await requestGet(CommonUrl.courseQuizUrl + courseId, isFront: false);
 
     if (response == null) {
       /* TODO : 에러 */

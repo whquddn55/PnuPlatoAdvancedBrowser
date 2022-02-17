@@ -9,7 +9,7 @@ class Course {
   final String id;
   Professor? professor;
   List<CourseAssistant> assistantList = [];
-  List<CourseArticle> articleList = [];
+  List<CourseArticleMetaData> articleList = [];
   final Map<String, List<Activity>> activityMap = <String, List<Activity>>{};
   final Map<String, String> summaryMap = <String, String>{};
   late Uri koreanPlanUri;

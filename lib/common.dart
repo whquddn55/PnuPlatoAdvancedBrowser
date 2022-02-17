@@ -39,6 +39,7 @@ abstract class CommonUrl {
   static const String courseArticleUrl = 'https://plato.pusan.ac.kr/mod/ubboard/article.php?';
   static const String courseBoardUrl = 'https://plato.pusan.ac.kr/mod/ubboard/view.php?id=';
   static const String courseBoardWriteUrl = 'https://plato.pusan.ac.kr/mod/ubboard/write.php?id=';
+  static const String courseBoardActionUrl = 'https://plato.pusan.ac.kr/mod/ubboard/action.php';
 
   static const String vodViewerUrl = 'https://plato.pusan.ac.kr/mod/vod/viewer.php?id=';
   static const String fileViewerUrl = 'https://plato.pusan.ac.kr/mod/ubfile/view.php?id=';
@@ -107,7 +108,7 @@ class NFMarquee extends StatelessWidget {
   }
 }
 
-Future<dio.Response?> request(final String url, {dio.Options? options, bool? isFront}) async {
+Future<dio.Response?> requestGet(final String url, {dio.Options? options, bool? isFront}) async {
   dio.Response? response;
   int retry = 0;
 
@@ -121,24 +122,62 @@ Future<dio.Response?> request(final String url, {dio.Options? options, bool? isF
         options.headers!["Cookie"] = BackgroundLoginController.moodleSessionKey;
       }
 
-      print(options.headers!["Cookie"]);
+      print("[DEBUG] ${options.headers!["Cookie"]}");
     }
     try {
       response = await dio.Dio().get(url, options: options);
       if (parse(response.data).children[0].attributes['class'] == 'html_login') {
         retry++;
-        // if (isFront != null) {
-        //   if (isFront == true) {
-        //     await Get.find<LoginController>().login(autologin: true);
-        //   } else {
-        //     await BackgroundLoginController.login(autologin: true);
-        //   }
-        // }
+        if (isFront != null) {
+          if (isFront == true) {
+            await Get.find<LoginController>().login(autologin: true);
+          } else {
+            await BackgroundLoginController.login(autologin: true);
+          }
+        }
       } else {
         break;
       }
     } on dio.DioError catch (e, _) {
+      print("[ERROR] ${e.response}");
       retry++;
+    }
+  }
+  return response;
+}
+
+Future<dio.Response?> requestPost(final String url, final dynamic data, {dio.Options? options, final bool? isFront, final int retry = 5}) async {
+  dio.Response? response;
+  int time = 0;
+
+  options ??= dio.Options();
+  options.headers ??= {};
+  while (time < retry) {
+    if (isFront != null) {
+      if (isFront == true) {
+        options.headers!["Cookie"] = Get.find<LoginController>().moodleSessionKey;
+      } else {
+        options.headers!["Cookie"] = BackgroundLoginController.moodleSessionKey;
+      }
+      print("[DEBUG] ${options.headers!["Cookie"]}");
+    }
+    try {
+      response = await dio.Dio().post(url, data: data, options: options);
+      if (parse(response.data).children[0].attributes['class'] == 'html_login') {
+        time++;
+        if (isFront != null) {
+          if (isFront == true) {
+            await Get.find<LoginController>().login(autologin: true);
+          } else {
+            await BackgroundLoginController.login(autologin: true);
+          }
+        }
+      } else {
+        break;
+      }
+    } on dio.DioError catch (e, _) {
+      print("[ERROR] ${e.response}");
+      time++;
     }
   }
   return response;
@@ -293,7 +332,7 @@ Future<BuildContext> showProgressDialog(final BuildContext context, final String
   return await dialogContextCompleter.future;
 }
 
-void closeProgressModal(BuildContext context) {
+void closeProgressDialog(BuildContext context) {
   Navigator.pop(context);
 }
 
