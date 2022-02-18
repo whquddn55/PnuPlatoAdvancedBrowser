@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/article_comment_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_article_comment_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_article_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity.dart';
@@ -162,37 +162,6 @@ class CourseController {
 
     return res;
   }
-
-  // Future<Map<String, dynamic>> getArticleInfo(final CourseArticleMetaData article) async {
-  //   var response = await requestGet(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}', isFront: true);
-
-  //   if (response == null) {
-  //     /* TODO: 에러 */
-  //     return <String, String>{};
-  //   }
-
-  //   Map<String, dynamic> res = <String, dynamic>{};
-  //   Document document = parse(response.data);
-  //   res['main'] = document.getElementsByClassName('main')[0].text.trim();
-  //   res['title'] = document.getElementsByClassName('subject')[0].text.trim();
-  //   res['writer'] = document.getElementsByClassName('writer')[0].text.trim();
-  //   res['date'] = document.getElementsByClassName('date')[0].text.trim();
-  //   res['content'] = document.getElementsByClassName('text_to_html')[0].innerHtml;
-  //   if (document.getElementsByClassName('files').length >= 2) {
-  //     res['files'] = document.getElementsByClassName('files')[1].children.map((li) {
-  //       var img = li.getElementsByTagName('img')[0];
-  //       var a = li.getElementsByTagName('a')[0];
-  //       return [a.text.trim(), a.attributes['href']!, img.attributes['src']!];
-  //     }).toList();
-  //   }
-  //   res['commentable'] = document.getElementsByClassName('ubboard_comment').isNotEmpty;
-  //   res["commentMetaData"] = ArticleCommentController.fetchArticleCommentMetaData(document);
-
-  //   if (document.getElementsByClassName('comment_list').isNotEmpty) {
-  //     res["comments"] = ArticleCommentController.fetchArticleComment(document);
-  //   }
-  //   return res;
-  // }
 
   List<Activity> getBoardList(final String courseId) {
     var res = <Activity>[];

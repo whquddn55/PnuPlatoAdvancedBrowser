@@ -3,7 +3,7 @@ import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/article_comment.dart';
 
-abstract class ArticleCommentController {
+abstract class CourseArticleCommentController {
   static ArticleCommentMetaData getArticleCommentMetaData(final Document document) {
     String id = '', cid = '', bid = '', bwid = '';
     for (var element in document.getElementsByClassName('controls')[0].children) {

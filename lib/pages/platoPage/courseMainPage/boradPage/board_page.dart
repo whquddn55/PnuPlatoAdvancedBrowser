@@ -146,14 +146,14 @@ class _BoardPageState extends State<BoardPage> {
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
-                                  child: Row(
-                                    children: [
-                                      Flexible(
-                                        child: Text(article.title, style: const TextStyle(color: Colors.blueAccent)),
-                                      ),
-                                      if (article.commentCnt != 0)
-                                        Container(margin: const EdgeInsets.only(left: 8.0), child: Text("[${article.commentCnt.toString()}]")),
-                                    ],
+                                  child: Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(text: article.title, style: const TextStyle(color: Colors.blueAccent)),
+                                        const TextSpan(text: "  "),
+                                        if (article.commentCnt != 0) TextSpan(text: "[${article.commentCnt.toString()}]"),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

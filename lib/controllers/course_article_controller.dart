@@ -1,7 +1,7 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/article_comment_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_article_comment_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/article_comment.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 
@@ -58,11 +58,11 @@ abstract class CourseArticleController {
       }).toList();
     }
     final bool commentable = document.getElementsByClassName('ubboard_comment').isNotEmpty;
-    final ArticleCommentMetaData commentMetaData = ArticleCommentController.getArticleCommentMetaData(document);
+    final ArticleCommentMetaData commentMetaData = CourseArticleCommentController.getArticleCommentMetaData(document);
 
     List<ArticleComment>? commentList;
     if (document.getElementsByClassName('comment_list').isNotEmpty) {
-      commentList = ArticleCommentController.getArticleCommentList(document);
+      commentList = CourseArticleCommentController.getArticleCommentList(document);
     }
     return CourseArticle(
       boardTitle: boardTitle,

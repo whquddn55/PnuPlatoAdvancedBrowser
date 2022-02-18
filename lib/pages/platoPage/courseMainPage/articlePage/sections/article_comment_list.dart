@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/article_comment_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_article_comment_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/article_comment.dart';
 
 class ArticleCommentList extends StatefulWidget {
@@ -211,7 +211,7 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
   }
 
   Future<void> _writeComment() async {
-    var res = await ArticleCommentController.writeComment(
+    var res = await CourseArticleCommentController.writeComment(
         replyTargetIndex == null ? null : commentList[replyTargetIndex!].commentId, widget.metaData, controller.text);
 
     if (res != null) {
@@ -227,7 +227,7 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
   }
 
   Future<void> _editComment() async {
-    var res = await ArticleCommentController.editComment(editTargetComment!.commentId, widget.metaData, controller.text);
+    var res = await CourseArticleCommentController.editComment(editTargetComment!.commentId, widget.metaData, controller.text);
 
     if (res != null) {
       controller.clear();
@@ -274,7 +274,7 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
 
       if (dialogResult == true) {
         var dialogContext = await showProgressDialog(context, "삭제 중입니다..");
-        var deleteResult = await ArticleCommentController.deleteComment(comment.commentId, widget.metaData);
+        var deleteResult = await CourseArticleCommentController.deleteComment(comment.commentId, widget.metaData);
         closeProgressDialog(dialogContext);
         if (deleteResult == null) {
           Fluttertoast.cancel();
