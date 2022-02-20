@@ -33,7 +33,7 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Divider(height: 2, thickness: 1, color: Colors.grey[700]),
+        Divider(height: 20, thickness: 1, color: Colors.grey[700]),
         const Text("댓글"),
         ..._renderCommentList(),
         _renderReplyBox(),

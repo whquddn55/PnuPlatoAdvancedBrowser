@@ -204,7 +204,7 @@ class _BoardPageState extends State<BoardPage> {
       context,
       MaterialPageRoute(
         builder: (context) => ArticlePage(
-          article: article,
+          metaData: article,
           courseTitle: widget.courseTitle,
           courseId: widget.courseId,
         ),

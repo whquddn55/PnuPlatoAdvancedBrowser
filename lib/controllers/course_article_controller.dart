@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
@@ -58,6 +59,8 @@ abstract class CourseArticleController {
       }).toList();
     }
     final bool commentable = document.getElementsByClassName('ubboard_comment').isNotEmpty;
+    final bool editable = document.getElementsByClassName('modify').isNotEmpty;
+    final bool deletable = document.getElementsByClassName('delete').isNotEmpty;
     final ArticleCommentMetaData commentMetaData = CourseArticleCommentController.getArticleCommentMetaData(document);
 
     List<ArticleComment>? commentList;
@@ -72,8 +75,19 @@ abstract class CourseArticleController {
       content: content,
       fileList: fileList,
       commentable: commentable,
+      editable: editable,
+      deletable: deletable,
       commentMetaData: commentMetaData,
       commentList: commentList,
     );
+  }
+
+  static Future<bool> deleteCourseArticle(final CourseArticleMetaData metaData) async {
+    var res = await requestGet(CommonUrl.courseBoardActionUrl + "?id=" + metaData.boardId + "&bwid=" + metaData.id + "&type=delete", isFront: true);
+
+    if (res == null) {
+      return false;
+    }
+    return true;
   }
 }

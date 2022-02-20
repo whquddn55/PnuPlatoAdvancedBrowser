@@ -26,6 +26,8 @@ class CourseArticle {
   final String content;
   final List<CourseArticleFile>? fileList;
   final bool commentable;
+  final bool editable;
+  final bool deletable;
   final ArticleCommentMetaData commentMetaData;
   final List<ArticleComment>? commentList;
 
@@ -37,6 +39,8 @@ class CourseArticle {
     required this.content,
     required this.fileList,
     required this.commentable,
+    required this.editable,
+    required this.deletable,
     required this.commentMetaData,
     required this.commentList,
   });

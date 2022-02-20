@@ -5,16 +5,17 @@ import 'package:pnu_plato_advanced_browser/controllers/course_article_controller
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_comment_list.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_edit_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_file_list.dart';
 
 class ArticlePage extends StatelessWidget {
-  final CourseArticleMetaData article;
+  final CourseArticleMetaData metaData;
   final String courseTitle;
   final String courseId;
 
   const ArticlePage({
     Key? key,
-    required this.article,
+    required this.metaData,
     required this.courseTitle,
     required this.courseId,
   }) : super(key: key);
@@ -22,13 +23,13 @@ class ArticlePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: CourseArticleController.fetchCourseArticle(article),
+      future: CourseArticleController.fetchCourseArticle(metaData),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          CourseArticle data = snapshot.data as CourseArticle;
+          CourseArticle article = snapshot.data as CourseArticle;
           return Scaffold(
             appBar: AppBar(
-              title: Text(data.boardTitle),
+              title: Text(article.boardTitle),
               centerTitle: true,
             ),
             body: SingleChildScrollView(
@@ -45,7 +46,7 @@ class ArticlePage extends StatelessWidget {
                           Flexible(
                             child: Center(
                               child: Text(
-                                data.title,
+                                article.title,
                                 style: Get.textTheme.subtitle1,
                               ),
                             ),
@@ -64,15 +65,37 @@ class ArticlePage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(data.writer),
-                          Text(data.date),
+                          Text(article.writer),
+                          Text(article.date),
                         ],
                       ),
                     ),
-                    if (data.fileList != null) ArticleFileList(data.fileList!, courseTitle, courseId),
+                    if (article.fileList != null) ArticleFileList(article.fileList!, courseTitle, courseId),
                     Divider(height: 0, thickness: 1, color: Colors.grey[700]),
-                    renderHtml(data.content),
-                    if (data.commentable) ArticleCommentList(data.commentMetaData, data.commentList),
+                    renderHtml(article.content),
+                    const SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        BetaBadge(
+                          child: ElevatedButton(
+                            child: const Text("수정"),
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => ArticleEditPage(metaData.boardId, metaData.id)));
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          child: const Text("삭제"),
+                          style: ElevatedButton.styleFrom(primary: Colors.red),
+                          onPressed: () {
+                            _deleteArticle(context);
+                          },
+                        ),
+                      ],
+                    ),
+                    if (article.commentable) ArticleCommentList(article.commentMetaData, article.commentList),
                   ],
                 ),
               ),
@@ -83,5 +106,24 @@ class ArticlePage extends StatelessWidget {
         }
       },
     );
+  }
+
+  Future<void> _deleteArticle(final BuildContext context) async {
+    var dialogRes = await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: const Text("게시글을 삭제합니다."),
+          actions: [
+            TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context, false)),
+            TextButton(child: const Text("삭제"), onPressed: () => Navigator.pop(context, true)),
+          ],
+        );
+      },
+    );
+
+    if (dialogRes) {
+      CourseArticleController.deleteCourseArticle(metaData);
+    }
   }
 }

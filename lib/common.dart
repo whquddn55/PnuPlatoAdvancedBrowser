@@ -108,13 +108,13 @@ class NFMarquee extends StatelessWidget {
   }
 }
 
-Future<dio.Response?> requestGet(final String url, {dio.Options? options, bool? isFront}) async {
+Future<dio.Response?> requestGet(final String url, {dio.Options? options, bool? isFront, final int retry = 5}) async {
   dio.Response? response;
-  int retry = 0;
+  int time = 0;
 
   options ??= dio.Options();
   options.headers ??= {};
-  while (retry < 5) {
+  while (time < retry) {
     if (isFront != null) {
       if (isFront == true) {
         options.headers!["Cookie"] = Get.find<LoginController>().moodleSessionKey;
@@ -127,7 +127,7 @@ Future<dio.Response?> requestGet(final String url, {dio.Options? options, bool? 
     try {
       response = await dio.Dio().get(url, options: options);
       if (parse(response.data).children[0].attributes['class'] == 'html_login') {
-        retry++;
+        time++;
         if (isFront != null) {
           if (isFront == true) {
             await Get.find<LoginController>().login(autologin: true);
@@ -140,7 +140,7 @@ Future<dio.Response?> requestGet(final String url, {dio.Options? options, bool? 
       }
     } on dio.DioError catch (e, _) {
       print("[ERROR] ${e.response}");
-      retry++;
+      time++;
     }
   }
   return response;

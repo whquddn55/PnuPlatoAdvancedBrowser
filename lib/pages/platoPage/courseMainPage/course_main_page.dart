@@ -261,7 +261,7 @@ class CourseMainPage extends StatelessWidget {
     return TextButton(
       onPressed: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ArticlePage(article: article, courseTitle: course.title, courseId: course.id)));
+            context, MaterialPageRoute(builder: (context) => ArticlePage(metaData: article, courseTitle: course.title, courseId: course.id)));
       },
       style: TextButton.styleFrom(
         padding: EdgeInsets.zero,
