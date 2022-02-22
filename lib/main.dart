@@ -24,6 +24,7 @@ void main() async {
   Get.put(NoticeController());
   Get.put(TodoController());
   await AppSettingController.initiate();
+  await Get.find<TodoController>().initiate();
 
   await BackgroundService.initializeService();
 
