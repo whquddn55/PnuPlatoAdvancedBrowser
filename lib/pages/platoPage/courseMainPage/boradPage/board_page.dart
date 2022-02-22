@@ -80,8 +80,11 @@ class _BoardPageState extends State<BoardPage> {
                             ? BetaBadge(
                                 child: ElevatedButton(
                                   child: const Text("글 쓰기"),
-                                  onPressed: () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => BoardWritePage(widget.boardId)));
+                                  onPressed: () async {
+                                    await Navigator.push(context, MaterialPageRoute(builder: (context) => BoardWritePage(widget.boardId)));
+                                    setState(() {
+                                      page = 1;
+                                    });
                                   },
                                 ),
                               )
@@ -198,9 +201,9 @@ class _BoardPageState extends State<BoardPage> {
     );
   }
 
-  void _inkwllTouchEvent(BuildContext context, final CourseArticleMetaData article) {
+  void _inkwllTouchEvent(BuildContext context, final CourseArticleMetaData article) async {
     if (article.id == '') return;
-    Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ArticlePage(
@@ -210,5 +213,6 @@ class _BoardPageState extends State<BoardPage> {
         ),
       ),
     );
+    setState(() {});
   }
 }

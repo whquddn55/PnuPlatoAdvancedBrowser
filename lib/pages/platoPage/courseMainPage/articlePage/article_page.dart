@@ -8,7 +8,7 @@ import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articl
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_edit_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_file_list.dart';
 
-class ArticlePage extends StatelessWidget {
+class ArticlePage extends StatefulWidget {
   final CourseArticleMetaData metaData;
   final String courseTitle;
   final String courseId;
@@ -21,9 +21,14 @@ class ArticlePage extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ArticlePage> createState() => _ArticlePageState();
+}
+
+class _ArticlePageState extends State<ArticlePage> {
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: CourseArticleController.fetchCourseArticle(metaData),
+      future: CourseArticleController.fetchCourseArticle(widget.metaData),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           CourseArticle article = snapshot.data as CourseArticle;
@@ -70,7 +75,7 @@ class ArticlePage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    if (article.fileList != null) ArticleFileList(article.fileList!, courseTitle, courseId),
+                    if (article.fileList != null) ArticleFileList(article.fileList!, widget.courseTitle, widget.courseId),
                     Divider(height: 0, thickness: 1, color: Colors.grey[700]),
                     renderHtml(article.content),
                     const SizedBox(height: 30),
@@ -80,8 +85,10 @@ class ArticlePage extends StatelessWidget {
                         BetaBadge(
                           child: ElevatedButton(
                             child: const Text("수정"),
-                            onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => ArticleEditPage(metaData.boardId, metaData.id)));
+                            onPressed: () async {
+                              await Navigator.push(
+                                  context, MaterialPageRoute(builder: (context) => ArticleEditPage(widget.metaData.boardId, widget.metaData.id)));
+                              setState(() {});
                             },
                           ),
                         ),
@@ -123,7 +130,7 @@ class ArticlePage extends StatelessWidget {
     );
 
     if (dialogRes) {
-      CourseArticleController.deleteCourseArticle(metaData);
+      CourseArticleController.deleteCourseArticle(widget.metaData);
     }
   }
 }
