@@ -46,7 +46,7 @@ abstract class BackgroundTodoController {
       final String title = _getTitle(activity);
       bool? done;
       for (var vod in vodStatusList) {
-        if (vod.containsKey(title)) {
+        if (vod["title"] == title) {
           done = vod["status"];
         }
       }
@@ -187,17 +187,9 @@ abstract class BackgroundTodoController {
     if (activity.getElementsByClassName('instancename').isEmpty) {
       return '';
     } else {
-      var temp = activity.getElementsByClassName('instancename')[0].text.split(' ');
-      if (temp.length > 1) {
-        temp.removeLast();
-      }
-      return temp.join(' ');
-      /* 뒤에 붙은 필요 없는 단어 제거 오류 시 사용
-      final String unusedName =
-          activity.getElementsByClassName('accesshide ').isEmpty ? '' : activity.getElementsByClassName('accesshide ')[0].text;
-      var temp = activity.getElementsByClassName('instancename')[0].text.split('unusedName');
-      name = temp.join();
-      */
+      final String unusedName = activity.getElementsByClassName('accesshide ').isEmpty ? '' : activity.getElementsByClassName('accesshide ')[0].text;
+      var temp = activity.getElementsByClassName('instancename')[0].text.split(unusedName);
+      return temp.join();
     }
   }
 
@@ -224,7 +216,7 @@ abstract class BackgroundTodoController {
   static TodoType? _getType(html.Element activity) {
     TodoType? type;
     for (var typeValue in TodoType.values) {
-      if (typeValue.toString() == activity.classes.elementAt(1)) {
+      if (typeValue.name == activity.classes.elementAt(1).trim()) {
         type = typeValue;
       }
     }
