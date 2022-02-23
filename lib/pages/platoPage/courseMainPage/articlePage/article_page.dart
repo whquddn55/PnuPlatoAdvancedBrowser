@@ -82,24 +82,26 @@ class _ArticlePageState extends State<ArticlePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        BetaBadge(
-                          child: ElevatedButton(
-                            child: const Text("수정"),
-                            onPressed: () async {
-                              await Navigator.push(
-                                  context, MaterialPageRoute(builder: (context) => ArticleEditPage(widget.metaData.boardId, widget.metaData.id)));
-                              setState(() {});
+                        if (article.editable)
+                          BetaBadge(
+                            child: ElevatedButton(
+                              child: const Text("수정"),
+                              onPressed: () async {
+                                await Navigator.push(
+                                    context, MaterialPageRoute(builder: (context) => ArticleEditPage(widget.metaData.boardId, widget.metaData.id)));
+                                setState(() {});
+                              },
+                            ),
+                          ),
+                        const SizedBox(width: 10),
+                        if (article.deletable)
+                          ElevatedButton(
+                            child: const Text("삭제"),
+                            style: ElevatedButton.styleFrom(primary: Colors.red),
+                            onPressed: () {
+                              _deleteArticle(context);
                             },
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        ElevatedButton(
-                          child: const Text("삭제"),
-                          style: ElevatedButton.styleFrom(primary: Colors.red),
-                          onPressed: () {
-                            _deleteArticle(context);
-                          },
-                        ),
                       ],
                     ),
                     if (article.commentable) ArticleCommentList(article.commentMetaData, article.commentList),
