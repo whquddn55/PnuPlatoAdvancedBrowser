@@ -18,90 +18,111 @@ class LectureTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 8.0,
-      margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-      child: ListTile(
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-        leading: GetBuilder<TodoController>(builder: (controller) {
-          int videoCnt = 0;
-          int assignCnt = 0;
-          int zoomCnt = 0;
-          for (var todo in controller.todoList) {
-            if (todo.courseId == course.id) {
-              switch (todo.type) {
-                case TodoType.assign:
-                case TodoType.quiz:
-                  ++assignCnt;
-                  break;
-                case TodoType.vod:
-                  ++videoCnt;
-                  break;
-                case TodoType.zoom:
-                  ++zoomCnt;
-                  break;
-              }
-            }
-          }
-          return Column(
-            children: [
-              if (videoCnt != 0)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      height: 10,
-                      width: 10,
-                      margin: const EdgeInsets.only(right: 5),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: videoColor,
-                      ),
-                    ),
-                    Text('$videoCnt'),
-                  ],
-                ),
-              if (assignCnt != 0)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      height: 10,
-                      width: 10,
-                      margin: const EdgeInsets.only(right: 5),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: assignColor,
-                      ),
-                    ),
-                    Text('$assignCnt'),
-                  ],
-                ),
-              if (zoomCnt != 0)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      height: 10,
-                      width: 10,
-                      margin: const EdgeInsets.only(right: 5),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: zoomColor,
-                      ),
-                    ),
-                    Text('$zoomCnt'),
-                  ],
-                ),
+    return Container(
+      margin: const EdgeInsets.all(12.0),
+      child: InkWell(
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course))),
+        borderRadius: BorderRadius.circular(30.0),
+        child: Ink(
+          padding: const EdgeInsets.all(12.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(style: BorderStyle.solid),
+            borderRadius: BorderRadius.circular(30.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                blurRadius: 15.0,
+                offset: const Offset(0, 0.75), // changes position of shadow
+              ),
             ],
-          );
-        }),
-        title: Text(course.title),
-        trailing: Text('[${course.sub}]'),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course)));
-        },
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("${course.title} [${course.sub}]"),
+              GetBuilder<TodoController>(
+                builder: (controller) {
+                  int totalVodCnt = 0;
+                  int undoneVodCnt = 0;
+                  int totalAssignCnt = 0;
+                  int undoneAssignCnt = 0;
+                  int totalZoomCnt = 0;
+                  int undoneZoomCnt = 0;
+
+                  for (var todo in controller.todoList) {
+                    if (todo.courseId == course.id) {
+                      switch (todo.type) {
+                        case TodoType.assign:
+                        case TodoType.quiz:
+                          totalAssignCnt++;
+                          if (todo.status != TodoStatus.done) undoneAssignCnt++;
+                          break;
+                        case TodoType.vod:
+                          totalVodCnt++;
+                          if (todo.status != TodoStatus.done) undoneVodCnt++;
+                          break;
+                        case TodoType.zoom:
+                          totalZoomCnt++;
+                          if (todo.status != TodoStatus.done) undoneZoomCnt++;
+                          break;
+                      }
+                    }
+                  }
+                  return Column(
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            height: 10,
+                            width: 10,
+                            margin: const EdgeInsets.only(right: 5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: videoColor,
+                            ),
+                          ),
+                          Text('$undoneVodCnt /$totalVodCnt'),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            height: 10,
+                            width: 10,
+                            margin: const EdgeInsets.only(right: 5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: assignColor,
+                            ),
+                          ),
+                          Text('$undoneAssignCnt /$totalAssignCnt'),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            height: 10,
+                            width: 10,
+                            margin: const EdgeInsets.only(right: 5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: zoomColor,
+                            ),
+                          ),
+                          Text('$undoneZoomCnt /$totalZoomCnt'),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
