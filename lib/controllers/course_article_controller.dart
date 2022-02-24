@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
@@ -36,9 +37,9 @@ abstract class CourseArticleController {
   }
 
   static Future<CourseArticle?> fetchCourseArticle(final CourseArticleMetaData article) async {
-    var response = await requestGet(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}', isFront: true);
-
-    if (response == null) {
+    var response = await requestGet(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}',
+        isFront: true, options: Options(validateStatus: (status) => status == 200 || status == 303, followRedirects: false));
+    if (response == null || response.statusCode == 303) {
       /* TODO: 에러 */
       return null;
     }
