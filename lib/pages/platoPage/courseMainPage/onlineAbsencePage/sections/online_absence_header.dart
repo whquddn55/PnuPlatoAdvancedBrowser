@@ -14,7 +14,7 @@ class OnlineAbsenceHeader extends StatelessWidget {
             child: Container(
               decoration: const BoxDecoration(border: Border(bottom: BorderSide(), right: BorderSide())),
               padding: const EdgeInsets.all(8.0),
-              child: const Center(child: Text("마감 기한")),
+              child: const Center(child: Text("주차")),
             ),
           ),
           Expanded(

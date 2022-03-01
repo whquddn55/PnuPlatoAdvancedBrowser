@@ -18,6 +18,7 @@ import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/article_page.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/assignPage/AssignPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/boradPage/board_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/gradePage/grade_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/plannerPage/planner_page.dart';
@@ -454,6 +455,8 @@ class CourseMainPage extends StatelessWidget {
                   ),
                 );
                 Get.find<RouteController>().showBottomNavBar = true;
+              } else if (activity.type == 'assign') {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => AssignPage(assignId: activity.id)));
               }
             },
       child: Padding(

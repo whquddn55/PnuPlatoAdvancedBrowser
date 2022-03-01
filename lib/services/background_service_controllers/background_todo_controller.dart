@@ -55,7 +55,7 @@ abstract class BackgroundTodoController {
       }
 
       final List<DateTime?> dueDate = _getDueTime(activity);
-      if (dueDate[1] == null) {
+      if (dueDate[1] == null || DateTime.now().compareTo(dueDate[0]!) < 0) {
         continue;
       }
 

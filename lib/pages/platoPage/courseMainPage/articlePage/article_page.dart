@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_article_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
+import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_comment_list.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/sections/article_edit_page.dart';
@@ -31,6 +32,9 @@ class _ArticlePageState extends State<ArticlePage> {
       future: CourseArticleController.fetchCourseArticle(widget.metaData),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.data == null) {
+            return const ErrorPage(msg: "교수님이 게시글을 삭제하신거 같아요...");
+          }
           CourseArticle article = snapshot.data as CourseArticle;
           return Scaffold(
             appBar: AppBar(

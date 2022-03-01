@@ -29,7 +29,7 @@ class OnlineAbsencePage extends StatelessWidget {
                     const OnlineAbsenceHeader(),
                     ...data.entries.map(
                       (entry) {
-                        var week = DateTime.fromMillisecondsSinceEpoch(entry.key * 1000);
+                        int week = entry.key;
                         return IntrinsicHeight(
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.stretch,

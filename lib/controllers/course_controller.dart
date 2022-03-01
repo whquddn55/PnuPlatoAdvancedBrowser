@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_article_comment_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_article_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity.dart';
@@ -23,7 +22,7 @@ class CourseController {
   }
 
   Future<bool> updateCurrentSemesterCourseList() async {
-    var res = await _fetchCourseList(year: 2021, semester: 20);
+    var res = await _fetchCourseList(year: 2021, semester: 10);
     if (res == null) {
       return false;
     }
@@ -123,7 +122,11 @@ class CourseController {
     Map<int, List<Map<String, dynamic>>> res = <int, List<Map<String, dynamic>>>{};
     Document document = parse(response.data);
     if (response.realUri.toString().contains('user_progress_a')) {
+      int week = 0;
       for (var tr in document.getElementsByClassName('user_progress_table')[0].children[2].getElementsByTagName('tr')) {
+        if (tr.children[0].attributes["rowspan"] != null) {
+          week = int.parse(tr.children[0].text);
+        }
         if (tr.getElementsByClassName('text-left').isNotEmpty) {
           final String title = tr.getElementsByClassName('text-left')[0].text.trim();
           bool status = false;
@@ -132,7 +135,6 @@ class CourseController {
               status = true;
             }
           }
-          int week = int.parse(tr.getElementsByClassName('track_detail')[0].attributes['data-eterm']!);
 
           if (res[week] == null) {
             res[week] = [];
@@ -141,8 +143,12 @@ class CourseController {
         }
       }
     } else if (response.realUri.toString().contains('user_progress')) {
+      int week = 0;
       for (var tr in document.getElementsByClassName('user_progress')[0].children[2].getElementsByTagName('tr')) {
         if (tr.getElementsByClassName('text-left').isNotEmpty) {
+          if (tr.children[0].attributes["rowspan"] != null) {
+            week = int.parse(tr.children[0].text);
+          }
           final String title = tr.getElementsByClassName('text-left')[0].text.trim();
           bool status = false;
           for (var e in tr.getElementsByClassName('text-center')) {
@@ -150,7 +156,6 @@ class CourseController {
               status = true;
             }
           }
-          int week = int.parse(tr.getElementsByClassName('track_detail')[0].attributes['data-eterm']!);
 
           if (res[week] == null) {
             res[week] = [];
