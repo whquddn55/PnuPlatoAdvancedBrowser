@@ -41,6 +41,7 @@ abstract class CommonUrl {
   static const String courseBoardWriteUrl = 'https://plato.pusan.ac.kr/mod/ubboard/write.php?id=';
   static const String courseBoardActionUrl = 'https://plato.pusan.ac.kr/mod/ubboard/action.php';
   static const String courseAssignViewUrl = 'https://plato.pusan.ac.kr/mod/assign/view.php?id=';
+  static const String courseUrlViewUrl = 'https://plato.pusan.ac.kr/mod/url/view.php?id=';
 
   static const String vodViewerUrl = 'https://plato.pusan.ac.kr/mod/vod/viewer.php?id=';
   static const String fileViewerUrl = 'https://plato.pusan.ac.kr/mod/ubfile/view.php?id=';

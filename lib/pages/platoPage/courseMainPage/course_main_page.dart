@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -16,6 +17,7 @@ import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
+import 'package:pnu_plato_advanced_browser/inappwebview_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/article_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/assignPage/AssignPage.dart';
@@ -25,6 +27,7 @@ import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/planne
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/onlineAbsencePage/online_absence_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/smartAbsencePage/smart_absence_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/vodPage/vod_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CourseMainPage extends StatelessWidget {
   final Course course;
@@ -463,6 +466,8 @@ class CourseMainPage extends StatelessWidget {
                 Get.find<RouteController>().showBottomNavBar = true;
               } else if (activity.type == 'assign') {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => AssignPage(assignId: activity.id)));
+              } else if (activity.type == 'url') {
+                showModalBottomSheet(context: context, useRootNavigator: true, builder: (context) => _linkBottomSheet(context, activity));
               }
             },
       child: Padding(
@@ -661,6 +666,94 @@ class CourseMainPage extends StatelessWidget {
                   primary: Get.textTheme.bodyText1!.color,
                 ),
                 onPressed: () => viewHandler(),
+              ),
+              TextButton.icon(
+                icon: const Icon(Icons.cancel_outlined),
+                label: const Text('취소'),
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                  primary: Get.textTheme.bodyText1!.color,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _linkBottomSheet(final BuildContext context, final Activity activity) {
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      child: Wrap(
+        runSpacing: 20,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: CachedNetworkImage(
+                      imageUrl: activity.iconUri!.toString(),
+                      height: 20,
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      activity.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Text(
+                    activity.info,
+                    style: const TextStyle(
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8.0),
+            ],
+          ),
+          const Divider(height: 0, thickness: 1.5),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextButton.icon(
+                icon: const Icon(Icons.open_in_browser),
+                label: const BetaBadge(
+                    child: Padding(
+                  padding: EdgeInsets.only(right: 20.0),
+                  child: Text("내부 브라우저로 열기"),
+                )),
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                  primary: Get.textTheme.bodyText1!.color,
+                ),
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => InappwebviewWrapper(activity.title, CommonUrl.courseUrlViewUrl + activity.id + '&redirect=1', null))),
+              ),
+              TextButton.icon(
+                icon: const Icon(Icons.open_in_new),
+                label: const Text("외부 브라우저로 열기"),
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                  primary: Get.textTheme.bodyText1!.color,
+                ),
+                onPressed: () {
+                  print({"Cookie": Get.find<LoginController>().moodleSessionKey});
+                  launch(CommonUrl.courseUrlViewUrl + activity.id + '&redirect=1', headers: {"Cookie": Get.find<LoginController>().moodleSessionKey});
+                },
               ),
               TextButton.icon(
                 icon: const Icon(Icons.cancel_outlined),
