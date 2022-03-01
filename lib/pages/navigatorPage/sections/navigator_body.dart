@@ -38,38 +38,25 @@ class NavigatorBody extends StatelessWidget {
                           ),
                         ),
                         tabs: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Tab(child: Column(children: const [Icon(Icons.home), Text('플라토')])),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Tab(child: Column(children: const [Icon(Icons.calendar_today_outlined), Text('캘린더')])),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Tab(child: Column(children: const [Icon(Icons.email), Text('쪽지')])),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Tab(
-                                child: Column(children: [
-                              StreamBuilder<List<DownloadInformation>>(
-                                  stream: Get.find<DownloadController>().stream,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState == ConnectionState.active) {
-                                      List<DownloadInformation> list = snapshot.data!;
-                                      return Badge(
-                                        badgeContent: Text(list.length.toString()),
-                                        child: const Icon(Icons.download_rounded),
-                                        showBadge: list.isNotEmpty,
-                                      );
-                                    } else {
-                                      return const Icon(Icons.download_rounded);
-                                    }
-                                  }),
-                              const Text('저장소')
-                            ])),
+                          const Tab(child: Icon(Icons.home)),
+                          const Tab(child: Icon(Icons.calendar_today_outlined)),
+                          const Tab(child: Icon(Icons.email)),
+                          Tab(
+                            child: StreamBuilder<List<DownloadInformation>>(
+                              stream: Get.find<DownloadController>().stream,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.active) {
+                                  List<DownloadInformation> list = snapshot.data!;
+                                  return Badge(
+                                    badgeContent: Text(list.length.toString()),
+                                    child: const Icon(Icons.download_rounded),
+                                    showBadge: list.isNotEmpty,
+                                  );
+                                } else {
+                                  return const Icon(Icons.download_rounded);
+                                }
+                              },
+                            ),
                           ),
                         ],
                       ),

@@ -38,6 +38,10 @@ abstract class BackgroundTodoController {
 
     html.Document document = parse(response.data);
     for (var activity in document.getElementsByClassName('activity')) {
+      if (activity.parent!.parent!.parent!.parent!.parent!.children[0].text == "이번주 강의") {
+        continue;
+      }
+
       final TodoType? type = _getType(activity);
       if (type == null) {
         continue;

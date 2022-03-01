@@ -34,12 +34,15 @@ class CourseMainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _articleTileController = ExpandedTileController();
-    final _weekTileControllerList = List<ExpandedTileController>.empty(growable: true);
+    final _weekTileControllerList = <ExpandedTileController>[];
 
     return FutureBuilder(
       future: Get.find<CourseController>().updateCourseSpecification(course),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
+          for (var i = 0; i < course.activityMap.keys.length; ++i) {
+            _weekTileControllerList.add(ExpandedTileController());
+          }
           return Scaffold(
             appBar: AppBar(
               title: Text('${course.title} - ${course.professor!.name}'),
@@ -194,9 +197,12 @@ class CourseMainPage extends StatelessWidget {
                   ),
                   ...course.activityMap.keys.map((key) {
                     int index = course.activityMap.keys.toList().indexOf(key);
-                    while (_weekTileControllerList.length <= index) {
-                      _weekTileControllerList.add(ExpandedTileController());
+
+                    if (course.currentWeek != null) {
+                      int currentWeekIndex = course.activityMap.keys.toList().indexOf(course.currentWeek!);
+                      _weekTileControllerList[currentWeekIndex].expand();
                     }
+
                     return Column(
                       children: [
                         const Divider(

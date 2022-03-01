@@ -38,7 +38,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'PnuPlatoAdvancedBrowser',
-      theme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.light, fontFamily: 'DoHyeonRegular'),
+      theme: ThemeData(
+        primaryColor: Colors.lightBlue,
+        brightness: Brightness.light,
+        fontFamily: 'DoHyeonRegular',
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          elevation: 0.0,
+          toolbarHeight: 50,
+        ),
+      ),
       darkTheme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.dark, fontFamily: 'DoHyeonRegular'),
       themeMode: AppSettingController.themeMode,
       home: AppSettingController.isFirst ? const LandingPage() : const NavigatorPage(),

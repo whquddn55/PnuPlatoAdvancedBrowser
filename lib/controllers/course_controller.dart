@@ -22,7 +22,7 @@ class CourseController {
   }
 
   Future<bool> updateCurrentSemesterCourseList() async {
-    var res = await _fetchCourseList(year: 2021, semester: 10);
+    var res = await _fetchCourseList(year: 2022, semester: 10);
     if (res == null) {
       return false;
     }
@@ -76,8 +76,15 @@ class CourseController {
       }
     }
 
+    /* Activity 가져오기 */
     for (var activity in document.getElementsByClassName('activity')) {
       final String weeks = _getWeeks(activity);
+
+      if (activity.parent!.parent!.parent!.parent!.parent!.children[0].text == "이번주 강의") {
+        course.currentWeek = weeks;
+        continue;
+      }
+
       final String id = _getId(activity);
       final String type = _getType(activity);
       final String description = _getDescription(activity);

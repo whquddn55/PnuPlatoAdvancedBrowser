@@ -12,6 +12,7 @@ class Course {
   List<CourseArticleMetaData> articleList = [];
   final Map<String, List<Activity>> activityMap = <String, List<Activity>>{};
   final Map<String, String> summaryMap = <String, String>{};
+  String? currentWeek;
   late Uri koreanPlanUri;
   late Uri englishPlanUri;
 
