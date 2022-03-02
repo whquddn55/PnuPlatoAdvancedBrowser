@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/data/activity.dart';
+import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
+import 'package:pnu_plato_advanced_browser/data/course_file.dart';
+import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/assignPage/AssignPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/boradPage/board_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/file_bottom_sheet.dart';
@@ -14,7 +16,7 @@ import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sectio
 class ActivityButton extends StatelessWidget {
   final String courseTitle;
   final String courseId;
-  final Activity activity;
+  final CourseActivity activity;
   const ActivityButton({Key? key, required this.activity, required this.courseTitle, required this.courseId}) : super(key: key);
 
   @override
@@ -41,7 +43,12 @@ class ActivityButton extends StatelessWidget {
                     context: context,
                     isScrollControlled: true,
                     useRootNavigator: true,
-                    builder: (context) => FileBottomSheet(activity: activity, courseTitle: courseTitle, courseId: courseId));
+                    builder: (context) => FileBottomSheet(
+                        file:
+                            CourseFile(imgUrl: activity.iconUri?.toString() ?? '', url: CommonUrl.fileViewerUrl + activity.id, title: activity.title),
+                        fileType: DownloadType.activity,
+                        courseTitle: courseTitle,
+                        courseId: courseId));
                 //Get.find<RouteController>().showBottomNavBar = true;
               } else if (activity.type == 'assign') {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => AssignPage(assignId: activity.id)));

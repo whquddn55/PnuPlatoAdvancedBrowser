@@ -2,14 +2,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_folder_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/activity.dart';
+import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
+import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 import 'package:pnu_plato_advanced_browser/data/course_folder_file.dart';
+import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/file_bottom_sheet.dart';
 
 class FolderBottomSheet extends StatelessWidget {
   final String courseTitle;
   final String courseId;
-  final Activity activity;
+  final CourseActivity activity;
   const FolderBottomSheet({Key? key, required this.activity, required this.courseTitle, required this.courseId}) : super(key: key);
 
   @override
@@ -77,7 +79,11 @@ class FolderBottomSheet extends StatelessWidget {
                                 onPressed: () {
                                   showModalBottomSheet(
                                       context: context,
-                                      builder: (context) => FileBottomSheet(activity: activity, courseTitle: courseTitle, courseId: courseId));
+                                      builder: (context) => FileBottomSheet(
+                                          file: CourseFile(imgUrl: file.imgUrl, url: file.url, title: file.title),
+                                          fileType: DownloadType.normal,
+                                          courseTitle: courseTitle,
+                                          courseId: courseId));
                                 }),
                           )
                           .toList(),

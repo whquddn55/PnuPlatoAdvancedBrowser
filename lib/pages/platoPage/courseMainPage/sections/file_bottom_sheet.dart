@@ -5,21 +5,21 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/activity.dart';
+import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 
 class FileBottomSheet extends StatelessWidget {
   final String courseTitle;
   final String courseId;
-  final Activity activity;
-  const FileBottomSheet({Key? key, required this.activity, required this.courseTitle, required this.courseId}) : super(key: key);
+  final CourseFile file;
+  final DownloadType fileType;
+  const FileBottomSheet({Key? key, required this.file, required this.fileType, required this.courseTitle, required this.courseId}) : super(key: key);
 
   _viewHanlder(BuildContext context) async {
     var cachedFile = await DefaultCacheManager().getSingleFile(
-      CommonUrl.fileViewerUrl + activity.id,
+      file.url,
       headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
       key: '123',
     );
@@ -32,10 +32,11 @@ class FileBottomSheet extends StatelessWidget {
 
   _downloadHandler(BuildContext context) async {
     var downloadResult = await Get.find<DownloadController>().enQueue(
-      url: CommonUrl.fileViewerUrl + activity.id,
+      title: file.title,
+      url: file.url,
       courseTitle: courseTitle,
       courseId: courseId,
-      type: DownloadType.normal,
+      type: fileType,
     );
 
     if (downloadResult == DownloadQueueingStatus.denied) {
@@ -66,10 +67,11 @@ class FileBottomSheet extends StatelessWidget {
                 child: const Text("덮어쓰기"),
                 onPressed: () async {
                   await Get.find<DownloadController>().enQueue(
-                    url: CommonUrl.fileViewerUrl + activity.id,
+                    title: file.title,
+                    url: file.url,
                     courseTitle: courseTitle,
                     courseId: courseId,
-                    type: DownloadType.normal,
+                    type: fileType,
                     force: true,
                   );
                   Navigator.pop(context);
@@ -97,25 +99,19 @@ class FileBottomSheet extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: CachedNetworkImage(
-                      imageUrl: activity.iconUri!.toString(),
+                      imageUrl: file.imgUrl,
                       height: 20,
                     ),
                   ),
                   Flexible(
                     child: Text(
-                      activity.title,
+                      file.title,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                   const SizedBox(width: 20),
-                  Text(
-                    activity.info,
-                    style: const TextStyle(
-                      color: Colors.blueAccent,
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 8.0),
