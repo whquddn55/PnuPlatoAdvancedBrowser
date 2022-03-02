@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_folder_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
-import 'package:pnu_plato_advanced_browser/data/course_folder_file.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/file_bottom_sheet.dart';
 
@@ -54,7 +53,7 @@ class FolderBottomSheet extends StatelessWidget {
             ],
           ),
           const Divider(height: 0, thickness: 1.5),
-          FutureBuilder<List<CourseFolderFile>>(
+          FutureBuilder<List<CourseFile>>(
               future: CourseFolderController.fetchCourseFolderFileList(activity.id),
               builder: (context, snapshot) {
                 if (snapshot.connectionState != ConnectionState.done) {

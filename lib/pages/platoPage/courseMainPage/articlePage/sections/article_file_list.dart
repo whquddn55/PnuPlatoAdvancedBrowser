@@ -4,13 +4,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/course_article.dart';
+import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 
 class ArticleFileList extends StatelessWidget {
   final String courseTitle;
   final String courseId;
-  final List<CourseArticleFile> fileList;
+  final List<CourseFile> fileList;
   const ArticleFileList(this.fileList, this.courseTitle, this.courseId, {Key? key}) : super(key: key);
 
   @override

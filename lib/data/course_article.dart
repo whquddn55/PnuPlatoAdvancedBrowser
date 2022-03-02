@@ -1,4 +1,5 @@
 import 'package:pnu_plato_advanced_browser/data/article_comment.dart';
+import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 
 class CourseArticleMetaData {
   final String title;
@@ -24,7 +25,7 @@ class CourseArticle {
   final String writer;
   final String date;
   final String content;
-  final List<CourseArticleFile>? fileList;
+  final List<CourseFile>? fileList;
   final bool commentable;
   final bool editable;
   final bool deletable;
@@ -43,17 +44,5 @@ class CourseArticle {
     required this.deletable,
     required this.commentMetaData,
     required this.commentList,
-  });
-}
-
-class CourseArticleFile {
-  final String imgUrl;
-  final String url;
-  final String title;
-
-  CourseArticleFile({
-    required this.imgUrl,
-    required this.url,
-    required this.title,
   });
 }

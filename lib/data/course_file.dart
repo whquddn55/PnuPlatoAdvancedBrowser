@@ -8,4 +8,9 @@ class CourseFile {
     required this.url,
     required this.title,
   });
+
+  @override
+  String toString() {
+    return 'imgUrl: $imgUrl, url: $url, title: $title';
+  }
 }

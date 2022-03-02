@@ -1,9 +1,9 @@
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/data/course_folder_file.dart';
+import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 
 abstract class CourseFolderController {
-  static Future<List<CourseFolderFile>> fetchCourseFolderFileList(final String folderId) async {
+  static Future<List<CourseFile>> fetchCourseFolderFileList(final String folderId) async {
     var res = await requestGet(CommonUrl.courseFolderViewUrl + folderId, isFront: true);
 
     if (res == null) {
@@ -12,11 +12,11 @@ abstract class CourseFolderController {
 
     Document document = Document.html(res.data);
 
-    final List<CourseFolderFile> fileList = [];
+    final List<CourseFile> fileList = [];
     for (var fileInstance in document.getElementsByClassName('fp-filename-icon')) {
       if (fileInstance.getElementsByTagName('a').isEmpty) continue;
 
-      fileList.add(CourseFolderFile(
+      fileList.add(CourseFile(
         imgUrl: fileInstance.getElementsByTagName('img')[0].attributes['src']!,
         url: fileInstance.getElementsByTagName('a')[0].attributes['href']!,
         title: fileInstance.getElementsByClassName('fp-filename')[0].text,

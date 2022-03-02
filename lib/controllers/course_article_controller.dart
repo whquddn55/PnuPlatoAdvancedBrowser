@@ -5,6 +5,7 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_article_comment_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/article_comment.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
+import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 
 abstract class CourseArticleController {
   static List<CourseArticleMetaData> fetchCourseArticleMetaDataList(final Document document, final String boardId) {
@@ -50,12 +51,12 @@ abstract class CourseArticleController {
     final String writer = document.getElementsByClassName('writer')[0].text.trim();
     final String date = document.getElementsByClassName('date')[0].text.trim();
     final String content = document.getElementsByClassName('text_to_html')[0].innerHtml;
-    List<CourseArticleFile>? fileList;
+    List<CourseFile>? fileList;
     if (document.getElementsByClassName('files').length >= 2) {
       fileList = document.getElementsByClassName('files')[1].children.map((li) {
         var img = li.getElementsByTagName('img')[0];
         var a = li.getElementsByTagName('a')[0];
-        return CourseArticleFile(imgUrl: img.attributes['src']!, url: a.attributes['href']!, title: a.text.trim());
+        return CourseFile(imgUrl: img.attributes['src']!, url: a.attributes['href']!, title: a.text.trim());
       }).toList();
     }
     final bool commentable = document.getElementsByClassName('ubboard_comment').isNotEmpty;

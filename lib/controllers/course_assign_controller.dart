@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assign.dart';
+import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 import 'package:pnu_plato_advanced_browser/data/professor.dart';
 
 abstract class CourseAssignController {
@@ -19,11 +20,11 @@ abstract class CourseAssignController {
     final String contentStr = document.getElementById('intro')!.getElementsByClassName('no-overflow').isEmpty
         ? ''
         : document.getElementById('intro')!.getElementsByClassName('no-overflow')[0].innerHtml;
-    final List<CourseAssignFile> fileList = [];
+    final List<CourseFile> fileList = [];
     log('[DEBUG] ${response.data}');
     for (var fileElement in document.getElementById('intro')!.getElementsByTagName('li')) {
       fileList.add(
-        CourseAssignFile(
+        CourseFile(
           imgUrl: fileElement.getElementsByTagName('img')[0].attributes['src']!,
           title: fileElement.getElementsByTagName('a')[0].text,
           url: fileElement.getElementsByTagName('a')[0].attributes['href']!,
@@ -37,7 +38,7 @@ abstract class CourseAssignController {
     String? dueString;
     CourseAssignDueType? dueType;
     DateTime? lastEditDate;
-    final List<CourseAssignFile> attatchFileList = [];
+    final List<CourseFile> attatchFileList = [];
 
     for (var element in document.getElementsByClassName('generaltable')[0].getElementsByTagName('tr')) {
       if (element.children[0].text == '제출 여부') {
@@ -59,7 +60,7 @@ abstract class CourseAssignController {
         lastEditDate = DateTime.parse(element.children[1].text);
       } else if (element.children[0].text == '첨부파일') {
         for (var fileElement in element.children[1].getElementsByTagName('li')) {
-          attatchFileList.add(CourseAssignFile(
+          attatchFileList.add(CourseFile(
             imgUrl: fileElement.getElementsByTagName('img')[0].attributes['src']!,
             title: fileElement.getElementsByTagName('a')[0].text,
             url: fileElement.getElementsByTagName('a')[0].attributes['href']!,
