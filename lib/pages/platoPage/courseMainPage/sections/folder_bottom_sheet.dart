@@ -14,7 +14,7 @@ class FolderBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Wrap(
         runSpacing: 20,

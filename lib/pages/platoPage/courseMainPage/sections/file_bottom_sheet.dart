@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity.dart';
@@ -86,7 +84,7 @@ class FileBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Wrap(
         runSpacing: 20,
@@ -121,60 +119,6 @@ class FileBottomSheet extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8.0),
-              if (activity.startDate != null)
-                if (activity.lateDate != null)
-                  Text(
-                    '${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.endDate!)}\n(지각: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.lateDate!)})',
-                    style: const TextStyle(
-                      color: Colors.orangeAccent,
-                    ),
-                  )
-                else
-                  Text(
-                    '${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.endDate!)}',
-                    style: const TextStyle(
-                      color: Colors.orangeAccent,
-                    ),
-                  ),
-              const SizedBox(height: 8.0),
-              FutureBuilder(
-                future: Get.find<CourseController>().getVodStatus(activity.courseId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    var data = snapshot.data as Map<int, List<Map<String, dynamic>>>;
-                    Widget? status;
-                    for (var weeks in data.values) {
-                      for (var activities in weeks) {
-                        if (activities["title"] == activity.title) {
-                          if (activities["status"] == true) {
-                            status = const Icon(
-                              Icons.check,
-                              color: Colors.lightGreen,
-                            );
-                          } else {
-                            status = const Icon(
-                              Icons.close,
-                              color: Colors.red,
-                            );
-                          }
-                        }
-                      }
-                    }
-                    if (status == null) {
-                      return const SizedBox.shrink();
-                    } else {
-                      return Row(
-                        children: [
-                          const Text('출석 상태: '),
-                          status,
-                        ],
-                      );
-                    }
-                  } else {
-                    return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
-                  }
-                },
-              ),
             ],
           ),
           const Divider(height: 0, thickness: 1.5),

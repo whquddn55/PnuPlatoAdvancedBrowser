@@ -31,6 +31,7 @@ class ActivityButton extends StatelessWidget {
                 //Get.find<RouteController>().showBottomNavBar = false;
                 await showModalBottomSheet(
                     context: context,
+                    isScrollControlled: true,
                     useRootNavigator: true,
                     builder: (context) => VodBottomSheet(activity: activity, courseTitle: courseTitle, courseId: courseId));
                 //Get.find<RouteController>().showBottomNavBar = true;
@@ -38,17 +39,20 @@ class ActivityButton extends StatelessWidget {
                 //Get.find<RouteController>().showBottomNavBar = false;
                 await showModalBottomSheet(
                     context: context,
+                    isScrollControlled: true,
                     useRootNavigator: true,
                     builder: (context) => FileBottomSheet(activity: activity, courseTitle: courseTitle, courseId: courseId));
                 //Get.find<RouteController>().showBottomNavBar = true;
               } else if (activity.type == 'assign') {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => AssignPage(assignId: activity.id)));
               } else if (activity.type == 'url') {
-                showModalBottomSheet(context: context, useRootNavigator: true, builder: (context) => LinkBottomSheet(activity: activity));
+                showModalBottomSheet(
+                    context: context, isScrollControlled: true, useRootNavigator: true, builder: (context) => LinkBottomSheet(activity: activity));
               } else if (activity.type == 'folder') {
                 showModalBottomSheet(
                     context: context,
                     useRootNavigator: true,
+                    isScrollControlled: true,
                     builder: (context) => FolderBottomSheet(activity: activity, courseTitle: courseTitle, courseId: courseId));
               }
             },
