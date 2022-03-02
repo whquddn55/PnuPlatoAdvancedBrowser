@@ -7,6 +7,7 @@ import 'package:pnu_plato_advanced_browser/data/activity.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/assignPage/AssignPage.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/boradPage/board_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/file_bottom_sheet.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/folder_bottom_sheet.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/link_bottom_sheet.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/vod_bottom_sheet.dart';
 
@@ -44,6 +45,11 @@ class ActivityButton extends StatelessWidget {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => AssignPage(assignId: activity.id)));
               } else if (activity.type == 'url') {
                 showModalBottomSheet(context: context, useRootNavigator: true, builder: (context) => LinkBottomSheet(activity: activity));
+              } else if (activity.type == 'folder') {
+                showModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    builder: (context) => FolderBottomSheet(activity: activity, courseTitle: courseTitle, courseId: courseId));
               }
             },
       child: Padding(
