@@ -1,4 +1,4 @@
-class Activity {
+class CourseActivity {
   final String type;
   final String title;
   final String id;
@@ -12,7 +12,7 @@ class Activity {
   final String availablilityInfo;
   final bool availablility;
 
-  Activity({
+  CourseActivity({
     required this.type,
     required this.title,
     required this.id,

@@ -1,4 +1,4 @@
-enum DownloadType { normal, m3u8, articleAttach }
+enum DownloadType { activity, m3u8, normal }
 enum DownloadStatus { queueing, downloading, complete, fail }
 
 class DownloadInformation {
@@ -22,7 +22,7 @@ class DownloadInformation {
     this.total = '',
     this.status = DownloadStatus.queueing,
   }) {
-    assert(type == DownloadType.normal ? headers != {} : true);
+    assert(type == DownloadType.activity ? headers != {} : true);
     assert(type == DownloadType.m3u8 ? title != '' : true);
   }
 }

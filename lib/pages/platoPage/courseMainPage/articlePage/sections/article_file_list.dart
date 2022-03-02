@@ -29,7 +29,7 @@ class ArticleFileList extends StatelessWidget {
                 title: fileInfo.title,
                 courseTitle: courseTitle,
                 courseId: courseId,
-                type: DownloadType.articleAttach,
+                type: DownloadType.normal,
                 force: false,
               );
 
@@ -65,7 +65,7 @@ class ArticleFileList extends StatelessWidget {
                               title: fileInfo.title,
                               courseTitle: courseTitle,
                               courseId: courseId,
-                              type: DownloadType.articleAttach,
+                              type: DownloadType.normal,
                               force: true,
                             );
                             Navigator.pop(context);

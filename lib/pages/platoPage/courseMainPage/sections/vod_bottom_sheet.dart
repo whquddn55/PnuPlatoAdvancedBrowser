@@ -6,14 +6,14 @@ import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/activity.dart';
+import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/vodPage/vod_page.dart';
 
 class VodBottomSheet extends StatelessWidget {
   final String courseTitle;
   final String courseId;
-  final Activity activity;
+  final CourseActivity activity;
   const VodBottomSheet({Key? key, required this.activity, required this.courseTitle, required this.courseId}) : super(key: key);
 
   _viewHanlder(BuildContext context) async {

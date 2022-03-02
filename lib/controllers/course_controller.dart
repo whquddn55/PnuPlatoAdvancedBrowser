@@ -5,7 +5,7 @@ import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_article_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/activity.dart';
+import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assistant.dart';
@@ -72,7 +72,7 @@ class CourseController {
       course.summaryMap[weeks] = item.innerHtml;
 
       if (!course.activityMap.keys.contains(weeks)) {
-        course.activityMap[weeks] = <Activity>[];
+        course.activityMap[weeks] = <CourseActivity>[];
       }
     }
 
@@ -96,7 +96,7 @@ class CourseController {
           activity.getElementsByClassName('availabilityinfo').isEmpty ? '' : activity.getElementsByClassName('availabilityinfo')[0].innerHtml;
       final bool availablility = activity.getElementsByTagName('a').isNotEmpty;
 
-      var newActivity = Activity(
+      var newActivity = CourseActivity(
         type: type.trim(),
         title: title.trim(),
         id: id,
@@ -175,8 +175,8 @@ class CourseController {
     return res;
   }
 
-  List<Activity> getBoardList(final String courseId) {
-    var res = <Activity>[];
+  List<CourseActivity> getBoardList(final String courseId) {
+    var res = <CourseActivity>[];
     for (var course in _currentSemesterCourseList) {
       if (course.id == courseId) {
         for (var activity in course.activityMap['강의 개요']!) {

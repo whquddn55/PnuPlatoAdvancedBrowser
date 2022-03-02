@@ -59,7 +59,7 @@ class DownloadController {
         final String externalDir = (await getExternalStorageDirectory())!.path;
         String saveDir;
         switch (type) {
-          case DownloadType.normal:
+          case DownloadType.activity:
             saveDir = '$externalDir/$courseTitle\$$courseId';
 
             final Options options = Options(
@@ -76,7 +76,7 @@ class DownloadController {
               title = Uri.decodeFull(url.split('/').last);
             }
             break;
-          case DownloadType.articleAttach:
+          case DownloadType.normal:
             saveDir = '$externalDir/$courseTitle\$$courseId';
             break;
           case DownloadType.m3u8:
@@ -106,8 +106,8 @@ class DownloadController {
 
   Future<bool> _checkDuplication(final DownloadType type, final String saveDir, final String title) async {
     switch (type) {
+      case DownloadType.activity:
       case DownloadType.normal:
-      case DownloadType.articleAttach:
         return File('$saveDir/$title').exists();
       case DownloadType.m3u8:
         return Directory(saveDir).exists();

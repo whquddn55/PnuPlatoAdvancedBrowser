@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/activity.dart';
+import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/inappwebview_wrapper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LinkBottomSheet extends StatelessWidget {
-  final Activity activity;
+  final CourseActivity activity;
   const LinkBottomSheet({Key? key, required this.activity}) : super(key: key);
 
   @override
