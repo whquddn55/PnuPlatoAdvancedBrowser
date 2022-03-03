@@ -4,7 +4,6 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:html/dom.dart' as html;
 import 'package:html/parser.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class BackgroundTodoController {
   static Future<List<Todo>> fetchTodoList(final List<String> courseIdList, final List<Map<String, dynamic>> vodStatusList) async {
@@ -16,9 +15,6 @@ abstract class BackgroundTodoController {
       todoList.addAll(await _fetchQuiz(courseId));
       todoList.addAll(await _fetchZoom(courseId));
     }
-
-    final preference = await SharedPreferences.getInstance();
-    preference.setString("todoList", jsonEncode(todoList));
 
     return todoList;
   }

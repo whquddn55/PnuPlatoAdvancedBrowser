@@ -5,6 +5,7 @@ import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_article_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
@@ -114,6 +115,7 @@ class CourseController {
       course.activityMap[weeks]!.add(newActivity);
     }
 
+    //Get.find<TodoController>().refreshTodoList([course.id], vodStatusList);
     return true;
   }
 
@@ -171,6 +173,8 @@ class CourseController {
         }
       }
     }
+
+    Get.find<TodoController>().updateTodoStatus(res);
 
     return res;
   }
