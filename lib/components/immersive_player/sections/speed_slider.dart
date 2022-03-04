@@ -11,18 +11,33 @@ class SpeedSlider extends StatefulWidget {
 
 class _SpeedSliderState extends State<SpeedSlider> {
   double speed = 1.0;
+
+  @override
+  void initState() {
+    super.initState();
+    speed = widget.controller.videoPlayerController!.value.speed;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Slider(
-      onChanged: (value) {
-        setState(() => speed = value);
-        widget.controller.setSpeed(speed);
-      },
-      value: speed,
-      min: 0.25,
-      max: 2.00,
-      label: speed.toStringAsFixed(2),
-      divisions: 35,
+    return Padding(
+      padding: const EdgeInsets.only(left: 10),
+      child: Row(children: [
+        Flexible(
+          flex: 9,
+          child: Slider(
+            onChanged: (value) {
+              setState(() => speed = value);
+              widget.controller.setSpeed(speed);
+            },
+            value: speed,
+            min: 0.3,
+            max: 2.00,
+            divisions: 17,
+          ),
+        ),
+        Flexible(flex: 1, child: Text(speed.toStringAsFixed(2))),
+      ]),
     );
   }
 }

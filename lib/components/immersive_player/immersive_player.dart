@@ -2,6 +2,7 @@ import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pnu_plato_advanced_browser/components/immersive_player/sections/controls_configuration.dart';
+import 'package:pnu_plato_advanced_browser/components/palyer_wrapper.dart';
 
 class ImmersivePlayer extends StatefulWidget {
   final String url;
@@ -31,9 +32,9 @@ class _ImmersivePlayerState extends State<ImmersivePlayer> {
   @override
   Widget build(BuildContext context) {
     var datasource = BetterPlayerDataSource.file(widget.url);
-    var controller = BetterPlayerController(const BetterPlayerConfiguration(allowedScreenSleep: false, useRootNavigator: true),
-        betterPlayerDataSource: datasource);
-    controller.setBetterPlayerControlsConfiguration(betterPlayerControlsConfiguration(context, controller));
-    return BetterPlayer(controller: controller);
+    var controller =
+        BetterPlayerController(const BetterPlayerConfiguration(allowedScreenSleep: false, fit: BoxFit.scaleDown), betterPlayerDataSource: datasource);
+    controller.setBetterPlayerControlsConfiguration(betterPlayerControlsConfiguration(context, controller, false, false));
+    return Material(child: PlayerWrapper(BetterPlayer(controller: controller)));
   }
 }

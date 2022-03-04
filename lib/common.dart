@@ -13,7 +13,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:marquee/marquee.dart';
 import 'package:pnu_plato_advanced_browser/components/immersive_player/sections/controls_configuration.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
-import 'package:pnu_plato_advanced_browser/inner_player.dart';
+import 'package:pnu_plato_advanced_browser/components/inner_player.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 
 abstract class CommonUrl {
