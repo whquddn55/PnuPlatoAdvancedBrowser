@@ -51,7 +51,14 @@ class ActivityButton extends StatelessWidget {
                         courseId: courseId));
                 //Get.find<RouteController>().showBottomNavBar = true;
               } else if (activity.type == 'assign') {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => AssignPage(assignId: activity.id)));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => AssignPage(
+                              assignId: activity.id,
+                              courseId: courseId,
+                              courseTitle: courseTitle,
+                            )));
               } else if (activity.type == 'url') {
                 showModalBottomSheet(
                     context: context, isScrollControlled: true, useRootNavigator: true, builder: (context) => LinkBottomSheet(activity: activity));

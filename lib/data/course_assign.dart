@@ -7,15 +7,20 @@ enum CourseAssignDueType { late, early, over }
 class CourseAssign {
   final String title;
   final Html content;
-  final List<CourseFile>? fileList;
+  final List<CourseFile> fileList;
   final bool? submitted;
   final bool? graded;
+  final bool isUpadtedToOver;
+  final bool submitable;
   final DateTime? dueDate;
   final String? dueString;
   final CourseAssignDueType? dueType;
   final DateTime? lastEditDate;
-  final List<CourseFile>? attatchFileList;
+  final List<CourseFile> attatchFileList;
   final CourseAssignGradeResult? gradeResult;
+
+  /* TODO: 팀으로 처리하기 */
+  final String? team;
 
   CourseAssign({
     required this.title,
@@ -23,12 +28,15 @@ class CourseAssign {
     required this.fileList,
     required this.submitted,
     required this.graded,
+    required this.isUpadtedToOver,
+    required this.submitable,
     required this.dueDate,
     required this.dueString,
     required this.dueType,
     required this.lastEditDate,
     required this.attatchFileList,
     required this.gradeResult,
+    required this.team,
   });
 }
 
@@ -36,8 +44,9 @@ class CourseAssignGradeResult {
   final String grade;
   final DateTime gradeTime;
   final Professor grader;
+  final Html? feedback;
 
-  CourseAssignGradeResult({required this.grade, required this.gradeTime, required this.grader});
+  CourseAssignGradeResult({required this.grade, required this.gradeTime, required this.grader, required this.feedback});
 
   @override
   String toString() {

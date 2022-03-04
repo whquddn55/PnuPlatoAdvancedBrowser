@@ -35,44 +35,66 @@ abstract class CourseAssignController {
     String? dueString;
     CourseAssignDueType? dueType;
     DateTime? lastEditDate;
+    String? team;
     final List<CourseFile> attatchFileList = [];
 
     for (var element in document.getElementsByClassName('generaltable')[0].getElementsByTagName('tr')) {
-      if (element.children[0].text == '제출 여부') {
-        submitted = element.children[1].classes.contains('submissionstatussubmitted') ? true : false;
-      } else if (element.children[0].text == '채점 상황') {
-        graded = element.children[1].classes.contains('submissiongraded') ? true : false;
-      } else if (element.children[0].text == '종료 일시') {
-        dueDate = DateTime.parse(element.children[1].text);
-      } else if (element.children[0].text == '마감까지 남은 기한') {
-        dueString = element.children[1].text;
-        if (element.children[1].classes.contains('earlysubmission')) {
-          dueType = CourseAssignDueType.early;
-        } else if (element.children[1].classes.contains('overdue')) {
-          dueType = CourseAssignDueType.over;
-        } else if (element.children[1].classes.contains('latesubmission')) {
-          dueType = CourseAssignDueType.late;
-        }
-      } else if (element.children[0].text == '최종 수정 일시') {
-        lastEditDate = DateTime.tryParse(element.children[1].text);
-      } else if (element.children[0].text == '첨부파일') {
-        for (var fileElement in element.children[1].getElementsByTagName('li')) {
-          attatchFileList.add(CourseFile(
-            imgUrl: fileElement.getElementsByTagName('img')[0].attributes['src']!,
-            title: fileElement.getElementsByTagName('a')[0].text,
-            url: fileElement.getElementsByTagName('a')[0].attributes['href']!,
-          ));
-        }
+      final String target = element.children[0].text;
+      switch (target) {
+        case "제출 여부":
+          submitted = element.children[1].classes.contains('submissionstatussubmitted') ? true : false;
+          break;
+        case "채점 상황":
+          graded = element.children[1].classes.contains('submissiongraded') ? true : false;
+          break;
+        case "제종료 일시":
+          dueDate = DateTime.parse(element.children[1].text);
+          break;
+        case "마감까지 남은 기한":
+          dueString = element.children[1].text;
+          if (element.children[1].classes.contains('earlysubmission')) {
+            dueType = CourseAssignDueType.early;
+          } else if (element.children[1].classes.contains('overdue')) {
+            dueType = CourseAssignDueType.over;
+          } else if (element.children[1].classes.contains('latesubmission')) {
+            dueType = CourseAssignDueType.late;
+          }
+          break;
+        case "최종 수정 일시":
+          lastEditDate = DateTime.tryParse(element.children[1].text);
+          break;
+        case "첨부파일":
+          for (var fileElement in element.children[1].getElementsByTagName('li')) {
+            attatchFileList.add(CourseFile(
+              imgUrl: fileElement.getElementsByTagName('img')[0].attributes['src']!,
+              title: fileElement.getElementsByTagName('a')[0].text,
+              url: fileElement.getElementsByTagName('a')[0].attributes['href']!,
+            ));
+          }
+          break;
+        case "팀":
+          team = element.children[1].text;
+          break;
+        default:
+          /* TODO: 버그 리포트로 이동 */
+          break;
       }
     }
 
+    bool isUpadtedToOver = document
+        .getElementsByClassName("alert-heading mb-2")
+        .fold<bool>(false, (previousValue, element) => previousValue |= element.text == "과제 종료일시가 지났습니다.");
+
+    bool submitable = document.getElementsByClassName("btn btn-secondary").isNotEmpty;
+
     CourseAssignGradeResult? gradeResult;
-    if (document.getElementsByClassName('generaltable').length >= 2) {
+    if (graded == true) {
       String? grade;
       DateTime? gradeTime;
       String? graderName;
       String? graderId;
       Uri? graderIconUri;
+      String? feedbackHtmlStr;
       for (var element in document.getElementsByClassName('generaltable')[1].getElementsByTagName('tr')) {
         if (element.children[0].text == '성적') {
           grade = element.children[1].text;
@@ -82,6 +104,8 @@ abstract class CourseAssignController {
           graderName = element.children[1].text;
           graderId = element.children[1].getElementsByTagName('a')[0].attributes['href']!.split('&course=')[0].split('?id=')[1];
           graderIconUri = Uri.parse(element.children[1].getElementsByTagName('img')[0].attributes['src']!);
+        } else if (element.children[0].text == '피드백') {
+          feedbackHtmlStr = element.children[1].innerHtml;
         }
       }
 
@@ -93,6 +117,7 @@ abstract class CourseAssignController {
           id: graderId!,
           iconUri: graderIconUri!,
         ),
+        feedback: feedbackHtmlStr == null ? null : renderHtml(feedbackHtmlStr),
       );
     }
 
@@ -102,12 +127,15 @@ abstract class CourseAssignController {
       fileList: fileList,
       submitted: submitted,
       graded: graded,
+      isUpadtedToOver: isUpadtedToOver,
+      submitable: submitable,
       dueDate: dueDate,
       dueString: dueString,
       dueType: dueType,
       lastEditDate: lastEditDate,
       attatchFileList: attatchFileList,
       gradeResult: gradeResult,
+      team: team,
     );
   }
 }
