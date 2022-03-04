@@ -93,8 +93,7 @@ abstract class BackgroundTodoController {
         String title = tr.getElementsByClassName('cell c1')[0].text.trim();
         String id = tr.getElementsByClassName('cell c1')[0].getElementsByTagName('a')[0].attributes['href']!.split('?id=')[1];
         DateTime dueDate = DateTime.tryParse(tr.getElementsByClassName('cell c2')[0].text.trim()) ?? DateTime.now();
-        bool done =
-            tr.getElementsByClassName('cell c3')[0].text.trim().contains('완료') || (tr.getElementsByClassName('cell c3')[0].text.trim() != "-");
+        bool done = tr.getElementsByClassName('cell c3')[0].text.trim().contains('완료');
 
         todoList.add(Todo(
           availability: true,
