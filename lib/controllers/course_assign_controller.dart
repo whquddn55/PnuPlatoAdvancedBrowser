@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assign.dart';
@@ -21,7 +19,6 @@ abstract class CourseAssignController {
         ? ''
         : document.getElementById('intro')!.getElementsByClassName('no-overflow')[0].innerHtml;
     final List<CourseFile> fileList = [];
-    log('[DEBUG] ${response.data}');
     for (var fileElement in document.getElementById('intro')!.getElementsByTagName('li')) {
       fileList.add(
         CourseFile(
@@ -57,7 +54,7 @@ abstract class CourseAssignController {
           dueType = CourseAssignDueType.late;
         }
       } else if (element.children[0].text == '최종 수정 일시') {
-        lastEditDate = DateTime.parse(element.children[1].text);
+        lastEditDate = DateTime.tryParse(element.children[1].text);
       } else if (element.children[0].text == '첨부파일') {
         for (var fileElement in element.children[1].getElementsByTagName('li')) {
           attatchFileList.add(CourseFile(

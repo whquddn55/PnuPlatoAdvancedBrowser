@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,11 +11,13 @@ import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
+import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/admin_bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/noticeListPage/notice_list_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/settingPage/setting_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({Key? key}) : super(key: key);
@@ -48,7 +52,7 @@ class MainDrawer extends StatelessWidget {
                   }
                   // BackgroundService.sendData(BackgroundServiceAction.fetchTodoList,
                   //     data: {"courseIdList": courseIdList, "vodStatusList": vodStatusList});
-                  Get.find<TodoController>().updateTodoList(courseIdList, vodStatusList);
+                  Get.find<TodoController>().refreshTodoList(courseIdList, vodStatusList);
                 },
               ),
               const Divider(height: 0),
@@ -103,6 +107,19 @@ class MainDrawer extends StatelessWidget {
                   title: const Text('세팅2'),
                   onTap: () {
                     Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => const AdminBugReportPage()));
+                  }),
+              const Divider(height: 0),
+              ListTile(
+                  trailing: const Icon(Icons.settings),
+                  title: const Text('디버그버튼'),
+                  onTap: () async {
+                    var todoList = Get.find<TodoController>().todoList;
+                    for (var todo in todoList) {
+                      todo.status = TodoStatus.undone;
+                    }
+                    final preference = await SharedPreferences.getInstance();
+                    preference.remove('todoList');
+                    //preference.setString("todoList", '');
                   }),
             ]);
           } else {
