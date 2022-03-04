@@ -8,7 +8,7 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/permission_controller.dart';
 import 'dart:io';
 
-import 'package:pnu_plato_advanced_browser/pages/storagePage/directoryPage/sections/player.dart';
+import 'package:pnu_plato_advanced_browser/components/immersive_player/immersive_player.dart';
 
 class DirectoryPage extends StatefulWidget {
   final Directory rootDirectory;
@@ -134,7 +134,7 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
                             ),
                             onPressed: () {
                               Navigator.of(context, rootNavigator: true)
-                                  .push(MaterialPageRoute(builder: (context) => Player(url: e.path + '/index.m3u8')));
+                                  .push(MaterialPageRoute(builder: (context) => ImmersivePlayer(url: e.path + '/index.m3u8')));
                             },
                             onLongPress: () {
                               showDialog(

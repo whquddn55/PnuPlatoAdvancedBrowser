@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:better_player/better_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
@@ -10,7 +11,9 @@ import 'package:html/parser.dart';
 import 'package:get/get.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:marquee/marquee.dart';
+import 'package:pnu_plato_advanced_browser/components/immersive_player/sections/controls_configuration.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/inner_player.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 
 abstract class CommonUrl {
@@ -219,6 +222,12 @@ Html renderHtml(String html) {
             scrollDirection: Axis.horizontal,
             child: (context.tree as TableLayoutElement).toWidget(context),
           ),
+        );
+      },
+      "video": (context, child) {
+        return InnerPlayer(
+          (context.tree as VideoContentElement).src[0].toString(),
+          headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
         );
       }
     },
