@@ -7,7 +7,7 @@ enum CourseAssignDueType { late, early, over }
 class CourseAssign {
   final String title;
   final Html content;
-  final List<CourseFile> fileList;
+  final List<dynamic> fileList;
   final bool? submitted;
   final bool? graded;
   final bool isUpadtedToOver;
@@ -16,7 +16,7 @@ class CourseAssign {
   final String? dueString;
   final CourseAssignDueType? dueType;
   final DateTime? lastEditDate;
-  final List<CourseFile> attatchFileList;
+  final List<dynamic> attatchFileList;
   final CourseAssignGradeResult? gradeResult;
 
   /* TODO: 팀으로 처리하기 */

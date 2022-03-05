@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assign.dart';
@@ -18,15 +20,12 @@ abstract class CourseAssignController {
     final String contentStr = document.getElementById('intro')!.getElementsByClassName('no-overflow').isEmpty
         ? ''
         : document.getElementById('intro')!.getElementsByClassName('no-overflow')[0].innerHtml;
-    final List<CourseFile> fileList = [];
-    for (var fileElement in document.getElementById('intro')!.getElementsByTagName('li')) {
-      fileList.add(
-        CourseFile(
-          imgUrl: fileElement.getElementsByTagName('img')[0].attributes['src']!,
-          title: fileElement.getElementsByTagName('a')[0].text,
-          url: fileElement.getElementsByTagName('a')[0].attributes['href']!,
-        ),
-      );
+    final List<dynamic> fileList = [];
+    for (var div in document.getElementById('intro')!.children) {
+      if (div.id.contains('assign_files')) {
+        _buildAttatchFileList(fileList, div.getElementsByTagName('ul')[0]);
+        break;
+      }
     }
 
     bool? submitted;
@@ -36,7 +35,7 @@ abstract class CourseAssignController {
     CourseAssignDueType? dueType;
     DateTime? lastEditDate;
     String? team;
-    final List<CourseFile> attatchFileList = [];
+    final List<dynamic> attatchFileList = [];
 
     for (var element in document.getElementsByClassName('generaltable')[0].getElementsByTagName('tr')) {
       final String target = element.children[0].text;
@@ -64,13 +63,7 @@ abstract class CourseAssignController {
           lastEditDate = DateTime.tryParse(element.children[1].text);
           break;
         case "첨부파일":
-          for (var fileElement in element.children[1].getElementsByTagName('li')) {
-            attatchFileList.add(CourseFile(
-              imgUrl: fileElement.getElementsByTagName('img')[0].attributes['src']!,
-              title: fileElement.getElementsByTagName('a')[0].text,
-              url: fileElement.getElementsByTagName('a')[0].attributes['href']!,
-            ));
-          }
+          _buildAttatchFileList(attatchFileList, element.children[1].getElementsByTagName('ul')[0]);
           break;
         case "팀":
           team = element.children[1].text;
@@ -137,5 +130,29 @@ abstract class CourseAssignController {
       gradeResult: gradeResult,
       team: team,
     );
+  }
+
+  static void _buildAttatchFileList(List<dynamic> attatchFileList, Element ul) {
+    for (var li in ul.children) {
+      for (var element in li.children) {
+        if (element.localName == "div") {
+          if (element.getElementsByTagName('img')[0].attributes['src']!.contains('folder')) {
+            attatchFileList.add({
+              "title": element.text.trim(),
+              "imgUrl": element.getElementsByTagName('img')[0].attributes['src']!,
+              "folder": [],
+            });
+          } else {
+            attatchFileList.add(CourseFile(
+              imgUrl: element.getElementsByTagName('img')[0].attributes['src']!,
+              title: element.getElementsByTagName('a')[0].text,
+              url: element.getElementsByTagName('a')[0].attributes['href']!,
+            ));
+          }
+        } else if (element.localName == "ul") {
+          _buildAttatchFileList(attatchFileList.last["folder"], element);
+        }
+      }
+    }
   }
 }

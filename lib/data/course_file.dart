@@ -9,8 +9,16 @@ class CourseFile {
     required this.title,
   });
 
-  @override
-  String toString() {
-    return 'imgUrl: $imgUrl, url: $url, title: $title';
+  CourseFile.fromJson(Map<String, dynamic> json)
+      : imgUrl = json["imgUrl"],
+        title = json["title"],
+        url = json["url"];
+
+  Map<String, dynamic> toJson() {
+    return {
+      "imgUrl": imgUrl,
+      "title": title,
+      "url": url,
+    };
   }
 }

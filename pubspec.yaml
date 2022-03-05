@@ -59,6 +59,7 @@ dependencies:
   flutter_background_service: ^0.2.4
   modal_bottom_sheet: ^2.0.0
   url_launcher: ^6.0.20
+  flutter_treeview: ^1.0.7+1
 
   firebase_core: ^1.12.0
   cloud_firestore: ^3.1.7

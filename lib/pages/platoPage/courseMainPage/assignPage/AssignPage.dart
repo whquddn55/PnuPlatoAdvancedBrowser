@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_treeview/flutter_treeview.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_assign_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assign.dart';
@@ -9,32 +12,67 @@ import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/file_bottom_sheet.dart';
 
-class AssignPage extends StatelessWidget {
+class AssignPage extends StatefulWidget {
   final String assignId;
   final String courseTitle;
   final String courseId;
   const AssignPage({Key? key, required this.assignId, required this.courseTitle, required this.courseId}) : super(key: key);
 
-  Widget _renderFileList(final BuildContext context, final List<CourseFile> fileList, final String metaString, CrossAxisAlignment alignment) {
+  @override
+  State<AssignPage> createState() => _AssignPageState();
+}
+
+class _AssignPageState extends State<AssignPage> {
+  List<Node> _buildFileListWidget(final BuildContext context, final List<dynamic> fileList) {
+    List<Node> res = [];
+    for (var element in fileList) {
+      if (element.runtimeType == CourseFile) {
+        res.add(Node(key: jsonEncode(element), label: '1', data: element));
+      } else {
+        var children = _buildFileListWidget(context, element["folder"]);
+        res.add(Node(key: "", label: '2', data: element, children: children));
+      }
+    }
+    return res;
+  }
+
+  Widget _renderFileList(final BuildContext context, final List<dynamic> fileList, final String metaString, CrossAxisAlignment alignment) {
     if (fileList.isEmpty) return const SizedBox.shrink();
+
+    TreeViewController controller = TreeViewController(children: _buildFileListWidget(context, fileList));
 
     return Column(
       crossAxisAlignment: alignment,
       children: [
         Text(metaString, style: const TextStyle(color: Colors.grey)),
-        ...List.generate(
-          fileList.length,
-          (index) => TextButton.icon(
-            icon: CachedNetworkImage(imageUrl: fileList[index].imgUrl),
-            label: Text(fileList[index].title),
-            onPressed: () {
-              showModalBottomSheet(
-                  context: context,
-                  builder: (context) =>
-                      FileBottomSheet(file: fileList[index], fileType: DownloadType.normal, courseTitle: courseTitle, courseId: courseId));
-            },
-          ),
-        )
+        TreeView(
+          controller: controller,
+          shrinkWrap: true,
+          primary: false,
+          theme: const TreeViewTheme(expanderTheme: ExpanderThemeData(type: ExpanderType.none)),
+          onNodeTap: (key) {
+            CourseFile courseFile = CourseFile.fromJson(jsonDecode(key));
+            showModalBottomSheet(
+                context: context,
+                builder: (context) =>
+                    FileBottomSheet(file: courseFile, fileType: DownloadType.normal, courseTitle: widget.courseTitle, courseId: widget.courseId));
+          },
+          nodeBuilder: (context, node) {
+            if (node.data.runtimeType == CourseFile) {
+              CourseFile courseFile = node.data;
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  children: [CachedNetworkImage(imageUrl: courseFile.imgUrl), const SizedBox(width: 4.0), Text(courseFile.title)],
+                ),
+              );
+            } else {
+              return Row(
+                children: [CachedNetworkImage(imageUrl: node.data["imgUrl"]), const SizedBox(width: 4.0), Text(node.data["title"])],
+              );
+            }
+          },
+        ),
       ],
     );
   }
@@ -67,9 +105,9 @@ class AssignPage extends StatelessWidget {
 
   Widget _renderSubmitForm(final BuildContext context, final CourseAssign courseAssign) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _renderFileList(context, courseAssign.attatchFileList, "제출한 파일", CrossAxisAlignment.end),
+        _renderFileList(context, courseAssign.attatchFileList, "제출한 파일", CrossAxisAlignment.start),
         if (courseAssign.isUpadtedToOver)
           Container(
             padding: const EdgeInsets.all(16.0),
@@ -116,7 +154,7 @@ class AssignPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<CourseAssign?>(
-      future: CourseAssignController.fetchCourseAssign(assignId),
+      future: CourseAssignController.fetchCourseAssign(widget.assignId),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const LoadingPage(msg: "로딩 중입니다...");
@@ -146,12 +184,13 @@ class AssignPage extends StatelessWidget {
                     children: [
                       _renderSubmissionStatus(courseAssign),
                       const Divider(thickness: 1.0, height: 4.0),
-                      courseAssign.content,
                       _renderFileList(context, courseAssign.fileList, "첨부파일", CrossAxisAlignment.start),
+                      const Divider(thickness: 1.0, height: 4.0),
+                      courseAssign.content,
                       const Divider(thickness: 1.0, height: 4.0),
                       const SizedBox(height: 20),
                       courseAssign.team != null
-                          ? Text(courseAssign.team!, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
+                          ? Text(courseAssign.team!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
                           : const SizedBox.shrink(),
                       _renderSubmitForm(context, courseAssign),
                       const Divider(thickness: 1.0, height: 4.0),
