@@ -6,7 +6,6 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:pnu_plato_advanced_browser/data/notification.dart' as noti;
 
 abstract class BackgroundLoginController {
   static String moodleSessionKey = '';
@@ -125,52 +124,52 @@ abstract class BackgroundLoginController {
     return true;
   }
 
-  static Future<bool> getNotifications() async {
-    var options = dio.Options(headers: {'Cookie': moodleSessionKey});
-    var response = await requestGet(CommonUrl.notificationUrl, options: options, isFront: false);
+  // static Future<bool> getNotifications() async {
+  //   var options = dio.Options(headers: {'Cookie': moodleSessionKey});
+  //   var response = await requestGet(CommonUrl.notificationUrl, options: options, isFront: false);
 
-    if (response == null) {
-      /* TODO: 에러 */
+  //   if (response == null) {
+  //     /* TODO: 에러 */
 
-      return false;
-    }
+  //     return false;
+  //   }
 
-    Document document = parse(response.data);
-    int i = 0;
-    /* TODO: 파일 추가해야 됨 */
-    const typeNames = {'ubboard': '공지사항', 'assign': '과제', 'vod': '동영상', 'quiz': '퀴즈'};
-    for (var element in document.getElementsByClassName("well wellnopadding")[0].children) {
-      if (element.localName == 'a') {
-        String url = element.attributes['href']!;
-        String title = element.getElementsByClassName('media-heading')[0].text.split(' ')[0];
-        String timeago = element.getElementsByClassName('timeago')[0].innerHtml;
-        String type = typeNames[url.split('/')[4]]!;
-        String body = await _getBody(url, type);
-        var notification = noti.Notification(id: ++i, title: '$title($timeago)', body: '[$type]$body', url: url);
-        print('$url, $title, $timeago, $type');
-        await notification.notify();
-      }
-    }
+  //   Document document = parse(response.data);
+  //   int i = 0;
+  //   /* TODO: 파일 추가해야 됨 */
+  //   const typeNames = {'ubboard': '공지사항', 'assign': '과제', 'vod': '동영상', 'quiz': '퀴즈'};
+  //   for (var element in document.getElementsByClassName("well wellnopadding")[0].children) {
+  //     if (element.localName == 'a') {
+  //       String url = element.attributes['href']!;
+  //       String title = element.getElementsByClassName('media-heading')[0].text.split(' ')[0];
+  //       String timeago = element.getElementsByClassName('timeago')[0].innerHtml;
+  //       String type = typeNames[url.split('/')[4]]!;
+  //       String body = await _getBody(url, type);
+  //       var notification = noti.Notification(id: ++i, title: '$title($timeago)', body: '[$type]$body', url: url);
+  //       print('$url, $title, $timeago, $type');
+  //       await notification.notify();
+  //     }
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
 
-  static Future<String> _getBody(String url, String type) async {
-    var options = dio.Options(headers: {'Cookie': moodleSessionKey});
-    var response = await requestGet(url, options: options, isFront: false);
-    if (response == null) {
-      return 'Undefined1';
-    }
-    Document document = parse(response.data);
-    if (type == '공지사항') {
-      return document.getElementsByTagName('h3')[0].text;
-    } else if (type == '과제' || type == '동영상' || type == '퀴즈') {
-      return document.getElementsByClassName('breadcrumb')[0].children.last.children[0].text;
-    }
-    /* TODO: 에러 */
+  // static Future<String> _getBody(String url, String type) async {
+  //   var options = dio.Options(headers: {'Cookie': moodleSessionKey});
+  //   var response = await requestGet(url, options: options, isFront: false);
+  //   if (response == null) {
+  //     return 'Undefined1';
+  //   }
+  //   Document document = parse(response.data);
+  //   if (type == '공지사항') {
+  //     return document.getElementsByTagName('h3')[0].text;
+  //   } else if (type == '과제' || type == '동영상' || type == '퀴즈') {
+  //     return document.getElementsByClassName('breadcrumb')[0].children.last.children[0].text;
+  //   }
+  //   /* TODO: 에러 */
 
-    return 'Undefined2';
-  }
+  //   return 'Undefined2';
+  // }
 
   static Future<String?> _getSessionKey(final String moodleSessionKey) async {
     var options = dio.Options(headers: {'Cookie': moodleSessionKey});

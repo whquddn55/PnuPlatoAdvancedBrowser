@@ -11,7 +11,6 @@ import 'package:html/parser.dart';
 import 'package:get/get.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:marquee/marquee.dart';
-import 'package:pnu_plato_advanced_browser/components/immersive_player/sections/controls_configuration.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/components/inner_player.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
@@ -23,7 +22,7 @@ abstract class CommonUrl {
   static const String defaultAvatarUrl = 'https://plato.pusan.ac.kr/theme/image.php/coursemosv2/core/1636448872/u/f1';
   static const String loginUrl = 'https://plato.pusan.ac.kr/login/index.php';
   static const String loginErrorUrl = 'https://plato.pusan.ac.kr/login.php?errorcode=3';
-  static const String notificationUrl = 'https://plato.pusan.ac.kr/local/ubnotification/';
+  static const String notificationUrl = 'https://plato.pusan.ac.kr/local/ubnotification/index.php?page=';
   static const String logoutUrl = 'https://plato.pusan.ac.kr/login/logout.php?sesskey=';
   static const String courseListUrl = 'https://plato.pusan.ac.kr/local/ubion/user/index.php?';
   static const String courseMainUrl = 'https://plato.pusan.ac.kr/course/view.php?id=';

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
+import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_todo_controller.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:shared_preferences_ios/shared_preferences_ios.dart';
@@ -18,6 +19,7 @@ abstract class BackgroundService {
   static final Map<int, Completer> _completerMap = <int, Completer>{};
 
   static Future<void> initializeService() async {
+    await BackgroundNotificationController.initialize();
     await _service.configure(
       androidConfiguration: AndroidConfiguration(
         // this will executed when app is in foreground or background in separated isolate
@@ -133,4 +135,11 @@ void _onStart() {
         break;
     }
   });
+
+  Timer.periodic(
+    const Duration(minutes: 3),
+    (timer) async {
+      await BackgroundNotificationController.fetchNotification();
+    },
+  );
 }

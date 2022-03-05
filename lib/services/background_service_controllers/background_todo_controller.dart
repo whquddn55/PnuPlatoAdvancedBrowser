@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:html/dom.dart' as html;
@@ -9,7 +7,6 @@ abstract class BackgroundTodoController {
   static Future<List<Todo>> fetchTodoList(final List<String> courseIdList, final List<Map<String, dynamic>> vodStatusList) async {
     final List<Todo> todoList = <Todo>[];
     for (var courseId in courseIdList) {
-      print(courseId);
       todoList.addAll(await _fetchVod(courseId, vodStatusList));
       todoList.addAll(await _fetchAssign(courseId));
       todoList.addAll(await _fetchQuiz(courseId));

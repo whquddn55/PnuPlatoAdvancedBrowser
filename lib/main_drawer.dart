@@ -17,6 +17,7 @@ import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.d
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/noticeListPage/notice_list_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/settingPage/setting_page.dart';
+import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_notification_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -113,13 +114,13 @@ class MainDrawer extends StatelessWidget {
                   trailing: const Icon(Icons.settings),
                   title: const Text('디버그버튼'),
                   onTap: () async {
-                    var todoList = Get.find<TodoController>().todoList;
-                    for (var todo in todoList) {
-                      todo.status = TodoStatus.undone;
-                    }
-                    final preference = await SharedPreferences.getInstance();
-                    preference.remove('todoList');
-                    //preference.setString("todoList", '');
+                    await BackgroundNotificationController.fetchNotification();
+                    // var todoList = Get.find<TodoController>().todoList;
+                    // for (var todo in todoList) {
+                    //   todo.status = TodoStatus.undone;
+                    // }
+                    // final preference = await SharedPreferences.getInstance();
+                    // preference.remove('todoList');
                   }),
             ]);
           } else {

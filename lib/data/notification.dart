@@ -1,18 +1,31 @@
+enum NotificationType { ubboard, ubfile, zoom, vod, folder, url }
+
 class Notification {
-  final int id;
   final String title;
   final String body;
   final String url;
+  final NotificationType notificationType;
 
-  Notification({required this.id, required this.title, required this.body, required this.url});
+  Notification({required this.title, required this.body, required this.url, required this.notificationType});
 
-  Future<void> notify() async {
-    // final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    //
-    // const android = AndroidNotificationDetails('thuthi_plato_noti', '플라토 브라우저 알림', channelDescription:  '플라토 브라우저에서 새 알림을 보여줌',
-    //     importance: Importance.max, priority: Priority.high);
-    // const detail = NotificationDetails(android: android);
-    //
-    // await flutterLocalNotificationsPlugin.show(id, title, body, detail, payload: id.toString());
+  Notification.fromJson(Map<String, dynamic> json)
+      : title = json["title"],
+        body = json["body"],
+        url = json["url"],
+        notificationType = NotificationType.values.byName(json["notificationType"]);
+
+  Map<String, dynamic> toJson() {
+    return {
+      "title": title,
+      "body": body,
+      "url": url,
+      "notificationType": notificationType.name,
+    };
   }
+
+  @override
+  int get hashCode => url.hashCode;
+
+  @override
+  bool operator ==(final Object other) => other.runtimeType == Notification && hashCode == other.hashCode;
 }
