@@ -32,6 +32,155 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
   @override
   bool get wantKeepAlive => true;
 
+  Widget _renderFolder(final BuildContext context, final Directory directory) {
+    return ElevatedButton.icon(
+      label: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(flex: 3, child: NFMarquee(text: basename(directory.path).split('\$')[0])),
+          Flexible(flex: 1, child: Text('(${basename(directory.path).split('\$')[1]})')),
+        ],
+      ),
+      style: ElevatedButton.styleFrom(
+        primary: Get.theme.cardColor,
+        onPrimary: Get.textTheme.bodyText2!.color,
+      ),
+      icon: const Icon(Icons.folder_open),
+      onPressed: () async => await _updateCurrentDirectory(directory),
+      onLongPress: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text("${basename(directory.path).split('\$')[0]}(${basename(directory.path).split('\$')[1]})를 삭제합니다"),
+              actions: [
+                TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context)),
+                TextButton(child: const Text("확인"), onPressed: () async => await _deleteFile(context, directory)),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _renderM3u8(final BuildContext context, final Directory directory) {
+    /* m3u8파일 */
+    bool show = false;
+    int fileSize = 0;
+    for (var file in directory.listSync()) {
+      if (basename(file.path).contains('index')) {
+        show = true;
+      }
+      fileSize += (file as File).lengthSync();
+    }
+    if (show) {
+      return ElevatedButton.icon(
+        icon: const Icon(Icons.videocam),
+        label: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(flex: 3, child: NFMarquee(text: basename(directory.path))),
+            Flexible(flex: 1, child: Text(formatBytes(fileSize, 2), style: Get.textTheme.caption)),
+          ],
+        ),
+        style: ElevatedButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          primary: Get.theme.cardColor,
+          onPrimary: Get.textTheme.bodyText2!.color,
+        ),
+        onPressed: () {
+          Navigator.of(context, rootNavigator: true)
+              .push(MaterialPageRoute(builder: (context) => ImmersivePlayer(url: directory.path + '/index.m3u8')));
+        },
+        onLongPress: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                content: Text("${basename(directory.path)}를 삭제합니다"),
+                actions: [
+                  TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context)),
+                  TextButton(child: const Text("확인"), onPressed: () async => await _deleteFile(context, directory)),
+                ],
+              );
+            },
+          );
+        },
+      );
+    } else {
+      return ElevatedButton.icon(
+        icon: const Icon(Icons.videocam),
+        label: Text(basename(directory.path) + "(다운중...)"),
+        style: ElevatedButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          primary: Get.theme.cardColor,
+          onPrimary: Get.textTheme.bodyText2!.color,
+        ),
+        onPressed: null,
+      );
+    }
+  }
+
+  Widget _renderNormal(final BuildContext context, final FileSystemEntity fileSystemEntity) {
+    return ElevatedButton.icon(
+      icon: iconFromExtension(basename(fileSystemEntity.path).split('.').last),
+      label: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(flex: 3, child: NFMarquee(text: basename(fileSystemEntity.path))),
+          Flexible(flex: 1, child: Text(formatBytes((fileSystemEntity as File).lengthSync(), 2), style: Get.textTheme.caption)),
+        ],
+      ),
+      style: ElevatedButton.styleFrom(
+        alignment: Alignment.centerLeft,
+        primary: Get.theme.cardColor,
+        onPrimary: Get.textTheme.bodyText2!.color,
+      ),
+      onPressed: () async {
+        var permissionRes = await PermissionController.requestPermission();
+        switch (permissionRes) {
+          case PermissionStatus.denied:
+            Fluttertoast.cancel();
+            Fluttertoast.showToast(msg: '다운 받기 위해서는 권한이 필요합니다.');
+            break;
+          case PermissionStatus.permanentlyDenied:
+            await showDialog(
+              context: context,
+              builder: (context) {
+                return const AlertDialog(
+                  content: Text("앱 세팅 화면에서 권한을 모두 허용으로 바꾸어 주세요."),
+                );
+              },
+            );
+            openAppSettings();
+            break;
+          default:
+            var result = await OpenFile.open(fileSystemEntity.path);
+            if (result.type != ResultType.done) {
+              Fluttertoast.cancel();
+              Fluttertoast.showToast(msg: result.message);
+            }
+            break;
+        }
+      },
+      onLongPress: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text("${basename(fileSystemEntity.path)}를 삭제합니다"),
+              actions: [
+                TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context)),
+                TextButton(child: const Text("확인"), onPressed: () async => await _deleteFile(context, fileSystemEntity)),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -77,151 +226,12 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
                   ...fileList.map((FileSystemEntity e) {
                     if (e is Directory) {
                       if (basename(e.path).contains('\$')) {
-                        /* 강좌 폴더 */
-                        return ElevatedButton.icon(
-                          label: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(basename(e.path).split('\$')[0]),
-                              Text('(${basename(e.path).split('\$')[1]})'),
-                            ],
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            primary: Get.theme.cardColor,
-                            onPrimary: Get.textTheme.bodyText2!.color,
-                          ),
-                          icon: const Icon(Icons.folder_open),
-                          onPressed: () async => await _updateCurrentDirectory(e),
-                          onLongPress: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  content: Text("${basename(e.path).split('\$')[0]}(${basename(e.path).split('\$')[1]})를 삭제합니다"),
-                                  actions: [
-                                    TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context)),
-                                    TextButton(child: const Text("확인"), onPressed: () async => await _deleteFile(context, e)),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        );
+                        return _renderFolder(context, e);
                       } else {
-                        /* m3u8파일 */
-                        bool show = false;
-                        int fileSize = 0;
-                        for (var file in e.listSync()) {
-                          if (basename(file.path).contains('index')) {
-                            show = true;
-                          }
-                          fileSize += (file as File).lengthSync();
-                        }
-                        if (show) {
-                          return ElevatedButton.icon(
-                            icon: const Icon(Icons.videocam),
-                            label: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(basename(e.path)),
-                                Text(formatBytes(fileSize, 2), style: Get.textTheme.caption),
-                              ],
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              alignment: Alignment.centerLeft,
-                              primary: Get.theme.cardColor,
-                              onPrimary: Get.textTheme.bodyText2!.color,
-                            ),
-                            onPressed: () {
-                              Navigator.of(context, rootNavigator: true)
-                                  .push(MaterialPageRoute(builder: (context) => ImmersivePlayer(url: e.path + '/index.m3u8')));
-                            },
-                            onLongPress: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    content: Text("${basename(e.path)}를 삭제합니다"),
-                                    actions: [
-                                      TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context)),
-                                      TextButton(child: const Text("확인"), onPressed: () async => await _deleteFile(context, e)),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        } else {
-                          return ElevatedButton.icon(
-                            icon: const Icon(Icons.videocam),
-                            label: Text(basename(e.path) + "(다운중...)"),
-                            style: ElevatedButton.styleFrom(
-                              alignment: Alignment.centerLeft,
-                              primary: Get.theme.cardColor,
-                              onPrimary: Get.textTheme.bodyText2!.color,
-                            ),
-                            onPressed: null,
-                          );
-                        }
+                        return _renderM3u8(context, e);
                       }
                     } else {
-                      /* 일반파일 */
-                      return ElevatedButton.icon(
-                        icon: iconFromExtension(basename(e.path).split('.').last),
-                        label: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(basename(e.path)),
-                            Text(formatBytes((e as File).lengthSync(), 2), style: Get.textTheme.caption),
-                          ],
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          alignment: Alignment.centerLeft,
-                          primary: Get.theme.cardColor,
-                          onPrimary: Get.textTheme.bodyText2!.color,
-                        ),
-                        onPressed: () async {
-                          var permissionRes = await PermissionController.requestPermission();
-                          switch (permissionRes) {
-                            case PermissionStatus.denied:
-                              Fluttertoast.cancel();
-                              Fluttertoast.showToast(msg: '다운 받기 위해서는 권한이 필요합니다.');
-                              break;
-                            case PermissionStatus.permanentlyDenied:
-                              await showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return const AlertDialog(
-                                    content: Text("앱 세팅 화면에서 권한을 모두 허용으로 바꾸어 주세요."),
-                                  );
-                                },
-                              );
-                              openAppSettings();
-                              break;
-                            default:
-                              var result = await OpenFile.open(e.path);
-                              if (result.type != ResultType.done) {
-                                Fluttertoast.cancel();
-                                Fluttertoast.showToast(msg: result.message);
-                              }
-                              break;
-                          }
-                        },
-                        onLongPress: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                content: Text("${basename(e.path)}를 삭제합니다"),
-                                actions: [
-                                  TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context)),
-                                  TextButton(child: const Text("확인"), onPressed: () async => await _deleteFile(context, e)),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      );
+                      return _renderNormal(context, e);
                     }
                   }).toList()
                 ],

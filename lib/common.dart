@@ -64,7 +64,7 @@ class NFMarquee extends StatelessWidget {
   const NFMarquee({
     Key? key,
     required this.text,
-    required this.fontSize,
+    this.fontSize = 14.0,
     this.fontWeight = FontWeight.w600,
     this.velocity = 30.0,
     this.blankSpace = 65.0,
@@ -86,27 +86,33 @@ class NFMarquee extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: (fontSize + 13.0) * MediaQuery.of(context).textScaleFactor,
-      child: AutoSizeText(
-        text,
-        minFontSize: fontSize,
-        maxFontSize: fontSize,
-        style: TextStyle(
-          fontSize: fontSize,
-          fontWeight: fontWeight,
-          color: color,
-        ),
-        overflowReplacement: Marquee(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          text: text,
-          blankSpace: blankSpace,
-          accelerationCurve: Curves.easeOutCubic,
-          velocity: velocity,
-          startAfter: startAfter,
-          pauseAfterRound: pauseAfterRound,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: AutoSizeText(
+          text,
+          minFontSize: fontSize,
+          maxFontSize: fontSize,
           style: TextStyle(
             fontSize: fontSize,
             fontWeight: fontWeight,
             color: color,
+          ),
+          overflowReplacement: Padding(
+            padding: EdgeInsets.only(top: ((fontSize + 13.0) * MediaQuery.of(context).textScaleFactor - fontSize) / 2 - 4.0),
+            child: Marquee(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              text: text,
+              blankSpace: blankSpace,
+              accelerationCurve: Curves.easeOutCubic,
+              velocity: velocity,
+              startAfter: startAfter,
+              pauseAfterRound: pauseAfterRound,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: fontWeight,
+                color: color,
+              ),
+            ),
           ),
         ),
       ),

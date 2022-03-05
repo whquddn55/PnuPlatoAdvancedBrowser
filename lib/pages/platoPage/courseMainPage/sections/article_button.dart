@@ -20,17 +20,8 @@ class ArticleButton extends StatelessWidget {
         padding: EdgeInsets.zero,
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Expanded(
-            flex: 3,
-            child: Text(
-              '-',
-              style: TextStyle(
-                color: Colors.black,
-              ),
-            ),
-          ),
           Expanded(
             flex: 100,
             child: NFMarquee(
