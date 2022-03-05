@@ -6,7 +6,8 @@ class InappwebviewWrapper extends StatelessWidget {
   final String title;
   final String url;
   final Function(InAppWebViewController, Uri?)? onLoadStop;
-  const InappwebviewWrapper(this.title, this.url, this.onLoadStop, {Key? key}) : super(key: key);
+  final bool preventRedirect;
+  const InappwebviewWrapper(this.title, this.url, this.onLoadStop, {Key? key, this.preventRedirect = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +17,7 @@ class InappwebviewWrapper extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
         centerTitle: true,
+        leading: BackButton(onPressed: () => Navigator.pop(context)),
       ),
       body: WillPopScope(
         onWillPop: () async {
@@ -31,19 +33,17 @@ class InappwebviewWrapper extends StatelessWidget {
           children: [
             InAppWebView(
               initialUrlRequest: URLRequest(url: Uri.parse(url)),
-              initialOptions: InAppWebViewGroupOptions(
-                  android: AndroidInAppWebViewOptions(
-                displayZoomControls: true,
-              )),
               onWebViewCreated: (controller) {
                 _webViewController = controller;
               },
-              onLoadStart: (controller, url) async {
+              onLoadStart: (controller, uri) async {
+                if (preventRedirect && (uri.toString() != url)) Navigator.pop(context);
+
                 _loaderKey.currentState!.setLoading();
               },
-              onLoadStop: (controller, url) async {
+              onLoadStop: (controller, uri) async {
                 if (onLoadStop != null) {
-                  await onLoadStop!(controller, url);
+                  await onLoadStop!(controller, uri);
                 }
                 _loaderKey.currentState!.setLoaded();
               },
@@ -51,6 +51,9 @@ class InappwebviewWrapper extends StatelessWidget {
                 if (msg.message == 'ppab:close') {
                   Navigator.pop(context);
                 }
+              },
+              onDownloadStart: (controller, uri) {
+                print(uri);
               },
             ),
             _Loader(key: _loaderKey),

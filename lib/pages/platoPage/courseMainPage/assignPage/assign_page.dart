@@ -4,10 +4,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_treeview/flutter_treeview.dart';
 import 'package:intl/intl.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_assign_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assign.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
+import 'package:pnu_plato_advanced_browser/inappwebview_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/file_bottom_sheet.dart';
@@ -122,9 +124,29 @@ class _AssignPageState extends State<AssignPage> {
           ),
         if (courseAssign.lastEditDate != null) Text("최종 수정 일시: ${DateFormat("yyyy-MM-dd hh:mm").format(courseAssign.lastEditDate!)}"),
         if (courseAssign.submitable)
-          OutlinedButton(
-            child: Text(courseAssign.submitted == true ? "편집하기" : "제출하기"),
-            onPressed: () {},
+          BetaBadge(
+            child: OutlinedButton(
+              child: Text(courseAssign.submitted == true ? "편집하기" : "제출하기"),
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => InappwebviewWrapper(
+                      "과제 제출",
+                      "https://plato.pusan.ac.kr/mod/assign/view.php?id=1258811&action=editsubmission",
+                      (controller, uri) async {
+                        await controller.evaluateJavascript(
+                            source:
+                                "document.body.replaceChild(document.getElementById('mform1'), document.getElementById('page')); document.getElementById('fitem_id_files_filemanager').style['margin-left'] = '0px';");
+                      },
+                      preventRedirect: true,
+                    ),
+                  ),
+                );
+
+                setState(() {});
+              },
+            ),
           ),
       ],
     );
