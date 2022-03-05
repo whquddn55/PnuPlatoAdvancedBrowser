@@ -23,7 +23,7 @@ class CourseController {
   }
 
   Future<bool> updateCurrentSemesterCourseList() async {
-    var res = await _fetchCourseList(year: 2021, semester: 20);
+    var res = await _fetchCourseList(year: 2022, semester: 10);
     if (res == null) {
       return false;
     }
@@ -196,6 +196,7 @@ class CourseController {
   Future<Map<String, dynamic>> getBoardInfo(final String boardId, final int page) async {
     /*
       title: 게시판 이름
+      content: 게시판 설명
       articleList: 게시글 목록
       pageLength: 게시판 페이지 수
       writable: 글쓰기 권한 확인
@@ -211,6 +212,7 @@ class CourseController {
     Document document = parse(response.data);
 
     res['title'] = document.getElementsByClassName('main')[0].text.trim();
+    res['content'] = document.getElementsByClassName('box generalbox').isEmpty ? '' : document.getElementsByClassName('box generalbox')[0].innerHtml;
     if (document.getElementsByClassName('tp').isEmpty) {
       res['pageLength'] = 1;
     } else {

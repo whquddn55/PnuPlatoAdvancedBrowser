@@ -41,6 +41,7 @@ class _BoardPageState extends State<BoardPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
+                    renderHtml(data['content']),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
