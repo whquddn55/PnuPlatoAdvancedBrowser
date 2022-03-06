@@ -4,7 +4,6 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
@@ -17,7 +16,7 @@ class FileBottomSheet extends StatelessWidget {
   final DownloadType fileType;
   const FileBottomSheet({Key? key, required this.file, required this.fileType, required this.courseTitle, required this.courseId}) : super(key: key);
 
-  _viewHanlder(BuildContext context) async {
+  void _viewHanlder(BuildContext context) async {
     var cachedFile = await DefaultCacheManager().getSingleFile(
       file.url,
       headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
@@ -30,7 +29,7 @@ class FileBottomSheet extends StatelessWidget {
     }
   }
 
-  _downloadHandler(BuildContext context) async {
+  void _downloadHandler(BuildContext context) async {
     var downloadResult = await Get.find<DownloadController>().enQueue(
       title: file.title,
       url: file.url,
@@ -38,50 +37,6 @@ class FileBottomSheet extends StatelessWidget {
       courseId: courseId,
       type: fileType,
     );
-
-    if (downloadResult == DownloadQueueingStatus.denied) {
-      Fluttertoast.cancel();
-      Fluttertoast.showToast(msg: '다운 받기 위해서는 권한이 필요합니다.');
-    } else if (downloadResult == DownloadQueueingStatus.permanentlyDenied) {
-      await showDialog(
-        context: context,
-        builder: (context) {
-          return const AlertDialog(
-            content: Text("앱 세팅 화면에서 권한을 모두 허용으로 바꾸어 주세요."),
-          );
-        },
-      );
-      openAppSettings();
-    } else if (downloadResult == DownloadQueueingStatus.duplicated) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: const Text("이미 존재하는 파일입니다. 다시 다운로드 받으시겠습니까?"),
-            actions: [
-              TextButton(
-                child: const Text("취소"),
-                onPressed: () => Navigator.pop(context),
-              ),
-              TextButton(
-                child: const Text("덮어쓰기"),
-                onPressed: () async {
-                  await Get.find<DownloadController>().enQueue(
-                    title: file.title,
-                    url: file.url,
-                    courseTitle: courseTitle,
-                    courseId: courseId,
-                    type: fileType,
-                    force: true,
-                  );
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
   }
 
   @override

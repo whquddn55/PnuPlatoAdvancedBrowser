@@ -138,30 +138,10 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
         onPrimary: Get.textTheme.bodyText2!.color,
       ),
       onPressed: () async {
-        var permissionRes = await PermissionController.requestPermission();
-        switch (permissionRes) {
-          case PermissionStatus.denied:
-            Fluttertoast.cancel();
-            Fluttertoast.showToast(msg: '다운 받기 위해서는 권한이 필요합니다.');
-            break;
-          case PermissionStatus.permanentlyDenied:
-            await showDialog(
-              context: context,
-              builder: (context) {
-                return const AlertDialog(
-                  content: Text("앱 세팅 화면에서 권한을 모두 허용으로 바꾸어 주세요."),
-                );
-              },
-            );
-            openAppSettings();
-            break;
-          default:
-            var result = await OpenFile.open(fileSystemEntity.path);
-            if (result.type != ResultType.done) {
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(msg: result.message);
-            }
-            break;
+        var result = await OpenFile.open(fileSystemEntity.path);
+        if (result.type != ResultType.done) {
+          Fluttertoast.cancel();
+          Fluttertoast.showToast(msg: result.message);
         }
       },
       onLongPress: () {

@@ -5,17 +5,17 @@ import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/permission_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 
-enum DownloadQueueingStatus { denied, permanentlyDenied, downloading, duplicated }
+enum DownloadQueueingStatus { denied, downloading }
 
 class DownloadController {
   late final Isolate _downloadIsolate;
@@ -50,58 +50,68 @@ class DownloadController {
       final bool force = false}) async {
     assert(type == DownloadType.m3u8 ? title != '' : true);
 
-    final PermissionStatus permissionStatus = await _requestPermission();
+    final bool permissionRes = await _requestPermission();
+    if (permissionRes == false) return DownloadQueueingStatus.denied;
 
-    switch (permissionStatus) {
-      case PermissionStatus.permanentlyDenied:
-        return DownloadQueueingStatus.permanentlyDenied;
-      case PermissionStatus.granted:
-        final String externalDir = (await getExternalStorageDirectory())!.path;
-        String saveDir;
-        switch (type) {
-          case DownloadType.activity:
-            saveDir = '$externalDir/$courseTitle\$$courseId';
+    final String externalDir = (await getExternalStorageDirectory())!.path;
+    String saveDir;
+    switch (type) {
+      case DownloadType.activity:
+        saveDir = '$externalDir/$courseTitle\$$courseId';
 
-            final Options options = Options(
-              headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
-              followRedirects: false,
-              validateStatus: (status) => status == 303 || status == 200,
-            );
-            var responseTemp = await requestGet(url, options: options, isFront: true);
-            if (responseTemp == null) {
-              /* TODO: 에러 */
-
-            } else {
-              url = responseTemp.headers.value('location')!.split('?')[0];
-              title = Uri.decodeFull(url.split('/').last);
-            }
-            break;
-          case DownloadType.normal:
-            saveDir = '$externalDir/$courseTitle\$$courseId';
-            break;
-          case DownloadType.m3u8:
-            saveDir = '$externalDir/$courseTitle\$$courseId/$title';
-            break;
-        }
-
-        if (!force) {
-          bool isExists = await _checkDuplication(type, saveDir, title);
-          if (isExists) return DownloadQueueingStatus.duplicated;
-        }
-
-        _downloadIsolateSendPort.send(DownloadInformation(
-          url: url,
-          courseTitle: courseTitle,
-          type: type,
-          saveDir: saveDir,
-          title: title,
+        final Options options = Options(
           headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
-          status: DownloadStatus.queueing,
-        ));
-        return DownloadQueueingStatus.downloading;
-      default:
-        return DownloadQueueingStatus.denied;
+          followRedirects: false,
+          validateStatus: (status) => status == 303 || status == 200,
+        );
+        var responseTemp = await requestGet(url, options: options, isFront: true);
+        if (responseTemp == null) {
+          /* TODO: 에러 */
+
+        } else {
+          url = responseTemp.headers.value('location')!.split('?')[0];
+          title = Uri.decodeFull(url.split('/').last);
+        }
+        break;
+      case DownloadType.normal:
+        saveDir = '$externalDir/$courseTitle\$$courseId';
+        break;
+      case DownloadType.m3u8:
+        saveDir = '$externalDir/$courseTitle\$$courseId/$title';
+        break;
     }
+
+    bool isExists = await _checkDuplication(type, saveDir, title);
+    if (isExists) {
+      bool duplicateSelect = await showDialog(
+        context: Get.context!,
+        builder: (context) {
+          return AlertDialog(
+            content: const Text("이미 존재하는 파일입니다. 다시 다운로드 받으시겠습니까?"),
+            actions: [
+              TextButton(
+                child: const Text("취소"),
+                onPressed: () => Navigator.pop(context, false),
+              ),
+              TextButton(child: const Text("덮어쓰기"), onPressed: () => Navigator.pop(context, true)),
+            ],
+          );
+        },
+      );
+
+      if (duplicateSelect == false) return DownloadQueueingStatus.denied;
+    }
+
+    _downloadIsolateSendPort.send(DownloadInformation(
+      url: url,
+      courseTitle: courseTitle,
+      type: type,
+      saveDir: saveDir,
+      title: title,
+      headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
+      status: DownloadStatus.queueing,
+    ));
+    return DownloadQueueingStatus.downloading;
   }
 
   Future<bool> _checkDuplication(final DownloadType type, final String saveDir, final String title) async {
@@ -110,7 +120,7 @@ class DownloadController {
       case DownloadType.normal:
         return File('$saveDir/$title').exists();
       case DownloadType.m3u8:
-        return Directory(saveDir).exists();
+        return File('$saveDir/index.m3u8').exists();
     }
   }
 
@@ -320,12 +330,13 @@ class DownloadController {
   }
 
   void _sendStatus(final SendPort sendPort, final Queue<DownloadInformation> pendingQueue, final List<DownloadInformation> downloadingQueue) {
+    var data = [...downloadingQueue, ...pendingQueue];
     sendPort.send({
       "data": [...downloadingQueue, ...pendingQueue]
     });
   }
 
-  Future<PermissionStatus> _requestPermission() {
+  Future<bool> _requestPermission() {
     return PermissionController.requestPermission();
   }
 }
