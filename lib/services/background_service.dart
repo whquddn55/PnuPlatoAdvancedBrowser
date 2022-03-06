@@ -19,7 +19,6 @@ abstract class BackgroundService {
   static final Map<int, Completer> _completerMap = <int, Completer>{};
 
   static Future<void> initializeService() async {
-    await BackgroundNotificationController.initialize();
     await _service.configure(
       androidConfiguration: AndroidConfiguration(
         // this will executed when app is in foreground or background in separated isolate
@@ -91,11 +90,13 @@ void _onIosBackground() {
   print('FLUTTER BACKGROUND FETCH');
 }
 
-void _onStart() {
+void _onStart() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (Platform.isAndroid) SharedPreferencesAndroid.registerWith();
   if (Platform.isIOS) SharedPreferencesIOS.registerWith();
+
+  await BackgroundNotificationController.initialize();
 
   final service = FlutterBackgroundService();
   service.onDataReceived.listen((data) async {

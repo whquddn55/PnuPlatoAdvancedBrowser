@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:math';
+import 'dart:developer';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:html/dom.dart';
@@ -29,12 +29,21 @@ abstract class BackgroundNotificationController {
 
     final List<Notification> newNotificationList = [];
     while (true) {
-      List<Notification> res = await _fetchNewNotificationList(page);
+      List<Notification>? res = await _fetchNewNotificationList(page);
+      if (res == null) return;
+
       newNotificationList.addAll(res);
       if (res.length != 15) break;
       ++page;
     }
 
+    await _updateNotificationList(newNotificationList);
+
+    final preference = await SharedPreferences.getInstance();
+    await preference.setStringList("notificationList", notificationList.map<String>((e) => jsonEncode(e)).toList());
+  }
+
+  static Future<void> _updateNotificationList(final List<Notification> newNotificationList) async {
     while (newNotificationList.isNotEmpty) {
       var newNotification = newNotificationList.last;
       newNotificationList.removeLast();
@@ -43,17 +52,19 @@ abstract class BackgroundNotificationController {
       await showNotification(newNotification);
     }
 
-    notificationList = notificationList.sublist(max(0, notificationList.length - 15));
-
-    final preference = await SharedPreferences.getInstance();
-    await preference.setStringList("notificationList", notificationList.map<String>((e) => jsonEncode(e)).toList());
+    int splitIndex = 0;
+    for (int i = 0; i < notificationList.length; ++i) {
+      if (DateTime.now().difference(notificationList[i].time).inDays < 30) break;
+      splitIndex = i;
+    }
+    notificationList = notificationList.sublist(splitIndex);
   }
 
-  static Future<List<Notification>> _fetchNewNotificationList(int page) async {
+  static Future<List<Notification>?> _fetchNewNotificationList(int page) async {
     var response = await requestGet(CommonUrl.notificationUrl + page.toString(), isFront: false, retry: 3);
 
     if (response == null) {
-      return [];
+      return null;
     }
 
     Document document = Document.html(response.data);
@@ -70,7 +81,7 @@ abstract class BackgroundNotificationController {
       final String url = notificationItem.attributes['href']!;
       final NotificationType notificationType = NotificationType.values.byName(url.split('/')[4]);
 
-      var newNotification = Notification(title: courseName, body: content, url: url, notificationType: notificationType);
+      var newNotification = Notification(title: courseName, body: content, url: url, time: DateTime.now(), notificationType: notificationType);
       if (notificationList.contains(newNotification)) break;
       newNotificationList.add(newNotification);
     }
