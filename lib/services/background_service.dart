@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_notification_controller.dart';
@@ -138,8 +139,9 @@ void _onStart() async {
   });
 
   Timer.periodic(
-    const Duration(minutes: 3),
+    const Duration(seconds: 5),
     (timer) async {
+      if (BackgroundLoginController.moodleSessionKey == '') return;
       await BackgroundNotificationController.fetchNotification();
     },
   );
