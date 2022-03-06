@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/todo.dart';
+import 'package:pnu_plato_advanced_browser/pages/calendarPage/sections/event_tile.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class MainCalendar extends StatefulWidget {
@@ -67,31 +71,30 @@ class _MainCalendarState extends State<MainCalendar> {
         return _isSameDay(_selectedDay, day);
       },
       onDaySelected: (selectedDay, focusedDay) {
+        var eventList = widget.todoList.where((event) => _isSameDay(event.dueDate, selectedDay)).toList();
+        if (eventList.isEmpty) return;
+
         setState(() {
           _selectedDay = selectedDay;
           _focusedDay = selectedDay;
         });
-        var eventList = widget.todoList;
 
-        showBarModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return ListView.builder(
+        showCupertinoModalBottomSheet(
+          context: context,
+          builder: (context) {
+            return SizedBox(
+              height: Get.height * 0.4,
+              child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: eventList.length,
                 itemBuilder: (context, index) {
-                  return Text(eventList[index].title);
+                  return EventWidget(event: eventList[index], index: index);
                 },
-              );
-            });
-        // showMaterialModalBottomSheet(
-        //   context: context,
-        //   expand: false,
-        //   builder: (context) {
-        //     return Text(eventList[0].title);
-
-        //   },
-        // );
+              ),
+            );
+          },
+        );
       },
       eventLoader: (day) {
         var eventList = <Todo>[];
@@ -128,7 +131,7 @@ class _MainCalendarState extends State<MainCalendar> {
                 child: Container(
                   child: Text('$videoCnt', textAlign: TextAlign.center),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.7),
+                    color: videoColor,
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -141,7 +144,7 @@ class _MainCalendarState extends State<MainCalendar> {
                 child: Container(
                   child: Text('$assignCnt', textAlign: TextAlign.center),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.7),
+                    color: assignColor,
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -154,7 +157,7 @@ class _MainCalendarState extends State<MainCalendar> {
                 child: Container(
                   child: Text('$zoomCnt', textAlign: TextAlign.center),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.7),
+                    color: zoomColor,
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),

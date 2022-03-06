@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:better_player/better_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
@@ -14,6 +13,10 @@ import 'package:marquee/marquee.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/components/inner_player.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
+
+Color videoColor = Colors.blue.withOpacity(0.7);
+Color assignColor = Colors.red.withOpacity(0.7);
+Color zoomColor = Colors.green.withOpacity(0.7);
 
 abstract class CommonUrl {
   static const String platoMainUrl = 'https://plato.pusan.ac.kr/';
@@ -44,6 +47,7 @@ abstract class CommonUrl {
   static const String courseBoardActionUrl = 'https://plato.pusan.ac.kr/mod/ubboard/action.php';
   static const String courseAssignViewUrl = 'https://plato.pusan.ac.kr/mod/assign/view.php?id=';
   static const String courseUrlViewUrl = 'https://plato.pusan.ac.kr/mod/url/view.php?id=';
+  static const String courseVodViewUrl = 'https://plato.pusan.ac.kr/mod/vod/view.php?id=';
   static const String courseFolderViewUrl = 'https://plato.pusan.ac.kr/mod/folder/view.php?id=';
 
   static const String vodViewerUrl = 'https://plato.pusan.ac.kr/mod/vod/viewer.php?id=';

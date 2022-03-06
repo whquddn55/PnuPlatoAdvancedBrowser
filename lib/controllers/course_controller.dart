@@ -18,12 +18,19 @@ class CourseController {
 
   List<Course> get currentSemesterCourseList => _currentSemesterCourseList;
 
+  Course? getCourseById(final String courseId) {
+    for (var course in _currentSemesterCourseList) {
+      if (course.id == courseId) return course;
+    }
+    return null;
+  }
+
   Future<List<Course>?> fetchCourseList(int year, int semester) async {
     return await _fetchCourseList(year: year, semester: semester);
   }
 
   Future<bool> updateCurrentSemesterCourseList() async {
-    var res = await _fetchCourseList(year: 2021, semester: 20);
+    var res = await _fetchCourseList(year: 2022, semester: 10);
     if (res == null) {
       return false;
     }
