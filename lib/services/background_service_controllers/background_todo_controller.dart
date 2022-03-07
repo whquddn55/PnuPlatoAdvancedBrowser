@@ -143,40 +143,37 @@ abstract class BackgroundTodoController {
   }
 
   static Future<List<Todo>> _fetchZoom(String courseId) async {
-    return [];
     /* TODO: 줌 강의 열리면 새로 짜야함 */
 
-    // var options = Options(headers: {'Cookie': Get.find<UserDataController>().moodleSessionKey});
-    // var response = await request(CommonUrl.courseQuizUrl + courseId, options: options, callback: Get.find<UserDataController>().login);
+    var response = await requestGet(CommonUrl.courseZoomUrl + courseId, isFront: false);
 
-    // if (response == null) {
-    //   /* TODO : 에러 */
-    //   return;
-    // }
-    // final List<Todo> todoList = <Todo>[];
-    // Document document = parse(response.data);
-    // for (var tr in document.getElementsByTagName('tr')) {
-    //   if (tr.getElementsByClassName('cell c1').isNotEmpty) {
-    //     String title = tr.getElementsByClassName('cell c1')[0].text.trim();
-    //     String id = tr.getElementsByClassName('cell c1')[0].getElementsByTagName('a')[0].attributes['href']!.split('?id=')[1];
-    //     DateTime dueDate = DateTime.parse(tr.getElementsByClassName('cell c2')[0].text.trim());
-    //     bool done = tr.getElementsByClassName('cell c3')[0].text.trim().contains('완료') ||
-    //         (tr.getElementsByClassName('cell c3')[0].text.trim() != "-") ||
-    //         (dueDate.compareTo(DateTime.now()) <= 0);
+    if (response == null) {
+      /* TODO : 에러 */
+      return [];
+    }
+    final List<Todo> todoList = <Todo>[];
+    html.Document document = parse(response.data);
+    for (var tr in document.getElementsByTagName('tr')) {
+      if (tr.getElementsByClassName('cell c1').isNotEmpty) {
+        String title = tr.getElementsByClassName('cell c1')[0].text.trim();
+        String id = tr.getElementsByClassName('cell c1')[0].getElementsByTagName('a')[0].attributes['href']!.split('?id=')[1];
+        DateTime dueDate = DateTime.parse(tr.getElementsByClassName('cell c2')[0].text.trim());
+        bool done = tr.parent!.parent!.classes.contains('mod_index') == false;
 
-    //     _todoList.add(Todo(
-    //       availability: true,
-    //       courseId: courseId,
-    //       dueDate: dueDate,
-    //       iconUri: Uri.parse("https://plato.pusan.ac.kr/theme/image.php/coursemosv2/assign/1641196863/icon"),
-    //       id: id,
-    //       title: title,
-    //       type: TodoType.quiz,
-    //       status: done ? TodoStatus.done : TodoStatus.undone,
-    //     ));
-    //   }
-    // }
-    // return todoList;
+        todoList.add(Todo(
+          availability: true,
+          courseId: courseId,
+          dueDate: dueDate,
+          iconUri: Uri.parse("https://plato.pusan.ac.kr/theme/image.php/coursemosv2/zoom/1641196863/icon"),
+          id: id,
+          title: title,
+          type: TodoType.zoom,
+          status: done ? TodoStatus.done : TodoStatus.undone,
+        ));
+      }
+    }
+
+    return todoList;
   }
 
   static String _getTitle(html.Element activity) {
