@@ -52,11 +52,11 @@ dependencies:
   open_file: ^3.2.1
   fluttertoast: ^8.0.8
   path_provider: ^2.0.8
-  permission_handler: ^8.3.0
+  permission_handler: ^9.2.0
   badges: ^2.0.2
   flutter_svg: ^0.23.0+1
   restart_app: ^1.1.0
-  flutter_background_service: ^0.2.4
+  flutter_background_service: ^0.2.6
   modal_bottom_sheet: ^2.0.0
   url_launcher: ^6.0.20
   flutter_treeview: ^1.0.7+1

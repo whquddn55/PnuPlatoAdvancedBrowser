@@ -21,7 +21,6 @@ class _NotificationPageState extends State<NotificationPage> {
       future: NotificationController.fetchNotificationList(),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) return const LoadingPage(msg: "로딩중 입니다...");
-        print(snapshot.data);
         if (snapshot.data == null) return const ErrorPage(msg: "알림 정보를 가져오는데 실패했어요...");
         var notificationList = snapshot.data!;
         return Scaffold(
@@ -29,7 +28,10 @@ class _NotificationPageState extends State<NotificationPage> {
           body: ScrollConfiguration(
             behavior: NoGlowBehavior(),
             child: RefreshIndicator(
-              onRefresh: () async => setState(() {}),
+              onRefresh: () async {
+                await NotificationController.clearNotificationList();
+                setState(() {});
+              },
               child: ListView.builder(
                 itemCount: notificationList.length,
                 itemBuilder: (context, index) {

@@ -5,4 +5,8 @@ abstract class NotificationController {
   static Future<List<Notification>> fetchNotificationList() async {
     return List<Notification>.from(await BackgroundService.sendData(BackgroundServiceAction.fetchNotificationList, data: null));
   }
+
+  static Future<void> clearNotificationList() async {
+    await BackgroundService.sendData(BackgroundServiceAction.clearNotificationList, data: null);
+  }
 }
