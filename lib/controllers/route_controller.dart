@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage/calendar_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/chat_page.dart';
+import 'package:pnu_plato_advanced_browser/pages/notification_page/notification_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/plato_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/storagePage/storage_page.dart';
 
 class RouteController extends GetxController {
-  final _pages = const [PlatoPage(), CalendarPage(), ChatPage(), StoragePage()];
+  final _pages = const [PlatoPage(), CalendarPage(), ChatPage(), StoragePage(), NotificationPage()];
   late final _navigatedPages;
-  final _navigatorKeyList = List.generate(4, (index) => GlobalKey<NavigatorState>());
+  final _navigatorKeyList = List.generate(5, (index) => GlobalKey<NavigatorState>());
   int _currentIndex = 0;
   bool _showBottomNavBar = true;
 

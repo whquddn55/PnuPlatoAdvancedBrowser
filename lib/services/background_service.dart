@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/data/notification.dart' as noti;
 import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_notification_controller.dart';
@@ -12,7 +12,7 @@ import 'package:pnu_plato_advanced_browser/services/background_service_controlle
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:shared_preferences_ios/shared_preferences_ios.dart';
 
-enum BackgroundServiceAction { login, logout, fetchTodoList, none }
+enum BackgroundServiceAction { login, logout, fetchTodoList, fetchNotificationList, clearNotificationList }
 
 /* APP 부분 */
 abstract class BackgroundService {
@@ -45,12 +45,7 @@ abstract class BackgroundService {
 
       print("[DEBUG] recevied app: $data");
 
-      BackgroundServiceAction action = BackgroundServiceAction.none;
-      for (var a in BackgroundServiceAction.values) {
-        if (a.toString() == data["action"]) {
-          action = a;
-        }
-      }
+      BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
 
       switch (action) {
         case BackgroundServiceAction.login:
@@ -62,10 +57,12 @@ abstract class BackgroundService {
         case BackgroundServiceAction.fetchTodoList:
           _completerMap[data["hashCode"]]!.complete(jsonDecode(data["data"]).map((map) => Todo.fromJson(map)).toList());
           break;
+        case BackgroundServiceAction.fetchNotificationList:
+          _completerMap[data["hashCode"]]!.complete(jsonDecode(data["data"]).map((map) => noti.Notification.fromJson(map)).toList());
+          break;
 
-        case BackgroundServiceAction.none:
-          print("[DEBUG] ERROR!!! $data");
-          assert(false);
+        case BackgroundServiceAction.clearNotificationList:
+          _completerMap[data["hashCode"]]!.complete(data["data"]);
           break;
       }
     });
@@ -76,9 +73,9 @@ abstract class BackgroundService {
     _completerMap[completer.hashCode] = completer;
 
     if (data == null) {
-      _service.sendData({"action": action.toString(), "hashCode": completer.hashCode});
+      _service.sendData({"action": action.name, "hashCode": completer.hashCode});
     } else {
-      _service.sendData({"action": action.toString(), "hashCode": completer.hashCode, ...data});
+      _service.sendData({"action": action.name, "hashCode": completer.hashCode, ...data});
     }
 
     return completer.future;
@@ -105,12 +102,7 @@ void _onStart() async {
       return;
     }
 
-    BackgroundServiceAction action = BackgroundServiceAction.none;
-    for (var a in BackgroundServiceAction.values) {
-      if (a.toString() == data["action"]) {
-        action = a;
-      }
-    }
+    BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
 
     print("[DEBUG] receive service: $data");
 
@@ -131,18 +123,24 @@ void _onStart() async {
         res["data"] = jsonEncode((await BackgroundTodoController.fetchTodoList(courseIdList, vodStatusList)).map((todo) => todo.toJson()).toList());
         service.sendData(res);
         break;
-
-      case BackgroundServiceAction.none:
-        assert(false);
+      case BackgroundServiceAction.fetchNotificationList:
+        await BackgroundNotificationController.updateNotificationList();
+        res["data"] = jsonEncode(BackgroundNotificationController.notificationList.reversed.toList());
+        service.sendData(res);
+        break;
+      case BackgroundServiceAction.clearNotificationList:
+        await BackgroundNotificationController.clearNotificationList();
+        res["data"] = true;
+        service.sendData(res);
         break;
     }
   });
 
   Timer.periodic(
-    const Duration(seconds: 5),
+    const Duration(minutes: 1),
     (timer) async {
       if (BackgroundLoginController.moodleSessionKey == '') return;
-      await BackgroundNotificationController.fetchNotification();
+      await BackgroundNotificationController.updateNotificationList();
     },
   );
 }

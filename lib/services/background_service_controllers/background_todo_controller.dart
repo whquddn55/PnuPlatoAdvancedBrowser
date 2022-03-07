@@ -143,8 +143,6 @@ abstract class BackgroundTodoController {
   }
 
   static Future<List<Todo>> _fetchZoom(String courseId) async {
-    /* TODO: 줌 강의 열리면 새로 짜야함 */
-
     var response = await requestGet(CommonUrl.courseZoomUrl + courseId, isFront: false);
 
     if (response == null) {

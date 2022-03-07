@@ -58,6 +58,7 @@ class NavigatorBody extends StatelessWidget {
                               },
                             ),
                           ),
+                          const Tab(child: Icon(Icons.notifications)),
                         ],
                       ),
               ),

@@ -114,7 +114,6 @@ class MainDrawer extends StatelessWidget {
                   trailing: const Icon(Icons.settings),
                   title: const Text('디버그버튼'),
                   onTap: () async {
-                    await BackgroundNotificationController.fetchNotification();
                     // var todoList = Get.find<TodoController>().todoList;
                     // for (var todo in todoList) {
                     //   todo.status = TodoStatus.undone;

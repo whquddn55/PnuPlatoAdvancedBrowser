@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
@@ -19,11 +18,17 @@ abstract class BackgroundNotificationController {
     await FlutterLocalNotificationsPlugin().initialize(initializationSettings, onSelectNotification: _onSelectNotification);
   }
 
+  static Future<void> clearNotificationList() async {
+    final preference = await SharedPreferences.getInstance();
+    await preference.remove('notificationList');
+    notificationList.clear();
+  }
+
   static void _onSelectNotification(String? arg) {
     print("[DEBUG] $arg");
   }
 
-  static Future<void> fetchNotification() async {
+  static Future<void> updateNotificationList() async {
     int page = 1;
 
     final List<Notification> newNotificationList = [];
@@ -70,6 +75,7 @@ abstract class BackgroundNotificationController {
 
     List<Notification> newNotificationList = [];
     for (var notificationItem in document.getElementsByClassName('notification-item')) {
+      if (notificationItem.localName != 'a') continue;
       final String timeago = notificationItem.getElementsByClassName('timeago')[0].text;
       final String courseName = notificationItem.getElementsByClassName('media-heading')[0].text.split(' ')[0] + ' - ' + timeago;
       final String content = notificationItem
