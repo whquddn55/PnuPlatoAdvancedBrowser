@@ -12,6 +12,7 @@ import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sectio
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/folder_bottom_sheet.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/link_bottom_sheet.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/vod_bottom_sheet.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/zoom_bottom_sheet.dart';
 
 class ActivityButton extends StatelessWidget {
   final String courseTitle;
@@ -30,15 +31,12 @@ class ActivityButton extends StatelessWidget {
                 Navigator.push(
                     context, MaterialPageRoute(builder: (context) => BoardPage(boardId: activity.id, courseTitle: courseTitle, courseId: courseId)));
               } else if (activity.type == 'vod') {
-                //Get.find<RouteController>().showBottomNavBar = false;
                 await showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
                     useRootNavigator: true,
                     builder: (context) => VodBottomSheet(activity: activity, courseTitle: courseTitle, courseId: courseId));
-                //Get.find<RouteController>().showBottomNavBar = true;
               } else if (activity.type == 'ubfile') {
-                //Get.find<RouteController>().showBottomNavBar = false;
                 await showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
@@ -49,7 +47,6 @@ class ActivityButton extends StatelessWidget {
                         fileType: DownloadType.activity,
                         courseTitle: courseTitle,
                         courseId: courseId));
-                //Get.find<RouteController>().showBottomNavBar = true;
               } else if (activity.type == 'assign') {
                 Navigator.push(
                     context,
@@ -68,6 +65,12 @@ class ActivityButton extends StatelessWidget {
                     useRootNavigator: true,
                     isScrollControlled: true,
                     builder: (context) => FolderBottomSheet(activity: activity, courseTitle: courseTitle, courseId: courseId));
+              } else if (activity.type == 'zoom') {
+                showModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    builder: (context) => ZoomBottomSheet(activity: activity, courseTitle: courseTitle, courseId: courseId));
               }
             },
       child: Padding(

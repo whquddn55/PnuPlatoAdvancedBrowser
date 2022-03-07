@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assign.dart';

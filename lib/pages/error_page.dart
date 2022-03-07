@@ -8,20 +8,25 @@ class ErrorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("에러"),
-          centerTitle: true,
+      appBar: AppBar(
+        title: const Text("에러"),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            errorWidget(),
+            Text(msg),
+          ],
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [SvgPicture.asset("assets/icons/lobster.svg", height: 25, width: 25, color: Colors.red), const Text("어라라...ㅂ스타?")]),
-              Text(msg),
-            ],
-          ),
-        ));
+      ),
+    );
   }
+}
+
+Widget errorWidget() {
+  return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [SvgPicture.asset("assets/icons/lobster.svg", height: 25, width: 25, color: Colors.red), const Text("어라라...ㅂ스타?")]);
 }
