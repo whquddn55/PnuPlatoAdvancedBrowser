@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class AppSettingController {
   static late SharedPreferences _preference;
-  static ThemeMode _themeMode = ThemeMode.system;
+  static ThemeMode _themeMode = ThemeMode.light;
   static bool _isFirst = true;
 
   static ThemeMode get themeMode => _themeMode;

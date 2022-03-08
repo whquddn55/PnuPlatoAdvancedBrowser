@@ -239,12 +239,26 @@ Html renderHtml(String html) {
           (context.tree as VideoContentElement).src[0].toString(),
           headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
         );
+      },
+      "span": (context, child) {
+        if (context.tree.elementClasses.contains('badge')) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.5),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(4.0), color: const Color(0xff17a2b8)),
+              child: Text(context.tree.element!.text, style: const TextStyle(color: Colors.white, fontSize: 11.0)),
+            ),
+          );
+        }
+        return child;
       }
     },
-    style: {
-      ".badge": Style(
-        color: Colors.transparent,
-      ),
+    onLinkTap: (a, b, c, d) {
+      print(a);
+      print(b);
+      print(c);
+      print(d);
     },
   );
 }
