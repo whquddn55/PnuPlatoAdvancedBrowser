@@ -37,7 +37,6 @@ dependencies:
   get:
   dio:
   html:
-  flutter_html: ^2.2.1
   flutter_inappwebview:
   shared_preferences: ^2.0.12
   flutter_expanded_tile: ^0.3.6
@@ -64,6 +63,13 @@ dependencies:
   firebase_core: ^1.12.0
   cloud_firestore: ^3.1.7
   flutter_local_notifications: ^9.4.0
+  flutter_widget_from_html: ^0.8.5
+
+dependency_overrides:
+  photo_view:
+    git:
+      url: https://github.com/bluefireteam/photo_view
+      ref: master
 
 dev_dependencies:
   flutter_test:

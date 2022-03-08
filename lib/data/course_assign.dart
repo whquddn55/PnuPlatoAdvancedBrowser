@@ -1,12 +1,11 @@
-import 'package:flutter_html/flutter_html.dart';
-import 'package:pnu_plato_advanced_browser/data/course_file.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:pnu_plato_advanced_browser/data/professor.dart';
 
 enum CourseAssignDueType { late, early, over }
 
 class CourseAssign {
   final String title;
-  final Html content;
+  final HtmlWidget content;
   final List<dynamic> fileList;
   final bool? submitted;
   final bool? graded;
@@ -44,7 +43,7 @@ class CourseAssignGradeResult {
   final String grade;
   final DateTime gradeTime;
   final Professor grader;
-  final Html? feedback;
+  final HtmlWidget? feedback;
 
   CourseAssignGradeResult({required this.grade, required this.gradeTime, required this.grader, required this.feedback});
 

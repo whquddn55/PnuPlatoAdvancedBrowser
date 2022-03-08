@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:html/parser.dart';
 import 'package:get/get.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:marquee/marquee.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/components/inner_player.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
@@ -201,63 +201,13 @@ Future<dio.Response?> requestPost(final String url, final dynamic data, {dio.Opt
   return response;
 }
 
-Html renderHtml(String html) {
+HtmlWidget renderHtml(String html) {
   html = html.replaceAll('<br>', '');
-  return Html(
-    data: html,
-    customImageRenders: {
-      networkSourceMatcher(): (context, attributes, element) {
-        return Container(
-          margin: const EdgeInsets.all(8),
-          child: CachedNetworkImage(
-            imageUrl: attributes["src"]!,
-            httpHeaders: {
-              'Cookie': Get.find<LoginController>().moodleSessionKey,
-            },
-            placeholder: (context, url) => const CircularProgressIndicator(),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-          ),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 1.5),
-          ),
-        );
-      },
-    },
-    customRender: {
-      "table": (context, child) {
-        final _scrollController = ScrollController();
-        return Scrollbar(
-          controller: _scrollController,
-          isAlwaysShown: true,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            scrollDirection: Axis.horizontal,
-            child: (context.tree as TableLayoutElement).toWidget(context),
-          ),
-        );
-      },
-      "video": (context, child) {
-        return InnerPlayer(
-          (context.tree as VideoContentElement).src[0].toString(),
-          headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
-        );
-      },
-      "span": (context, child) {
-        if (context.tree.elementClasses.contains('badge')) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.5),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(4.0), color: const Color(0xff17a2b8)),
-              child: Text(context.tree.element!.text, style: const TextStyle(color: Colors.white, fontSize: 11.0)),
-            ),
-          );
-        }
-        return child;
-      }
-    },
-    onLinkTap: (url, context, attribute, child) {
-      if (Uri.parse(url!).scheme == 'https') {
+  return HtmlWidget(
+    html,
+    isSelectable: true,
+    onTapUrl: (url) async {
+      if (Uri.parse(url).scheme == 'https') {
         ChromeSafariBrowser().open(
             url: Uri.parse(url),
             options: ChromeSafariBrowserClassOptions(
@@ -265,6 +215,78 @@ Html renderHtml(String html) {
       } else {
         launch(url);
       }
+      return true;
+    },
+    onTapImage: (imageMetadata) {
+      Navigator.of(Get.context!, rootNavigator: true)
+          .push(MaterialPageRoute(builder: (context) => SafeArea(child: PhotoView(imageProvider: NetworkImage(imageMetadata.sources.first.url)))));
+    },
+    customWidgetBuilder: (element) {
+      if (element.classes.contains("badge")) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 0.5),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(4.0), color: const Color(0xff17a2b8)),
+            child: Text(element.text, style: const TextStyle(color: Colors.white, fontSize: 11.0)),
+          ),
+        );
+      }
+      switch (element.localName) {
+        case "table":
+          final _scrollController = ScrollController();
+          var tbody = element.getElementsByTagName('tbody')[0];
+          var maxColumnLength = 0;
+          for (var row in tbody.children) {
+            maxColumnLength = max(maxColumnLength, row.children.length);
+          }
+          return Scrollbar(
+            controller: _scrollController,
+            isAlwaysShown: true,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              scrollDirection: Axis.horizontal,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Table(
+                  defaultColumnWidth: const IntrinsicColumnWidth(),
+                  border: TableBorder.symmetric(inside: const BorderSide(color: Colors.grey)),
+                  children: List.generate(
+                    tbody.children.length,
+                    (index) {
+                      var row = tbody.children[index];
+                      return TableRow(
+                        children: List.generate(
+                          maxColumnLength,
+                          (index2) {
+                            if (index2 >= row.children.length) {
+                              return const TableCell(
+                                child: Padding(padding: EdgeInsets.all(8.0), child: Text('')),
+                              );
+                            }
+                            var column = row.children[index2];
+                            return TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Text(column.text),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          );
+        case "video":
+          return InnerPlayer(
+            element.getElementsByTagName('source')[0].attributes["src"]!,
+            headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
+          );
+      }
+      return null;
     },
   );
 }
