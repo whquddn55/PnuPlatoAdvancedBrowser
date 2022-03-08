@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 
 class InappwebviewWrapper extends StatelessWidget {
@@ -52,9 +54,105 @@ class InappwebviewWrapper extends StatelessWidget {
                   Navigator.pop(context);
                 }
               },
-              onDownloadStart: (controller, uri) {
-                print(uri);
-              },
+              // onDownloadStart: (controller, uri) {
+              //   Get.find<DownloadController>().enQueue()
+              //   print(uri);
+              // },
+              // onAjaxProgress: (a, b) async {
+              //   print("onAjaxProgress");
+              //   return AjaxRequestAction.PROCEED;
+              // },
+              // onAjaxReadyStateChange: (a, b) async {
+              //   print("onAjaxReadyStateChange");
+              // },
+              // onCloseWindow: (a) async {
+              //   print("onCloseWindow");
+              // },
+              // onCreateWindow: (a, b) async {
+              //   print("onCreateWindow");
+              // },
+              // onEnterFullscreen: (a) {
+              //   print("onEnterFullscreen");
+              // },
+              // onExitFullscreen: (a) {
+              //   print("onExitFullscreen");
+              // },
+              // onFindResultReceived: (a, b, c, d) {
+              //   print("onFindResultReceived");
+              // },
+              // onJsAlert: (a, b) async {
+              //   print("onJsAlert");
+              // },
+              // onJsConfirm: (a, b) async {
+              //   print("onJsConfirm");
+              // },
+              // onJsPrompt: (a, b) async {
+              //   print("onJsPrompt");
+              // },
+              // onLoadError: (a, b, c, d) async {
+              //   print("onLoadError");
+              // },
+              // onLoadHttpError: (a, b, c, d) async {
+              //   print("onLoadHttpError");
+              // },
+              // onLoadResource: (a, b) async {
+              //   print("onLoadResource");
+              // },
+              // onLoadResourceCustomScheme: (a, b) async {
+              //   print("onLoadResourceCustomScheme");
+              // },
+              // onLongPressHitTestResult: (a, b) async {
+              //   print("onLongPressHitTestResult");
+              // },
+              // onOverScrolled: (a, b, c, d, e) async {
+              //   print("onOverScrolled");
+              // },
+              // onPageCommitVisible: (a, b) async {
+              //   print("onPageCommitVisible");
+              // },
+              // onPrint: (a, b) async {
+              //   print("onPrint");
+              // },
+              // onProgressChanged: (a, b) async {
+              //   print("onProgressChanged");
+              // },
+              // onReceivedClientCertRequest: (a, b) async {
+              //   print("onReceivedClientCertRequest");
+              // },
+              // onReceivedHttpAuthRequest: (a, b) async {
+              //   print("onReceivedHttpAuthRequest");
+              // },
+              // onReceivedServerTrustAuthRequest: (a, b) async {
+              //   print("onReceivedServerTrustAuthRequest");
+              // },
+              // onScrollChanged: (a, b, c) async {
+              //   print("onScrollChanged");
+              // },
+              // onTitleChanged: (a, b) async {
+              //   print("onTitleChanged");
+              // },
+              // onUpdateVisitedHistory: (a, b, c) async {
+              //   print("onUpdateVisitedHistory");
+              // },
+              // onWindowBlur: (a) async {
+              //   print("onWindowBlur");
+              // },
+              // onWindowFocus: (a) async {
+              //   print("onWindowFocus");
+              // },
+              // onZoomScaleChanged: (a, b, c) async {
+              //   print("onZoomScaleChanged");
+              // },
+              // initialOptions: InAppWebViewGroupOptions(
+              //     crossPlatform: InAppWebViewOptions(
+              //   allowFileAccessFromFileURLs: true,
+              //   allowUniversalAccessFromFileURLs: true,
+              //   javaScriptCanOpenWindowsAutomatically: true,
+              //   useOnDownloadStart: true,
+              //   useOnLoadResource: true,
+              //   javaScriptEnabled: true,
+
+              // )),
             ),
             _Loader(key: _loaderKey),
           ],

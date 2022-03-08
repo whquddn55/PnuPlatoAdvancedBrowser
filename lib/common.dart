@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:html/parser.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,7 @@ import 'package:marquee/marquee.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/components/inner_player.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Color videoColor = Colors.blue.withOpacity(0.7);
 Color assignColor = Colors.red.withOpacity(0.7);
@@ -254,11 +256,15 @@ Html renderHtml(String html) {
         return child;
       }
     },
-    onLinkTap: (a, b, c, d) {
-      print(a);
-      print(b);
-      print(c);
-      print(d);
+    onLinkTap: (url, context, attribute, child) {
+      if (Uri.parse(url!).scheme == 'https') {
+        ChromeSafariBrowser().open(
+            url: Uri.parse(url),
+            options: ChromeSafariBrowserClassOptions(
+                android: AndroidChromeCustomTabsOptions(showTitle: false, toolbarBackgroundColor: Colors.white), ios: IOSSafariOptions()));
+      } else {
+        launch(url);
+      }
     },
   );
 }

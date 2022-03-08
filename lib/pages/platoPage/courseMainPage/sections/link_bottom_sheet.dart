@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
-import 'package:pnu_plato_advanced_browser/inappwebview_wrapper.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LinkBottomSheet extends StatelessWidget {
   final CourseActivity activity;
@@ -66,36 +63,11 @@ class LinkBottomSheet extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   primary: Get.textTheme.bodyText1!.color,
                 ),
-                // onPressed: () => InAppBrowser().openUrlRequest(
-                //     urlRequest: URLRequest(
-                //         url: Uri.parse(CommonUrl.courseUrlViewUrl +
-                //             activity.id +
-                //             '&redirect=1')))
-
                 onPressed: () => ChromeSafariBrowser().open(
                     url: Uri.parse(CommonUrl.courseUrlViewUrl + activity.id + '&redirect=1'),
                     options: ChromeSafariBrowserClassOptions(
                         android: AndroidChromeCustomTabsOptions(showTitle: false, toolbarBackgroundColor: Colors.white), ios: IOSSafariOptions())),
-
-                // onPressed: () => launch(CommonUrl.courseUrlViewUrl + activity.id + '&redirect=1',
-                //     forceWebView: true, enableJavaScript: true, enableDomStorage: true),
-
-                // onPressed: () => Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (_) => InappwebviewWrapper(activity.title, CommonUrl.courseUrlViewUrl + activity.id + '&redirect=1', null))),
               ),
-              // TextButton.icon(
-              //   icon: const Icon(Icons.open_in_new),
-              //   label: const Text("외부 브라우저로 열기"),
-              //   style: TextButton.styleFrom(
-              //     alignment: Alignment.centerLeft,
-              //     primary: Get.textTheme.bodyText1!.color,
-              //   ),
-              //   onPressed: () {
-              //     launch(CommonUrl.courseUrlViewUrl + activity.id + '&redirect=1', headers: {"Cookie": Get.find<LoginController>().moodleSessionKey});
-              //   },
-              // ),
               TextButton.icon(
                 icon: const Icon(Icons.cancel_outlined),
                 label: const Text('취소'),
