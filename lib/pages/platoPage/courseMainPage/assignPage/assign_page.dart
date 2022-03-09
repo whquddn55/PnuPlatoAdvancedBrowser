@@ -56,6 +56,7 @@ class _AssignPageState extends State<AssignPage> {
             CourseFile courseFile = CourseFile.fromJson(jsonDecode(key));
             showModalBottomSheet(
                 context: context,
+                useRootNavigator: true,
                 builder: (context) =>
                     FileBottomSheet(file: courseFile, fileType: DownloadType.normal, courseTitle: widget.courseTitle, courseId: widget.courseId));
           },

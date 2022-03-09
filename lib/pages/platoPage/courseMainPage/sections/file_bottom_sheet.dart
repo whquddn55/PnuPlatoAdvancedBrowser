@@ -4,6 +4,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
@@ -20,7 +21,7 @@ class FileBottomSheet extends StatelessWidget {
     var cachedFile = await DefaultCacheManager().getSingleFile(
       file.url,
       headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
-      key: '123',
+      key: file.url,
     );
     var result = await OpenFile.open(cachedFile.path);
     if (result.type != ResultType.done) {
