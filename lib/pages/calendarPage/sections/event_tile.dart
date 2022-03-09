@@ -42,37 +42,45 @@ class EventTile extends StatelessWidget {
         break;
     }
 
-    return Stack(alignment: Alignment.centerLeft, children: [
-      InkWell(
-        onTap: () => _eventTabEvent(context),
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0, left: 20.0),
-          margin: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0, left: 15.0),
-          decoration: BoxDecoration(color: const Color(0xffdddddd), borderRadius: BorderRadius.circular(8.0)),
-          child: Column(
-            children: [
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(course.title), Text(DateFormat.Hms().format(event.dueDate))]),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(event.title), _RemainText(dueDate: event.dueDate)]),
-            ],
-          ),
-        ),
-      ),
-      Container(
-          height: 30.0,
-          width: 30.0,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30.0),
-            color: eventColor,
-            border: Border.all(
-              color: Colors.white,
-              width: 2.0,
+    return Opacity(
+      opacity: event.status == TodoStatus.done ? 0.3 : 1.0,
+      child: Stack(
+        alignment: Alignment.centerLeft,
+        children: [
+          InkWell(
+            onTap: () => _eventTabEvent(context),
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0, left: 20.0),
+              margin: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0, left: 15.0),
+              decoration: BoxDecoration(color: const Color(0xffdddddd), borderRadius: BorderRadius.circular(8.0)),
+              child: Column(
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [Text(course.title), Text(DateFormat.Hms().format(event.dueDate))]),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(event.title), _RemainText(dueDate: event.dueDate)]),
+                ],
+              ),
             ),
           ),
-          alignment: Alignment.center,
-          child: Text((index + 1).toString(), style: const TextStyle(color: Colors.white))),
-    ]);
+          Container(
+              height: 30.0,
+              width: 30.0,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30.0),
+                color: eventColor,
+                border: Border.all(
+                  color: Colors.white,
+                  width: 2.0,
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Text((index + 1).toString(), style: const TextStyle(color: Colors.white))),
+        ],
+      ),
+    );
   }
 }
 

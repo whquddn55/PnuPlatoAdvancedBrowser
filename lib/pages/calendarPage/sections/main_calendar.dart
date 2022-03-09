@@ -34,6 +34,83 @@ class _MainCalendarState extends State<MainCalendar> {
     );
   }
 
+  Widget _buildMarker(final List<Todo> events) {
+    int videoCnt = 0;
+    int assignCnt = 0;
+    int zoomCnt = 0;
+    int doneCnt = 0;
+    for (Todo event in events) {
+      if (event.status == TodoStatus.done) {
+        doneCnt++;
+        continue;
+      }
+      switch (event.type) {
+        case TodoType.vod:
+          videoCnt++;
+          break;
+        case TodoType.assign:
+        case TodoType.quiz:
+          assignCnt++;
+          break;
+        case TodoType.zoom:
+          zoomCnt++;
+      }
+    }
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            const Expanded(flex: 1, child: SizedBox.shrink()),
+            const Expanded(flex: 1, child: SizedBox.shrink()),
+            if (doneCnt != 0) _renderMarker(doneCnt, Colors.grey) else const Expanded(flex: 1, child: SizedBox.shrink())
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            if (videoCnt != 0) _renderMarker(videoCnt, videoColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
+            if (assignCnt != 0) _renderMarker(assignCnt, assignColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
+            if (zoomCnt != 0) _renderMarker(zoomCnt, zoomColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _onDaySelected(final DateTime selectedDay, final DateTime focusedDay) {
+    var undoneEventList = widget.todoList.where((event) => _isSameDay(event.dueDate, selectedDay) && event.status != TodoStatus.done).toList();
+    var doneEventList = widget.todoList.where((event) => _isSameDay(event.dueDate, selectedDay) && event.status == TodoStatus.done).toList();
+    if (undoneEventList.isEmpty && doneEventList.isEmpty) return;
+
+    setState(() {
+      _selectedDay = selectedDay;
+      _focusedDay = selectedDay;
+    });
+
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      builder: (context) {
+        return SizedBox(
+          height: Get.height * 0.4,
+          child: ListView.builder(
+            physics: const BouncingScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: undoneEventList.length + doneEventList.length,
+            itemBuilder: (context, index) {
+              if (index < undoneEventList.length) {
+                return EventTile(event: undoneEventList[index], index: index);
+              } else {
+                return EventTile(event: doneEventList[index - undoneEventList.length], index: index);
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return TableCalendar<Todo>(
@@ -80,33 +157,7 @@ class _MainCalendarState extends State<MainCalendar> {
       selectedDayPredicate: (day) {
         return _isSameDay(_selectedDay, day);
       },
-      onDaySelected: (selectedDay, focusedDay) {
-        var eventList = widget.todoList.where((event) => _isSameDay(event.dueDate, selectedDay)).toList();
-        if (eventList.isEmpty) return;
-
-        setState(() {
-          _selectedDay = selectedDay;
-          _focusedDay = selectedDay;
-        });
-
-        showModalBottomSheet(
-          context: context,
-          useRootNavigator: true,
-          builder: (context) {
-            return SizedBox(
-              height: Get.height * 0.4,
-              child: ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: eventList.length,
-                itemBuilder: (context, index) {
-                  return EventTile(event: eventList[index], index: index);
-                },
-              ),
-            );
-          },
-        );
-      },
+      onDaySelected: _onDaySelected,
       eventLoader: (day) {
         var eventList = <Todo>[];
         for (var todo in widget.todoList) {
@@ -117,49 +168,7 @@ class _MainCalendarState extends State<MainCalendar> {
         return eventList;
       },
       calendarBuilders: CalendarBuilders(
-        markerBuilder: (context, day, events) {
-          int videoCnt = 0;
-          int assignCnt = 0;
-          int zoomCnt = 0;
-          int doneCnt = 0;
-          for (Todo event in events) {
-            if (event.status == TodoStatus.done) {
-              doneCnt++;
-              continue;
-            }
-            switch (event.type) {
-              case TodoType.vod:
-                videoCnt++;
-                break;
-              case TodoType.assign:
-              case TodoType.quiz:
-                assignCnt++;
-                break;
-              case TodoType.zoom:
-                zoomCnt++;
-            }
-          }
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Expanded(flex: 1, child: SizedBox.shrink()),
-                  const Expanded(flex: 1, child: SizedBox.shrink()),
-                  if (doneCnt != 0) _renderMarker(doneCnt, Colors.grey) else const Expanded(flex: 1, child: SizedBox.shrink())
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  if (videoCnt != 0) _renderMarker(videoCnt, videoColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
-                  if (assignCnt != 0) _renderMarker(assignCnt, assignColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
-                  if (zoomCnt != 0) _renderMarker(zoomCnt, zoomColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
-                ],
-              ),
-            ],
-          );
-        },
+        markerBuilder: (context, day, events) => _buildMarker(events),
       ),
     );
   }
