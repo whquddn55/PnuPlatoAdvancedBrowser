@@ -214,6 +214,7 @@ abstract class BackgroundLoginController {
     res["department"] = document.getElementById('fitem_id_department')!.children[1].text.trim();
     res["name"] = document.getElementById('id_firstname')!.attributes['value']!.trim();
     res["imgUrl"] = document.getElementsByClassName('userpicture')[0].attributes['src']!;
+    res["sessionKey"] = document.getElementsByTagName('input').firstWhere((element) => element.attributes['name'] == 'sesskey').attributes['value'];
 
     return res;
   }

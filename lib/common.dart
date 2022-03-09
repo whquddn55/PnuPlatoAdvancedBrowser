@@ -25,6 +25,7 @@ void printLog(final String msg) {
 }
 
 abstract class CommonUrl {
+  static const String platoActionUrl = 'https://plato.pusan.ac.kr/theme/coursemosv2/action.php';
   static const String platoMainUrl = 'https://plato.pusan.ac.kr/';
   static const String platoUserInformationUrl = 'https://plato.pusan.ac.kr/user/user_edit.php';
   static const String platoCalendarUrl = 'https://plato.pusan.ac.kr/calendar/export.php';
@@ -186,6 +187,57 @@ Future<dio.Response?> requestPost(final String url, final dynamic data, {dio.Opt
     try {
       response = await dio.Dio().post(url, data: data, options: options);
       if (parse(response.data).children[0].attributes['class'] == 'html_login') {
+        time++;
+        if (isFront != null) {
+          if (isFront == true) {
+            await Get.find<LoginController>().login(autologin: true);
+          } else {
+            await BackgroundLoginController.login(autologin: true);
+          }
+        }
+      } else {
+        break;
+      }
+    } on dio.DioError catch (e, _) {
+      printLog("[ERROR] ${e.response}");
+      time++;
+    }
+  }
+  return response;
+}
+
+enum PlatoActionType { courseList }
+
+Future<dio.Response?> requestAction(final PlatoActionType type, {required final bool? isFront, final int retry = 5}) async {
+  dio.Response? response;
+  int time = 0;
+
+  var options = dio.Options(
+    contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+    headers: {"X-Requested-With": "XMLHttpRequest"},
+  );
+  while (time < retry) {
+    String body = "sesskey=${Get.find<LoginController>().sessionKey}";
+    switch (type) {
+      case PlatoActionType.courseList:
+        body += "&type=userInfoMy";
+        break;
+    }
+
+    if (isFront != null) {
+      if (isFront == true) {
+        options.headers!["Cookie"] = Get.find<LoginController>().moodleSessionKey;
+      } else {
+        options.headers!["Cookie"] = BackgroundLoginController.moodleSessionKey;
+      }
+    }
+
+    printLog("[DEBUG] ${options.headers}");
+
+    try {
+      response = await dio.Dio().post("https://plato.pusan.ac.kr/theme/coursemosv2/action.php", data: body, options: options);
+
+      if (response.data["code"] != "100") {
         time++;
         if (isFront != null) {
           if (isFront == true) {

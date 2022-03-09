@@ -13,6 +13,36 @@ class ZoomBottomSheet extends StatelessWidget {
   final CourseActivity activity;
   const ZoomBottomSheet({Key? key, required this.activity, required this.courseTitle, required this.courseId}) : super(key: key);
 
+  Widget _renderZoomInfo() {
+    return FutureBuilder<CourseZoom?>(
+      future: CourseZoomController.fetchCourseZoom(activity.id),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
+        }
+
+        if (snapshot.data == null) {
+          return errorWidget();
+        }
+
+        CourseZoom courseZoom = snapshot.data!;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("시작시간 : ${DateFormat("yyyy-MM-dd HH:mm").format(courseZoom.startTime)} (${courseZoom.runningTime})"),
+            Row(
+              children: [
+                const Text("상태 : "),
+                courseZoom.status ? const Icon(Icons.start, color: Colors.green) : const Icon(Icons.close, color: Colors.red)
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -75,36 +105,6 @@ class ZoomBottomSheet extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _renderZoomInfo() {
-    return FutureBuilder<CourseZoom?>(
-      future: CourseZoomController.fetchCourseZoom(activity.id),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
-        }
-
-        if (snapshot.data == null) {
-          return errorWidget();
-        }
-
-        CourseZoom courseZoom = snapshot.data!;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("시작시간 : ${DateFormat("yyyy-MM-dd HH:mm").format(courseZoom.startTime)} (${courseZoom.runningTime})"),
-            Row(
-              children: [
-                const Text("상태 : "),
-                courseZoom.status ? const Icon(Icons.start, color: Colors.green) : const Icon(Icons.close, color: Colors.red)
-              ],
-            ),
-          ],
-        );
-      },
     );
   }
 }

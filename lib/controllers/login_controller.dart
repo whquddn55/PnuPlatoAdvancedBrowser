@@ -36,6 +36,7 @@ class LoginController extends GetxController {
     _debugMsg = res["debugMsg"];
     if (_loginStatus == true) {
       _moodleSessionKey = res["moodleSessionKey"];
+      _sessionKey = res["sessionKey"];
       _studentId = res["studentId"];
       _department = res["department"];
       _name = res["name"];
