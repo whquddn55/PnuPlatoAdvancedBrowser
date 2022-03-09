@@ -4,11 +4,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/notification.dart' as noti;
 import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_todo_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:shared_preferences_ios/shared_preferences_ios.dart';
 
@@ -43,7 +47,7 @@ abstract class BackgroundService {
         return;
       }
 
-      print("[DEBUG] recevied app: $data");
+      printLog("[DEBUG] recevied app: $data");
 
       BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
 
@@ -96,6 +100,8 @@ void _onStart() async {
 
   await BackgroundNotificationController.initialize();
 
+  printLog("Service start");
+
   final service = FlutterBackgroundService();
   service.onDataReceived.listen((data) async {
     if (data == null) {
@@ -104,7 +110,7 @@ void _onStart() async {
 
     BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
 
-    print("[DEBUG] receive service: $data");
+    printLog("[DEBUG] receive service: $data");
 
     var res = <String, dynamic>{"action": data["action"], "hashCode": data["hashCode"]};
 
@@ -137,10 +143,35 @@ void _onStart() async {
   });
 
   Timer.periodic(
-    const Duration(minutes: 1),
+    const Duration(minutes: 3),
     (timer) async {
-      if (BackgroundLoginController.moodleSessionKey == '') return;
-      await BackgroundNotificationController.updateNotificationList();
+      // final DateTime now = DateTime.now();
+      // printLog("currentTime : $now");
+      // var pref = await SharedPreferences.getInstance();
+
+      // var lastFetchTodoTime = DateTime.fromMillisecondsSinceEpoch(pref.getInt("lastFetchTodoTime") ?? 0);
+      // printLog("lastFetchTodoTime : $lastFetchTodoTime");
+
+      // File file = File(
+      //     '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat.Hms().format(now)}.txt');
+      // await file.writeAsString('');
+      // // if (BackgroundLoginController.loginStatus == false) {
+      // //   file.writeAsString('return', mode: FileMode.append);
+      // //   return;
+      // // }
+      // await BackgroundNotificationController.updateNotificationList();
+
+      // var res = await requestGet(CommonUrl.notificationUrl + '1', isFront: false, retry: 2);
+      // if (res == null) {
+      //   await file.writeAsString('null', mode: FileMode.append);
+      //   return;
+      // }
+
+      // await File(
+      //         '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat.Hms().format(now)}.txt')
+      //     .writeAsString(res.data, mode: FileMode.append);
+      // await pref.setInt("lastFetchTodoTime", now.millisecondsSinceEpoch);
+      // printLog("successful!!");
     },
   );
 }

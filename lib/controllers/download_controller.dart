@@ -150,7 +150,7 @@ class DownloadController {
         _pendingQueue.add(downloadInformation);
       } catch (e) {
         /* TODO : 에러 */
-        print("[ERROR]$e");
+        printLog("[ERROR]$e");
       }
     });
   }
@@ -204,7 +204,7 @@ class DownloadController {
       return true;
     } catch (e) {
       /* TODO : 에러 */
-      print("[ERROR]$e");
+      printLog("[ERROR]$e");
       return false;
     }
   }

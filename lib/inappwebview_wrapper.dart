@@ -59,89 +59,89 @@ class InappwebviewWrapper extends StatelessWidget {
               //   print(uri);
               // },
               // onAjaxProgress: (a, b) async {
-              //   print("onAjaxProgress");
+              //   printLog("onAjaxProgress");
               //   return AjaxRequestAction.PROCEED;
               // },
               // onAjaxReadyStateChange: (a, b) async {
-              //   print("onAjaxReadyStateChange");
+              //   printLog("onAjaxReadyStateChange");
               // },
               // onCloseWindow: (a) async {
-              //   print("onCloseWindow");
+              //   printLog("onCloseWindow");
               // },
               // onCreateWindow: (a, b) async {
-              //   print("onCreateWindow");
+              //   printLog("onCreateWindow");
               // },
               // onEnterFullscreen: (a) {
-              //   print("onEnterFullscreen");
+              //   printLog("onEnterFullscreen");
               // },
               // onExitFullscreen: (a) {
-              //   print("onExitFullscreen");
+              //   printLog("onExitFullscreen");
               // },
               // onFindResultReceived: (a, b, c, d) {
-              //   print("onFindResultReceived");
+              //   printLog("onFindResultReceived");
               // },
               // onJsAlert: (a, b) async {
-              //   print("onJsAlert");
+              //   printLog("onJsAlert");
               // },
               // onJsConfirm: (a, b) async {
-              //   print("onJsConfirm");
+              //   printLog("onJsConfirm");
               // },
               // onJsPrompt: (a, b) async {
-              //   print("onJsPrompt");
+              //   printLog("onJsPrompt");
               // },
               // onLoadError: (a, b, c, d) async {
-              //   print("onLoadError");
+              //   printLog("onLoadError");
               // },
               // onLoadHttpError: (a, b, c, d) async {
-              //   print("onLoadHttpError");
+              //   printLog("onLoadHttpError");
               // },
               // onLoadResource: (a, b) async {
-              //   print("onLoadResource");
+              //   printLog("onLoadResource");
               // },
               // onLoadResourceCustomScheme: (a, b) async {
-              //   print("onLoadResourceCustomScheme");
+              //   printLog("onLoadResourceCustomScheme");
               // },
               // onLongPressHitTestResult: (a, b) async {
-              //   print("onLongPressHitTestResult");
+              //   printLog("onLongPressHitTestResult");
               // },
               // onOverScrolled: (a, b, c, d, e) async {
-              //   print("onOverScrolled");
+              //   printLog("onOverScrolled");
               // },
               // onPageCommitVisible: (a, b) async {
-              //   print("onPageCommitVisible");
+              //   printLog("onPageCommitVisible");
               // },
               // onPrint: (a, b) async {
-              //   print("onPrint");
+              //   printLog("onPrint");
               // },
               // onProgressChanged: (a, b) async {
-              //   print("onProgressChanged");
+              //   printLog("onProgressChanged");
               // },
               // onReceivedClientCertRequest: (a, b) async {
-              //   print("onReceivedClientCertRequest");
+              //   printLog("onReceivedClientCertRequest");
               // },
               // onReceivedHttpAuthRequest: (a, b) async {
-              //   print("onReceivedHttpAuthRequest");
+              //   printLog("onReceivedHttpAuthRequest");
               // },
               // onReceivedServerTrustAuthRequest: (a, b) async {
-              //   print("onReceivedServerTrustAuthRequest");
+              //   printLog("onReceivedServerTrustAuthRequest");
               // },
               // onScrollChanged: (a, b, c) async {
-              //   print("onScrollChanged");
+              //   printLog("onScrollChanged");
               // },
               // onTitleChanged: (a, b) async {
-              //   print("onTitleChanged");
+              //   printLog("onTitleChanged");
               // },
               // onUpdateVisitedHistory: (a, b, c) async {
-              //   print("onUpdateVisitedHistory");
+              //   printLog("onUpdateVisitedHistory");
               // },
               // onWindowBlur: (a) async {
-              //   print("onWindowBlur");
+              //   printLog("onWindowBlur");
               // },
               // onWindowFocus: (a) async {
-              //   print("onWindowFocus");
+              //   printLog("onWindowFocus");
               // },
               // onZoomScaleChanged: (a, b, c) async {
-              //   print("onZoomScaleChanged");
+              //   printLog("onZoomScaleChanged");
               // },
               // initialOptions: InAppWebViewGroupOptions(
               //     crossPlatform: InAppWebViewOptions(

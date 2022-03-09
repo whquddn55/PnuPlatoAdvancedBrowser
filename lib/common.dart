@@ -20,6 +20,10 @@ Color videoColor = Colors.blue.withOpacity(0.7);
 Color assignColor = Colors.red.withOpacity(0.7);
 Color zoomColor = Colors.green.withOpacity(0.7);
 
+void printLog(final String msg) {
+  print("[DEBUG] $msg");
+}
+
 abstract class CommonUrl {
   static const String platoMainUrl = 'https://plato.pusan.ac.kr/';
   static const String platoUserInformationUrl = 'https://plato.pusan.ac.kr/user/user_edit.php';
@@ -140,7 +144,7 @@ Future<dio.Response?> requestGet(final String url, {dio.Options? options, bool? 
         options.headers!["Cookie"] = BackgroundLoginController.moodleSessionKey;
       }
 
-      print("[DEBUG] ${options.headers!["Cookie"]}");
+      printLog("[DEBUG] ${options.headers!["Cookie"]}");
     }
     try {
       response = await dio.Dio().get(url, options: options);
@@ -157,7 +161,7 @@ Future<dio.Response?> requestGet(final String url, {dio.Options? options, bool? 
         break;
       }
     } on dio.DioError catch (e, _) {
-      print("[ERROR] ${e.response}");
+      printLog("[ERROR] ${e.response}");
       time++;
     }
   }
@@ -177,7 +181,7 @@ Future<dio.Response?> requestPost(final String url, final dynamic data, {dio.Opt
       } else {
         options.headers!["Cookie"] = BackgroundLoginController.moodleSessionKey;
       }
-      print("[DEBUG] ${options.headers!["Cookie"]}");
+      printLog("[DEBUG] ${options.headers!["Cookie"]}");
     }
     try {
       response = await dio.Dio().post(url, data: data, options: options);
@@ -194,7 +198,7 @@ Future<dio.Response?> requestPost(final String url, final dynamic data, {dio.Opt
         break;
       }
     } on dio.DioError catch (e, _) {
-      print("[ERROR] ${e.response}");
+      printLog("[ERROR] ${e.response}");
       time++;
     }
   }

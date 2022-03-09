@@ -105,7 +105,7 @@ abstract class BackgroundLoginController {
     );
     res["loginStatus"] = true;
 
-    print("[DEBUG] Sync With Plato : ${moodleSessionKey}");
+    printLog("[DEBUG] Sync With Plato : ${moodleSessionKey}");
     moodleSessionKey = res["moodleSessionKey"];
     return res;
   }
