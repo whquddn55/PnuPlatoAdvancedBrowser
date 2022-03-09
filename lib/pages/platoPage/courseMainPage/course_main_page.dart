@@ -145,103 +145,101 @@ class CourseMainPage extends StatelessWidget {
                 ],
               ),
             ),
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  ExpandedTile(
-                    onTap: () {
-                      for (var controller in _weekTileControllerList) {
-                        controller.collapse();
-                      }
-                    },
-                    controller: _articleTileController,
-                    theme: const ExpandedTileThemeData(
-                      headerPadding: EdgeInsets.all(10.0),
-                      headerColor: Color(0xfff3f2dd),
-                      headerRadius: 0.0,
-                      contentRadius: 0.0,
-                    ),
-                    contentSeperator: 0,
-                    title: const Text(
-                      '공지사항',
-                      style: TextStyle(color: Colors.black87),
-                    ),
-                    trailing: const Icon(Icons.chevron_right, color: Colors.black87),
-                    content: Container(
-                      padding: const EdgeInsets.only(left: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xfff3f2dd),
-                        border: Border.all(
-                          color: const Color(0xffdad9c6),
-                        ),
+            body: ListView(
+              children: [
+                ExpandedTile(
+                  onTap: () {
+                    for (var controller in _weekTileControllerList) {
+                      controller.collapse();
+                    }
+                  },
+                  controller: _articleTileController,
+                  theme: const ExpandedTileThemeData(
+                    headerPadding: EdgeInsets.all(10.0),
+                    headerColor: Color(0xfff3f2dd),
+                    headerRadius: 0.0,
+                    contentRadius: 0.0,
+                  ),
+                  contentSeperator: 0,
+                  title: const Text(
+                    '공지사항',
+                    style: TextStyle(color: Colors.black87),
+                  ),
+                  trailing: const Icon(Icons.chevron_right, color: Colors.black87),
+                  content: Container(
+                    padding: const EdgeInsets.only(left: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xfff3f2dd),
+                      border: Border.all(
+                        color: const Color(0xffdad9c6),
                       ),
-                      child: Column(
-                        children: course.articleList
-                            .map((article) => ArticleButton(article: article, courseTitle: course.title, courseId: course.id))
-                            .toList(),
-                      ),
+                    ),
+                    child: Column(
+                      children: course.articleList
+                          .map((article) => ArticleButton(article: article, courseTitle: course.title, courseId: course.id))
+                          .toList(),
                     ),
                   ),
-                  ...course.activityMap.keys.map((key) {
-                    int index = course.activityMap.keys.toList().indexOf(key);
+                ),
+                ...course.activityMap.keys.map((key) {
+                  int index = course.activityMap.keys.toList().indexOf(key);
 
-                    if (course.currentWeek != null) {
-                      int currentWeekIndex = course.activityMap.keys.toList().indexOf(course.currentWeek!);
-                      _weekTileControllerList[currentWeekIndex].expand();
-                    }
+                  if (course.currentWeek != null) {
+                    int currentWeekIndex = course.activityMap.keys.toList().indexOf(course.currentWeek!);
+                    _weekTileControllerList[currentWeekIndex].expand();
+                  }
 
-                    return Column(
-                      children: [
-                        const Divider(
-                          height: 3,
-                          thickness: 3,
-                        ),
-                        ExpandedTile(
-                          onTap: () {
-                            for (var controller in _weekTileControllerList) {
-                              if (controller != _weekTileControllerList[index]) {
-                                controller.collapse();
-                              }
+                  return Column(
+                    children: [
+                      const Divider(
+                        height: 3,
+                        thickness: 3,
+                      ),
+                      ExpandedTile(
+                        onTap: () {
+                          for (var controller in _weekTileControllerList) {
+                            if (controller != _weekTileControllerList[index]) {
+                              controller.collapse();
                             }
-                            _articleTileController.collapse();
-                          },
-                          controller: _weekTileControllerList[index],
-                          theme: ExpandedTileThemeData(
-                            headerPadding: const EdgeInsets.all(3.0),
-                            headerColor: Get.theme.secondaryHeaderColor,
-                            headerRadius: 0.0,
-                            contentRadius: 0.0,
-                            contentBackgroundColor: Get.theme.scaffoldBackgroundColor,
-                          ),
-                          contentSeperator: 0,
-                          title: Text(key),
-                          content: Material(
-                            child: Column(
-                              children: [
-                                course.summaryMap[key] == ''
-                                    ? const SizedBox.shrink()
-                                    : Container(
-                                        child: renderHtml(course.summaryMap[key]!),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(width: 1, color: Get.theme.hintColor),
-                                          borderRadius: BorderRadius.circular(3.0),
-                                        ),
-                                        margin: const EdgeInsets.only(bottom: 20.0),
+                          }
+                          _articleTileController.collapse();
+                        },
+                        controller: _weekTileControllerList[index],
+                        theme: ExpandedTileThemeData(
+                          headerPadding: const EdgeInsets.all(3.0),
+                          headerColor: Get.theme.secondaryHeaderColor,
+                          headerRadius: 0.0,
+                          contentRadius: 0.0,
+                          contentBackgroundColor: Get.theme.scaffoldBackgroundColor,
+                        ),
+                        contentSeperator: 0,
+                        title: Text(key),
+                        content: Material(
+                          child: Column(
+                            children: [
+                              course.summaryMap[key] == ''
+                                  ? const SizedBox.shrink()
+                                  : Container(
+                                      child: renderHtml(course.summaryMap[key]!),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(width: 1, color: Get.theme.hintColor),
+                                        borderRadius: BorderRadius.circular(3.0),
                                       ),
-                                Column(
-                                  children: course.activityMap[key]!
-                                      .map((activity) => ActivityButton(activity: activity, courseTitle: course.title, courseId: course.id))
-                                      .toList(),
-                                ),
-                              ],
-                            ),
+                                      margin: const EdgeInsets.only(bottom: 20.0),
+                                    ),
+                              Column(
+                                children: course.activityMap[key]!
+                                    .map((activity) => ActivityButton(activity: activity, courseTitle: course.title, courseId: course.id))
+                                    .toList(),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    );
-                  }).toList(),
-                ],
-              ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ],
             ),
           );
         } else {

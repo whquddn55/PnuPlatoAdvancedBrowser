@@ -95,7 +95,6 @@ class _MainCalendarState extends State<MainCalendar> {
         return SizedBox(
           height: Get.height * 0.4,
           child: ListView.builder(
-            physics: const BouncingScrollPhysics(),
             shrinkWrap: true,
             itemCount: undoneEventList.length + doneEventList.length,
             itemBuilder: (context, index) {

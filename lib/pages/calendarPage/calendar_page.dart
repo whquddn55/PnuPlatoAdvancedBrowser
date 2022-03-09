@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
@@ -35,16 +34,16 @@ class CalendarPage extends StatelessWidget {
               );
             });
           } else {
-            return SingleChildScrollView(
-              child: Column(
+            return RefreshIndicator(
+              onRefresh: () async => await Get.find<TodoController>().refreshTodoListAll(),
+              child: ListView(
+                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                 children: [
                   const AcademicCalendar(),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GetBuilder<TodoController>(
                       builder: (controller) {
-                        Fluttertoast.cancel();
-                        Fluttertoast.showToast(msg: "캘린더가 업데이트 되었습니다.");
                         return MainCalendar(controller.todoList);
                       },
                     ),

@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'PnuPlatoAdvancedBrowser',
+      scrollBehavior: _CustomScrollBehavior(),
       theme: ThemeData(
         primaryColor: Colors.lightBlue,
         brightness: Brightness.light,
@@ -53,5 +54,12 @@ class MyApp extends StatelessWidget {
       themeMode: AppSettingController.themeMode,
       home: AppSettingController.isFirst ? const LandingPage() : const NavigatorPage(),
     );
+  }
+}
+
+class _CustomScrollBehavior extends ScrollBehavior {
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const BouncingScrollPhysics();
   }
 }

@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 
 class NoticePage extends StatelessWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> notice;

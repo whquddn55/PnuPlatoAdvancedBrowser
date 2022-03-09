@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,6 +13,19 @@ class TodoController extends GetxController {
   Future<void> initiate() async {
     final preference = await SharedPreferences.getInstance();
     todoList = List<Map<String, dynamic>>.from(jsonDecode(preference.getString("todoList") ?? "[]")).map<Todo>((m) => Todo.fromJson(m)).toList();
+  }
+
+  Future<void> refreshTodoListAll() async {
+    var courseIdList = Get.find<CourseController>().currentSemesterCourseList.map((course) => course.id).toList();
+    var vodStatusList = <Map<String, dynamic>>[];
+    for (var courseId in courseIdList) {
+      for (var values in (await Get.find<CourseController>().getVodStatus(courseId)).values) {
+        for (var vodStatus in values) {
+          vodStatusList.add(vodStatus);
+        }
+      }
+    }
+    await Get.find<TodoController>().refreshTodoList(courseIdList, vodStatusList);
   }
 
   Future<void> refreshTodoList(final List<String> courseIdList, final List<Map<String, dynamic>> vodStatusList) async {
@@ -26,6 +41,9 @@ class TodoController extends GetxController {
     preference.setString("todoList", jsonEncode(todoList));
 
     update();
+
+    Fluttertoast.cancel();
+    Fluttertoast.showToast(msg: "캘린더가 업데이트 되었습니다.");
   }
 
   void updateTodoStatus(final Map<int, List<Map<String, dynamic>>> vodStatusMap) async {
