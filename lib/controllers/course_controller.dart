@@ -73,9 +73,14 @@ class CourseController {
     course.englishPlanUri = _getEnglishPlanUri(document);
 
     course.activityMap.clear();
+    course.summaryMap.clear();
+
+    if (document.getElementsByClassName('course-box-current').isNotEmpty) {
+      course.currentWeek = document.getElementsByClassName('course-box-current')[0].getElementsByClassName('sectionname')[0].text;
+    }
 
     /* 강의 개요(summary) 가져오기 */
-    for (var item in document.getElementsByClassName('summary')) {
+    for (var item in document.getElementById('course-all-sections')!.getElementsByClassName('summary')) {
       final String weeks = _getWeeks(item);
       course.summaryMap[weeks] = item.innerHtml;
 
@@ -85,13 +90,8 @@ class CourseController {
     }
 
     /* Activity 가져오기 */
-    for (var activity in document.getElementsByClassName('activity')) {
+    for (var activity in document.getElementById('course-all-sections')!.getElementsByClassName('activity')) {
       final String weeks = _getWeeks(activity);
-
-      if (activity.parent!.parent!.parent!.parent!.parent!.children[0].text == "이번주 강의") {
-        course.currentWeek = weeks;
-        continue;
-      }
 
       final String id = _getId(activity);
       final String type = _getType(activity);
