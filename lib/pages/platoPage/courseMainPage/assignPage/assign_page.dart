@@ -133,7 +133,7 @@ class _AssignPageState extends State<AssignPage> {
                   MaterialPageRoute(
                     builder: (context) => InappwebviewWrapper(
                       "과제 제출",
-                      "https://plato.pusan.ac.kr/mod/assign/view.php?id=1258811&action=editsubmission",
+                      CommonUrl.courseAssignViewUrl + widget.assignId + "&action=editsubmission",
                       (controller, uri) async {
                         await controller.evaluateJavascript(
                             source:
