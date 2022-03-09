@@ -28,6 +28,8 @@ class NotificationTile extends StatelessWidget {
     return Stack(alignment: Alignment.centerLeft, children: [
       InkWell(
         onTap: () => null,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0, left: 20.0),
@@ -53,19 +55,5 @@ class NotificationTile extends StatelessWidget {
           alignment: Alignment.center,
           child: Text((index + 1).toString(), style: const TextStyle(color: Colors.white))),
     ]);
-    // return Padding(
-    //   padding: const EdgeInsets.all(16.0),
-    //   child: Container(
-    //     decoration: BoxDecoration(border: Border.all(), borderRadius: BorderRadius.circular(4)),
-    //     padding: const EdgeInsets.all(16.0),
-    //     child: Column(
-    //       crossAxisAlignment: CrossAxisAlignment.start,
-    //       children: [
-    //         Text(notification.title),
-    //         Text(notification.body),
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 }

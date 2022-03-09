@@ -45,6 +45,8 @@ class EventTile extends StatelessWidget {
     return Stack(alignment: Alignment.centerLeft, children: [
       InkWell(
         onTap: () => _eventTabEvent(context),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
         child: Container(
           padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0, left: 20.0),
           margin: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0, left: 15.0),
