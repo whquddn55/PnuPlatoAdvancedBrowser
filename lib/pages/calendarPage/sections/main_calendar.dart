@@ -79,8 +79,9 @@ class _MainCalendarState extends State<MainCalendar> {
           _focusedDay = selectedDay;
         });
 
-        showCupertinoModalBottomSheet(
+        showModalBottomSheet(
           context: context,
+          useRootNavigator: true,
           builder: (context) {
             return SizedBox(
               height: Get.height * 0.4,
