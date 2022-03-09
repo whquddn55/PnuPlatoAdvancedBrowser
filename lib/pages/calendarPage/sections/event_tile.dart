@@ -103,6 +103,8 @@ class __RemainTextState extends State<_RemainText> {
   @override
   Widget build(BuildContext context) {
     Duration remainTime = widget.dueDate.difference(DateTime.now());
+    if (remainTime.isNegative) return const SizedBox.shrink();
+
     String days = remainTime.inDays.toString().padLeft(2, '0');
     String hours = (remainTime.inHours % 24).toString().padLeft(2, '0');
     String minutes = (remainTime.inMinutes % 60).toString().padLeft(2, '0');

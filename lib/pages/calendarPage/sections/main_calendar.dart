@@ -114,6 +114,7 @@ class _MainCalendarState extends State<MainCalendar> {
   @override
   Widget build(BuildContext context) {
     return TableCalendar<Todo>(
+      availableGestures: AvailableGestures.horizontalSwipe,
       focusedDay: _focusedDay,
       firstDay: DateTime(2020, 01, 01),
       lastDay: DateTime(2025, 12, 31),
