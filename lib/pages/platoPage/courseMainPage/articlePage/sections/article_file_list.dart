@@ -1,9 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/file_bottom_sheet.dart';
 
 class ArticleFileList extends StatelessWidget {
   final String courseTitle;
@@ -22,14 +21,10 @@ class ArticleFileList extends StatelessWidget {
             icon: CachedNetworkImage(imageUrl: fileInfo.imgUrl),
             label: Text(fileInfo.title),
             onPressed: () async {
-              var downloadResult = await Get.find<DownloadController>().enQueue(
-                url: fileInfo.url,
-                title: fileInfo.title,
-                courseTitle: courseTitle,
-                courseId: courseId,
-                type: DownloadType.normal,
-                force: false,
-              );
+              showModalBottomSheet(
+                  context: context,
+                  useRootNavigator: true,
+                  builder: (context) => FileBottomSheet(file: fileInfo, fileType: DownloadType.normal, courseTitle: courseTitle, courseId: courseId));
             },
           );
         }).toList()
