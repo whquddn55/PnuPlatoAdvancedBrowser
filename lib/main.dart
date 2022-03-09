@@ -60,6 +60,6 @@ class MyApp extends StatelessWidget {
 class _CustomScrollBehavior extends ScrollBehavior {
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const BouncingScrollPhysics();
+    return const ClampingScrollPhysics();
   }
 }

@@ -201,7 +201,6 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
             child: RefreshIndicator(
               onRefresh: () async => await _refreshFileList(),
               child: ListView(
-                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                 children: [
                   backButton,
                   ...fileList.map((FileSystemEntity e) {

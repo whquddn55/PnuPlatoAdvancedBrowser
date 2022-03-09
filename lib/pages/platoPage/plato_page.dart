@@ -44,7 +44,6 @@ class PlatoPage extends StatelessWidget {
                     return RefreshIndicator(
                       onRefresh: () async => null,
                       child: ListView(
-                        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                         children: [
                           ExpandedTile(
                               theme: ExpandedTileThemeData(

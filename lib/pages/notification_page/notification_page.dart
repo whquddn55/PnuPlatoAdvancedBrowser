@@ -57,7 +57,6 @@ class _NotificationPageState extends State<NotificationPage> {
                 });
               },
               child: ListView.builder(
-                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                 shrinkWrap: true,
                 itemCount: notificationList.length,
                 itemBuilder: (context, index) {

@@ -37,7 +37,6 @@ class CalendarPage extends StatelessWidget {
             return RefreshIndicator(
               onRefresh: () async => await Get.find<TodoController>().refreshTodoListAll(),
               child: ListView(
-                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                 children: [
                   const AcademicCalendar(),
                   Padding(
