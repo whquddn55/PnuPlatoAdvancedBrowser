@@ -8,25 +8,38 @@ import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/vodPage/vod_page.dart';
 
-class VodBottomSheet extends StatelessWidget {
+class VodBottomSheet extends StatefulWidget {
   final String courseTitle;
   final String courseId;
   final CourseActivity activity;
   const VodBottomSheet({Key? key, required this.activity, required this.courseTitle, required this.courseId}) : super(key: key);
 
+  @override
+  State<VodBottomSheet> createState() => _VodBottomSheetState();
+}
+
+class _VodBottomSheetState extends State<VodBottomSheet> {
+  late final Future _future;
+
+  @override
+  initState() {
+    super.initState();
+    _future = Get.find<CourseController>().getVodStatus(widget.courseId);
+  }
+
   _viewHanlder(BuildContext context) async {
-    return await Navigator.push(context, MaterialPageRoute(builder: (context) => VodPage(id: activity.id)));
+    return await Navigator.push(context, MaterialPageRoute(builder: (context) => VodPage(id: widget.activity.id)));
   }
 
   _downloadHandler(BuildContext context) async {
-    Uri uri = await Get.find<CourseController>().getM3u8Uri(activity.id);
+    Uri uri = await Get.find<CourseController>().getM3u8Uri(widget.activity.id);
     if (uri.toString() == '') {
     } else {
       var downloadResult = await Get.find<DownloadController>().enQueue(
         url: uri.toString(),
-        title: activity.title,
-        courseTitle: courseTitle,
-        courseId: courseId,
+        title: widget.activity.title,
+        courseTitle: widget.courseTitle,
+        courseId: widget.courseId,
         type: DownloadType.m3u8,
       );
     }
@@ -47,13 +60,13 @@ class VodBottomSheet extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: CachedNetworkImage(
-                      imageUrl: activity.iconUri!.toString(),
+                      imageUrl: widget.activity.iconUri!.toString(),
                       height: 20,
                     ),
                   ),
                   Flexible(
                     child: Text(
-                      activity.title,
+                      widget.activity.title,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -61,7 +74,7 @@ class VodBottomSheet extends StatelessWidget {
                   ),
                   const SizedBox(width: 20),
                   Text(
-                    activity.info,
+                    widget.activity.info,
                     style: const TextStyle(
                       color: Colors.blueAccent,
                     ),
@@ -69,31 +82,31 @@ class VodBottomSheet extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8.0),
-              if (activity.startDate != null)
-                if (activity.lateDate != null)
+              if (widget.activity.startDate != null)
+                if (widget.activity.lateDate != null)
                   Text(
-                    '${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.endDate!)}\n(지각: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.lateDate!)})',
+                    '${DateFormat('yyyy-MM-dd HH:mm:ss').format(widget.activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(widget.activity.endDate!)}\n(지각: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(widget.activity.lateDate!)})',
                     style: const TextStyle(
                       color: Colors.orangeAccent,
                     ),
                   )
                 else
                   Text(
-                    '${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.endDate!)}',
+                    '${DateFormat('yyyy-MM-dd HH:mm:ss').format(widget.activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(widget.activity.endDate!)}',
                     style: const TextStyle(
                       color: Colors.orangeAccent,
                     ),
                   ),
               const SizedBox(height: 8.0),
               FutureBuilder(
-                future: Get.find<CourseController>().getVodStatus(activity.courseId),
+                future: _future,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     var data = snapshot.data as Map<int, List<Map<String, dynamic>>>;
                     Widget? status;
                     for (var weeks in data.values) {
                       for (var activities in weeks) {
-                        if (activities["title"] == activity.title) {
+                        if (activities["title"] == widget.activity.title) {
                           if (activities["status"] == true) {
                             status = const Icon(
                               Icons.check,
