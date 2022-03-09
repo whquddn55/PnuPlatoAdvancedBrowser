@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:pnu_plato_advanced_browser/no_glow_behavior.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification.dart' as noti;
 import 'package:pnu_plato_advanced_browser/main_appbar.dart';
 import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
+import 'package:pnu_plato_advanced_browser/pages/notification_page/sections/notification_tile.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({Key? key}) : super(key: key);
@@ -33,24 +33,11 @@ class _NotificationPageState extends State<NotificationPage> {
                 setState(() {});
               },
               child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                shrinkWrap: true,
                 itemCount: notificationList.length,
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Container(
-                      decoration: BoxDecoration(border: Border.all(), borderRadius: BorderRadius.circular(4)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(notificationList[index].title),
-                          Text(notificationList[index].body),
-                          Text(notificationList[index].url),
-                          Text(notificationList[index].time.toString()),
-                          Text(notificationList[index].notificationType.name),
-                        ],
-                      ),
-                    ),
-                  );
+                  return NotificationTile(notification: notificationList[index], index: index);
                 },
               ),
             ),

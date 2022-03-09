@@ -9,10 +9,10 @@ import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
 
-class EventWidget extends StatelessWidget {
+class EventTile extends StatelessWidget {
   final Todo event;
   final int index;
-  const EventWidget({Key? key, required this.event, required this.index}) : super(key: key);
+  const EventTile({Key? key, required this.event, required this.index}) : super(key: key);
 
   void _eventTabEvent(final BuildContext context) {
     var course = Get.find<CourseController>().getCourseById(event.courseId);

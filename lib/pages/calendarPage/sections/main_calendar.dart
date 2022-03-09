@@ -1,8 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/todo.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage/sections/event_tile.dart';
@@ -90,7 +87,7 @@ class _MainCalendarState extends State<MainCalendar> {
                 shrinkWrap: true,
                 itemCount: eventList.length,
                 itemBuilder: (context, index) {
-                  return EventWidget(event: eventList[index], index: index);
+                  return EventTile(event: eventList[index], index: index);
                 },
               ),
             );
