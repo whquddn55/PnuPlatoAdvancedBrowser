@@ -21,6 +21,19 @@ class _MainCalendarState extends State<MainCalendar> {
     return day1.year == day2.year && day1.month == day2.month && day1.day == day2.day;
   }
 
+  Widget _renderMarker(final int cnt, final Color color) {
+    return Expanded(
+      flex: 1,
+      child: Container(
+        child: Text('$cnt', textAlign: TextAlign.center),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(3),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return TableCalendar<Todo>(
@@ -103,68 +116,51 @@ class _MainCalendarState extends State<MainCalendar> {
         }
         return eventList;
       },
-      calendarBuilders: CalendarBuilders(markerBuilder: (context, day, events) {
-        int videoCnt = 0;
-        int assignCnt = 0;
-        int zoomCnt = 0;
-        for (Todo event in events) {
-          switch (event.type) {
-            case TodoType.vod:
-              videoCnt++;
-              break;
-            case TodoType.assign:
-            case TodoType.quiz:
-              assignCnt++;
-              break;
-            case TodoType.zoom:
-              zoomCnt++;
+      calendarBuilders: CalendarBuilders(
+        markerBuilder: (context, day, events) {
+          int videoCnt = 0;
+          int assignCnt = 0;
+          int zoomCnt = 0;
+          int doneCnt = 0;
+          for (Todo event in events) {
+            if (event.status == TodoStatus.done) {
+              doneCnt++;
+              continue;
+            }
+            switch (event.type) {
+              case TodoType.vod:
+                videoCnt++;
+                break;
+              case TodoType.assign:
+              case TodoType.quiz:
+                assignCnt++;
+                break;
+              case TodoType.zoom:
+                zoomCnt++;
+            }
           }
-        }
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            if (videoCnt != 0)
-              Expanded(
-                flex: 1,
-                child: Container(
-                  child: Text('$videoCnt', textAlign: TextAlign.center),
-                  decoration: BoxDecoration(
-                    color: videoColor,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              )
-            else
-              const Expanded(flex: 1, child: SizedBox.shrink()),
-            if (assignCnt != 0)
-              Expanded(
-                flex: 1,
-                child: Container(
-                  child: Text('$assignCnt', textAlign: TextAlign.center),
-                  decoration: BoxDecoration(
-                    color: assignColor,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              )
-            else
-              const Expanded(flex: 1, child: SizedBox.shrink()),
-            if (zoomCnt != 0)
-              Expanded(
-                flex: 1,
-                child: Container(
-                  child: Text('$zoomCnt', textAlign: TextAlign.center),
-                  decoration: BoxDecoration(
-                    color: zoomColor,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              )
-            else
-              const Expanded(flex: 1, child: SizedBox.shrink()),
-          ],
-        );
-      }),
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Expanded(flex: 1, child: SizedBox.shrink()),
+                  const Expanded(flex: 1, child: SizedBox.shrink()),
+                  if (doneCnt != 0) _renderMarker(doneCnt, Colors.grey) else const Expanded(flex: 1, child: SizedBox.shrink())
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (videoCnt != 0) _renderMarker(videoCnt, videoColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
+                  if (assignCnt != 0) _renderMarker(assignCnt, assignColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
+                  if (zoomCnt != 0) _renderMarker(zoomCnt, zoomColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
