@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/main_appbar.dart';
 import 'package:pnu_plato_advanced_browser/main_drawer.dart';
+import 'package:pnu_plato_advanced_browser/pages/login_builder_page.dart';
 
 class ChatPage extends StatelessWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -12,31 +11,18 @@ class ChatPage extends StatelessWidget {
     return Scaffold(
       appBar: MainAppbar("쪽지"),
       drawer: const MainDrawer(),
-      body: GetBuilder<LoginController>(
-        builder: (controller) {
-          if (controller.loginStatus == false) {
-            return Builder(builder: (context) {
-              return GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                child: const Center(
-                    child: Text(
-                  '로그인이 필요합니다.',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                  ),
-                )),
-                onTap: () {
-                  Scaffold.of(context).openDrawer();
-                },
-              );
-            });
-          } else {
-            return ListView(
-              children: const [],
-            );
-          }
-        },
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text("구현할 시간이 없네요... 살려주세요"),
+          ],
+        ),
       ),
+
+      // LoginBuilderPage(() => ListView(
+      //       children: const [],
+      //     )),
     );
   }
 }
