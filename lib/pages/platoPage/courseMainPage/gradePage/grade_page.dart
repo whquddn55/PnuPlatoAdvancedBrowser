@@ -14,7 +14,11 @@ class GradePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return InappwebviewWrapper('성적', CommonUrl.courseGradeUrl + courseId, (controller, url) async {
       await controller.evaluateJavascript(
-        source: "document.getElementById('page-header').remove();document.getElementsByClassName('page-content-navigation')[0].remove();",
+        source: '''document.getElementById('page-header').remove();
+        document.getElementsByClassName('page-content-navigation')[0].remove();
+        document.getElementById('page-lnb').remove();
+        document.body.style.margin = '0px';
+            document.body.style.padding = '0px';''',
       );
     });
   }

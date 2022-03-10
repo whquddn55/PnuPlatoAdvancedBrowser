@@ -13,8 +13,12 @@ class ArticleEditPage extends StatelessWidget {
       '글쓰기',
       CommonUrl.courseBoardWriteUrl + boardId + "&bwid=" + articleId,
       (controller, url) async => await controller.evaluateJavascript(
-        source:
-            "document.getElementById('page-header').remove();document.getElementsByClassName('page-content-navigation')[0].remove(); document.getElementById('id_cancel').remove();",
+        source: '''document.getElementById('page-header').remove();
+            document.getElementsByClassName('page-content-navigation')[0].remove(); 
+            document.getElementById('id_cancel').remove();
+            document.getElementById('page-lnb').remove();
+            document.body.style.margin = '0px';
+            document.body.style.padding = '0px';''',
       ),
     );
   }
