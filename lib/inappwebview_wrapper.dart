@@ -33,6 +33,10 @@ class InappwebviewWrapper extends StatelessWidget {
           children: [
             InAppWebView(
               initialUrlRequest: URLRequest(url: Uri.parse(url)),
+              initialOptions: InAppWebViewGroupOptions(
+                  android: AndroidInAppWebViewOptions(
+                useHybridComposition: true,
+              )),
               onWebViewCreated: (controller) {
                 _webViewController = controller;
               },
