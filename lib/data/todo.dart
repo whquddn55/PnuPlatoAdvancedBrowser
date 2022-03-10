@@ -22,6 +22,16 @@ class Todo {
     required this.status,
   });
 
+  @override
+  int get hashCode => super.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (other.runtimeType != Todo) return false;
+    var otherTodo = other as Todo;
+    return otherTodo.id == id && otherTodo.courseId == courseId && otherTodo.type == type;
+  }
+
   Todo.fromJson(Map<String, dynamic> json)
       : id = json["id"],
         title = json["title"],
