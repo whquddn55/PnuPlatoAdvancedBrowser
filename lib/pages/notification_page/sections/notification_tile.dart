@@ -41,6 +41,7 @@ class NotificationTile extends StatelessWidget {
           ),
         ),
       ),
+      Container(height: 30, width: 30, decoration: BoxDecoration(borderRadius: BorderRadius.circular(30), color: Colors.white)),
       Container(
           height: 30.0,
           width: 30.0,
