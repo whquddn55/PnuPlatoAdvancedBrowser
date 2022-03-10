@@ -80,7 +80,10 @@ class CourseController {
     }
 
     /* 강의 개요(summary) 가져오기 */
-    for (var item in document.getElementById('course-all-sections')!.getElementsByClassName('summary')) {
+    for (var item in [
+      ...document.getElementById('section-0')!.getElementsByClassName('summary'),
+      ...document.getElementById('course-all-sections')!.getElementsByClassName('summary'),
+    ]) {
       final String weeks = _getWeeks(item);
       course.summaryMap[weeks] = item.innerHtml;
 
@@ -90,7 +93,10 @@ class CourseController {
     }
 
     /* Activity 가져오기 */
-    for (var activity in document.getElementById('course-all-sections')!.getElementsByClassName('activity')) {
+    for (var activity in [
+      ...document.getElementById('section-0')!.getElementsByClassName('activity'),
+      ...document.getElementById('course-all-sections')!.getElementsByClassName('activity'),
+    ]) {
       final String weeks = _getWeeks(activity);
 
       final String id = _getId(activity);
@@ -122,7 +128,6 @@ class CourseController {
       course.activityMap[weeks]!.add(newActivity);
     }
 
-    //Get.find<TodoController>().refreshTodoList([course.id], vodStatusList);
     return true;
   }
 
