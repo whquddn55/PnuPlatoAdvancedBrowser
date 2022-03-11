@@ -13,13 +13,18 @@ class ImmersivePlayer extends StatefulWidget {
 }
 
 class _ImmersivePlayerState extends State<ImmersivePlayer> {
-  late final BetterPlayer player;
+  late final BetterPlayerController controller;
   @override
   void initState() {
     super.initState();
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+
+    var datasource = BetterPlayerDataSource.file(widget.url);
+    controller =
+        BetterPlayerController(const BetterPlayerConfiguration(allowedScreenSleep: false, fit: BoxFit.scaleDown), betterPlayerDataSource: datasource);
+    controller.setBetterPlayerControlsConfiguration(betterPlayerControlsConfiguration(context, controller, false, false));
   }
 
   @override
@@ -31,10 +36,6 @@ class _ImmersivePlayerState extends State<ImmersivePlayer> {
 
   @override
   Widget build(BuildContext context) {
-    var datasource = BetterPlayerDataSource.file(widget.url);
-    var controller =
-        BetterPlayerController(const BetterPlayerConfiguration(allowedScreenSleep: false, fit: BoxFit.scaleDown), betterPlayerDataSource: datasource);
-    controller.setBetterPlayerControlsConfiguration(betterPlayerControlsConfiguration(context, controller, false, false));
-    return Material(child: PlayerWrapper(BetterPlayer(controller: controller)));
+    return PlayerWrapper(BetterPlayer(controller: controller));
   }
 }
