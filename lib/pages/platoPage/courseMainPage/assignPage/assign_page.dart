@@ -183,7 +183,7 @@ class _AssignPageState extends State<AssignPage> {
       future: CourseAssignController.fetchCourseAssign(widget.assignId),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return const LoadingPage(msg: "로딩 중입니다...");
+          return const Scaffold(body: LoadingPage(msg: "로딩 중입니다..."));
         } else {
           if (snapshot.data == null) {
             return const ErrorPage(msg: "과제 정보를 가져오는데 문제가 발생했습니다...");
