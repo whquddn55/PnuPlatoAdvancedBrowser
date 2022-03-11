@@ -1,11 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification.dart' as noti;
+import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
 
 class NotificationTile extends StatelessWidget {
   final noti.Notification notification;
   final int index;
   const NotificationTile({Key? key, required this.notification, required this.index}) : super(key: key);
+
+  void _tapEvent(final BuildContext context) {
+    final course = Get.find<CourseController>().getCourseByTitle(notification.title);
+    if (course == null) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("에러"),
+          content: const Text("강의를 찾을 수 없습니다."),
+          actions: [
+            TextButton(
+              child: const Text("확인"),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        ),
+      );
+      return;
+    }
+    printLog(notification.url.split('?id=')[1]);
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: notification.url.split('?id=')[1])));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +53,7 @@ class NotificationTile extends StatelessWidget {
 
     return Stack(alignment: Alignment.centerLeft, children: [
       InkWell(
-        onTap: () => null,
+        onTap: () => _tapEvent(context),
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         child: Container(

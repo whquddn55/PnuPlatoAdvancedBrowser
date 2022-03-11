@@ -67,6 +67,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
         final currenrWeekKey = GlobalKey();
         WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
           if (widget.targetActivityId != null) {
+            if (targetActivityKey.currentContext == null) return;
             Scrollable.ensureVisible(targetActivityKey.currentContext!, alignment: 0.5, duration: const Duration(milliseconds: 500));
           } else {
             Scrollable.ensureVisible(currenrWeekKey.currentContext!, duration: const Duration(milliseconds: 500));

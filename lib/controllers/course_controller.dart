@@ -25,6 +25,13 @@ class CourseController {
     return null;
   }
 
+  Course? getCourseByTitle(final String courseTitle) {
+    for (var course in _currentSemesterCourseList) {
+      if (course.title == courseTitle) return course;
+    }
+    return null;
+  }
+
   Future<List<Course>?> fetchCourseList(int year, int semester) async {
     return await _fetchCourseList(year: year, semester: semester);
   }
