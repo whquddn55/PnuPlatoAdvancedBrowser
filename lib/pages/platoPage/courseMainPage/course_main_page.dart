@@ -16,10 +16,12 @@ import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/smartA
 
 class CourseMainPage extends StatelessWidget {
   final Course course;
+  final String? targetActivityId;
 
-  const CourseMainPage({Key? key, required this.course}) : super(key: key);
+  const CourseMainPage({Key? key, required this.course, this.targetActivityId}) : super(key: key);
 
-  void _refreshTodoList(final Map<int, List<Map<String, dynamic>>> vodStatusMap) {
+  void _refreshTodoList() async {
+    final vodStatusMap = await Get.find<CourseController>().getVodStatus(course.id);
     List<Map<String, dynamic>> vodStatusList = [];
     for (var values in vodStatusMap.values) {
       for (var vodStatus in values) {
@@ -28,6 +30,148 @@ class CourseMainPage extends StatelessWidget {
     }
 
     TodoController.to.refreshTodoList([course.id], vodStatusList);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final _articleTileController = ExpandedTileController();
+    final _weekTileControllerList = <ExpandedTileController>[];
+    int? targetWeekIndex;
+
+    return FutureBuilder(
+      future: Get.find<CourseController>().updateCourseSpecification(course),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '강의 정보를 로딩 중입니다...'));
+
+        for (var i = 0; i < course.activityMap.keys.length; ++i) {
+          _weekTileControllerList.add(ExpandedTileController());
+        }
+
+        if (targetActivityId != null) {
+          var weekList = course.activityMap.values.toList();
+          for (int i = 0; i < weekList.length; ++i) {
+            var week = weekList[i];
+            bool isTargetWeek = week.firstWhereOrNull((activity) => activity.id == targetActivityId) != null;
+
+            if (isTargetWeek) targetWeekIndex = i;
+          }
+        }
+
+        _refreshTodoList();
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('${course.title} - ${course.professor!.name}'),
+            centerTitle: true,
+            leading: const BackButton(),
+          ),
+          endDrawer: _renderEndDrawer(context),
+          body: ListView(
+            children: [
+              ExpandedTile(
+                onTap: () {
+                  for (var controller in _weekTileControllerList) {
+                    controller.collapse();
+                  }
+                },
+                controller: _articleTileController,
+                theme: const ExpandedTileThemeData(
+                  headerPadding: EdgeInsets.all(10.0),
+                  headerColor: Color(0xfff3f2dd),
+                  headerRadius: 0.0,
+                  contentRadius: 0.0,
+                ),
+                contentSeperator: 0,
+                title: const Text(
+                  '공지사항',
+                  style: TextStyle(color: Colors.black87),
+                ),
+                trailing: const Icon(Icons.chevron_right, color: Colors.black87),
+                content: Container(
+                  padding: const EdgeInsets.only(left: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xfff3f2dd),
+                    border: Border.all(
+                      color: const Color(0xffdad9c6),
+                    ),
+                  ),
+                  child: Column(
+                    children:
+                        course.articleList.map((article) => ArticleButton(article: article, courseTitle: course.title, courseId: course.id)).toList(),
+                  ),
+                ),
+              ),
+              ...course.activityMap.keys.map((key) {
+                int index = course.activityMap.keys.toList().indexOf(key);
+
+                if (targetWeekIndex != null) {
+                  if (index == targetWeekIndex) _weekTileControllerList[index].expand();
+                } else {
+                  if (course.currentWeek != null) {
+                    int currentWeekIndex = course.activityMap.keys.toList().indexOf(course.currentWeek!);
+                    _weekTileControllerList[currentWeekIndex].expand();
+                  }
+                }
+
+                return Column(
+                  children: [
+                    const Divider(
+                      height: 3,
+                      thickness: 3,
+                    ),
+                    ExpandedTile(
+                      onTap: () {
+                        for (var controller in _weekTileControllerList) {
+                          if (controller != _weekTileControllerList[index]) {
+                            controller.collapse();
+                          }
+                        }
+                        _articleTileController.collapse();
+                      },
+                      controller: _weekTileControllerList[index],
+                      theme: ExpandedTileThemeData(
+                        headerPadding: const EdgeInsets.all(3.0),
+                        headerColor: Get.theme.secondaryHeaderColor,
+                        headerRadius: 0.0,
+                        contentRadius: 0.0,
+                        contentPadding: const EdgeInsets.all(0.0),
+                        contentBackgroundColor: Get.theme.scaffoldBackgroundColor,
+                      ),
+                      contentSeperator: 0,
+                      title: Text(key),
+                      content: Column(
+                        children: [
+                          course.summaryMap[key] == ''
+                              ? const SizedBox.shrink()
+                              : Container(
+                                  child: renderHtml(course.summaryMap[key]!),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(width: 1, color: Get.theme.hintColor),
+                                    borderRadius: BorderRadius.circular(3.0),
+                                  ),
+                                  margin: const EdgeInsets.only(bottom: 20.0),
+                                ),
+                          Column(
+                            children: course.activityMap[key]!.fold<List<Widget>>([], (prv, activity) {
+                              prv.addAll([
+                                const Divider(),
+                                ActivityButton(
+                                    activity: activity, courseTitle: course.title, courseId: course.id, isTarget: (activity.id == targetActivityId))
+                              ]);
+                              return prv;
+                            }),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget _renderEndDrawer(final BuildContext context) {
@@ -139,130 +283,6 @@ class CourseMainPage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final _articleTileController = ExpandedTileController();
-    final _weekTileControllerList = <ExpandedTileController>[];
-
-    return FutureBuilder<List<dynamic>>(
-      future: Future.wait([Get.find<CourseController>().updateCourseSpecification(course), Get.find<CourseController>().getVodStatus(course.id)]),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '강의 정보를 로딩 중입니다...'));
-        }
-
-        for (var i = 0; i < course.activityMap.keys.length; ++i) {
-          _weekTileControllerList.add(ExpandedTileController());
-        }
-
-        _refreshTodoList(snapshot.data![1]);
-
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('${course.title} - ${course.professor!.name}'),
-            centerTitle: true,
-            leading: const BackButton(),
-          ),
-          endDrawer: _renderEndDrawer(context),
-          body: ListView(
-            children: [
-              ExpandedTile(
-                onTap: () {
-                  for (var controller in _weekTileControllerList) {
-                    controller.collapse();
-                  }
-                },
-                controller: _articleTileController,
-                theme: const ExpandedTileThemeData(
-                  headerPadding: EdgeInsets.all(10.0),
-                  headerColor: Color(0xfff3f2dd),
-                  headerRadius: 0.0,
-                  contentRadius: 0.0,
-                ),
-                contentSeperator: 0,
-                title: const Text(
-                  '공지사항',
-                  style: TextStyle(color: Colors.black87),
-                ),
-                trailing: const Icon(Icons.chevron_right, color: Colors.black87),
-                content: Container(
-                  padding: const EdgeInsets.only(left: 8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xfff3f2dd),
-                    border: Border.all(
-                      color: const Color(0xffdad9c6),
-                    ),
-                  ),
-                  child: Column(
-                    children:
-                        course.articleList.map((article) => ArticleButton(article: article, courseTitle: course.title, courseId: course.id)).toList(),
-                  ),
-                ),
-              ),
-              ...course.activityMap.keys.map((key) {
-                int index = course.activityMap.keys.toList().indexOf(key);
-
-                if (course.currentWeek != null) {
-                  int currentWeekIndex = course.activityMap.keys.toList().indexOf(course.currentWeek!);
-                  _weekTileControllerList[currentWeekIndex].expand();
-                }
-
-                return Column(
-                  children: [
-                    const Divider(
-                      height: 3,
-                      thickness: 3,
-                    ),
-                    ExpandedTile(
-                      onTap: () {
-                        for (var controller in _weekTileControllerList) {
-                          if (controller != _weekTileControllerList[index]) {
-                            controller.collapse();
-                          }
-                        }
-                        _articleTileController.collapse();
-                      },
-                      controller: _weekTileControllerList[index],
-                      theme: ExpandedTileThemeData(
-                        headerPadding: const EdgeInsets.all(3.0),
-                        headerColor: Get.theme.secondaryHeaderColor,
-                        headerRadius: 0.0,
-                        contentRadius: 0.0,
-                        contentBackgroundColor: Get.theme.scaffoldBackgroundColor,
-                      ),
-                      contentSeperator: 0,
-                      title: Text(key),
-                      content: Column(
-                        children: [
-                          course.summaryMap[key] == ''
-                              ? const SizedBox.shrink()
-                              : Container(
-                                  child: renderHtml(course.summaryMap[key]!),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(width: 1, color: Get.theme.hintColor),
-                                    borderRadius: BorderRadius.circular(3.0),
-                                  ),
-                                  margin: const EdgeInsets.only(bottom: 20.0),
-                                ),
-                          Column(
-                            children: course.activityMap[key]!.fold<List<Widget>>([], (prv, activity) {
-                              prv.addAll([const Divider(), ActivityButton(activity: activity, courseTitle: course.title, courseId: course.id)]);
-                              return prv;
-                            }),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
-            ],
-          ),
-        );
-      },
     );
   }
 }

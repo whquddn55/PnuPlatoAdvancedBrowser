@@ -20,7 +20,15 @@ class EventTile extends StatelessWidget {
       Navigator.push(context, MaterialPageRoute(builder: (context) => const ErrorPage(msg: "없는... 강의인데요??")));
       return;
     }
-    Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course)));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CourseMainPage(
+          course: course,
+          targetActivityId: event.id,
+        ),
+      ),
+    );
   }
 
   @override
