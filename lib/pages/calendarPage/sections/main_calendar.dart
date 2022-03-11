@@ -69,7 +69,7 @@ class _MainCalendarState extends State<MainCalendar> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            if (videoCnt != 0) _renderMarker(videoCnt, videoColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
+            if (videoCnt != 0) _renderMarker(videoCnt, vodColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
             if (assignCnt != 0) _renderMarker(assignCnt, assignColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
             if (zoomCnt != 0) _renderMarker(zoomCnt, zoomColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
           ],

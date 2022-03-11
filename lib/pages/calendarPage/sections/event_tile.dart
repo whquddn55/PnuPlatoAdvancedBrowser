@@ -41,7 +41,7 @@ class EventTile extends StatelessWidget {
     late final Color eventColor;
     switch (event.type) {
       case TodoType.vod:
-        eventColor = videoColor;
+        eventColor = vodColor;
         break;
       case TodoType.assign:
       case TodoType.quiz:

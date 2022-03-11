@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/notification.dart' as noti;
+import 'package:pnu_plato_advanced_browser/data/notification/file_notification.dart';
+import 'package:pnu_plato_advanced_browser/data/notification/folder_notification.dart';
+import 'package:pnu_plato_advanced_browser/data/notification/notification.dart' as noti;
+import 'package:pnu_plato_advanced_browser/data/notification/vod_notification.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
 
 class NotificationTile extends StatelessWidget {
@@ -28,29 +31,12 @@ class NotificationTile extends StatelessWidget {
       );
       return;
     }
-    printLog(notification.url.split('?id=')[1]);
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: notification.url.split('?id=')[1])));
   }
 
   @override
   Widget build(BuildContext context) {
-    late final Color eventColor;
-    switch (notification.notificationType) {
-      case noti.NotificationType.zoom:
-        eventColor = zoomColor;
-        break;
-      case noti.NotificationType.vod:
-        eventColor = videoColor;
-        break;
-      case noti.NotificationType.folder:
-      case noti.NotificationType.ubfile:
-        eventColor = Colors.orange.withOpacity(0.7);
-        break;
-      default:
-        eventColor = Colors.grey.withOpacity(0.7);
-    }
-
     return Stack(alignment: Alignment.centerLeft, children: [
       InkWell(
         onTap: () => _tapEvent(context),
@@ -73,7 +59,7 @@ class NotificationTile extends StatelessWidget {
           width: 30.0,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30.0),
-            color: eventColor,
+            color: notification.color,
             border: Border.all(
               color: Colors.white,
               width: 2.0,

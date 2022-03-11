@@ -16,9 +16,11 @@ import 'package:pnu_plato_advanced_browser/components/inner_player.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-Color videoColor = Colors.blue.withOpacity(0.7);
+Color vodColor = Colors.blue.withOpacity(0.7);
 Color assignColor = Colors.red.withOpacity(0.7);
 Color zoomColor = Colors.green.withOpacity(0.7);
+Color folderColor = Colors.orange.withOpacity(0.7);
+Color unknownColor = Colors.grey.withOpacity(0.7);
 
 void printLog(final String msg) {
   print("[DEBUG] $msg");

@@ -1,4 +1,4 @@
-import 'package:pnu_plato_advanced_browser/data/notification.dart';
+import 'package:pnu_plato_advanced_browser/data/notification/notification.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
 abstract class NotificationController {

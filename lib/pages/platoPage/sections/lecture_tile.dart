@@ -78,7 +78,7 @@ class LectureTile extends StatelessWidget {
                             margin: const EdgeInsets.only(right: 5),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5),
-                              color: videoColor,
+                              color: vodColor,
                             ),
                           ),
                           Text('$undoneVodCnt /$totalVodCnt'),

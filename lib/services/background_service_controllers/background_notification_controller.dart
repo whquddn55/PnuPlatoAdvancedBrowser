@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/data/notification.dart';
+import 'package:pnu_plato_advanced_browser/data/notification/notification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class BackgroundNotificationController {
@@ -10,7 +10,7 @@ abstract class BackgroundNotificationController {
 
   static Future<void> initialize() async {
     final preference = await SharedPreferences.getInstance();
-    notificationList = preference.getStringList("notificationList")?.map<Notification>((e) => Notification.fromJson(jsonDecode(e))).toList() ?? [];
+    //notificationList = preference.getStringList("notificationList")?.map<Notification>((e) => Notification.fromJson(jsonDecode(e))).toList() ?? [];
 
     var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = const IOSInitializationSettings();
@@ -86,14 +86,9 @@ abstract class BackgroundNotificationController {
           ' - ' +
           timeago;
       final String url = notificationItem.attributes['href']!;
-      NotificationType? notificationType;
-      try {
-        notificationType = NotificationType.values.byName(url.split('/')[4]);
-      } catch (e) {
-        printLog(e.toString());
-      }
 
-      var newNotification = Notification(title: courseName, body: content, url: url, time: DateTime.now(), notificationType: notificationType);
+      var newNotification =
+          Notification.fromJson({"title": courseName, "body": content, "url": url, "time": DateTime.now().toString(), "type": url.split('/')[4]});
       if (notificationList.contains(newNotification)) break;
       newNotificationList.add(newNotification);
     }
@@ -102,12 +97,6 @@ abstract class BackgroundNotificationController {
   }
 
   static Future<void> showNotification(final Notification nofitication) async {
-    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-    const android = AndroidNotificationDetails('thuthi_plato_noti', '플라토 브라우저 알림',
-        channelDescription: '플라토 브라우저에서 새 알림을 보여줌', importance: Importance.max, priority: Priority.high);
-    const detail = NotificationDetails(android: android);
-
-    await flutterLocalNotificationsPlugin.show(nofitication.hashCode, nofitication.title, nofitication.body, detail, payload: nofitication.url);
+    nofitication.show();
   }
 }
