@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/inappwebview_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/main_appbar.dart';
 import 'package:pnu_plato_advanced_browser/main_drawer.dart';
 import 'package:pnu_plato_advanced_browser/pages/login_builder_page.dart';
@@ -8,21 +11,20 @@ class ChatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    InAppWebViewController? _webViewController;
     return Scaffold(
       appBar: MainAppbar("쪽지"),
       drawer: const MainDrawer(),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text("구현할 시간이 없네요... 살려주세요"),
-          ],
-        ),
-      ),
-
-      // LoginBuilderPage(() => ListView(
-      //       children: const [],
-      //     )),
+      body: LoginBuilderPage(() => InappwebviewWrapper(
+            "쪽지",
+            "https://plato.pusan.ac.kr/local/ubmessage/",
+            (controller, uri) async {
+              await controller.evaluateJavascript(source: '''document.getElementById('page-header').remove();
+            document.body.style.margin = '0px';
+            document.body.style.padding = '0px';''');
+            },
+            scaffolded: true,
+          )),
     );
   }
 }
