@@ -5,7 +5,7 @@ class Notification {
   final String body;
   final String url;
   final DateTime time;
-  final NotificationType notificationType;
+  final NotificationType? notificationType;
 
   Notification({required this.title, required this.body, required this.url, required this.time, required this.notificationType});
 
@@ -14,7 +14,7 @@ class Notification {
         body = json["body"],
         url = json["url"],
         time = DateTime.parse(json["time"]),
-        notificationType = NotificationType.values.byName(json["notificationType"]);
+        notificationType = json["notificationType"] == null ? null : NotificationType.values.byName(json["notificationType"]);
 
   Map<String, dynamic> toJson() {
     return {
@@ -22,7 +22,7 @@ class Notification {
       "body": body,
       "url": url,
       "time": time.toString(),
-      "notificationType": notificationType.name,
+      "notificationType": notificationType?.name,
     };
   }
 

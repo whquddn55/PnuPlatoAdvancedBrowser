@@ -77,14 +77,19 @@ abstract class BackgroundNotificationController {
     for (var notificationItem in document.getElementsByClassName('notification-item')) {
       if (notificationItem.localName != 'a') continue;
       final String timeago = notificationItem.getElementsByClassName('timeago')[0].text;
-      final String courseName = notificationItem.getElementsByClassName('media-heading')[0].text.split(' ')[0] + ' - ' + timeago;
+      final String courseName = notificationItem.getElementsByClassName('media-heading')[0].text.trim().split(' ')[0] + ' - ' + timeago;
       final String content = notificationItem
           .getElementsByClassName('media-body')[0]
           .text
           .replaceAll(notificationItem.getElementsByClassName('media-heading')[0].text, '')
           .replaceAll(timeago, '');
       final String url = notificationItem.attributes['href']!;
-      final NotificationType notificationType = NotificationType.values.byName(url.split('/')[4]);
+      NotificationType? notificationType;
+      try {
+        notificationType = NotificationType.values.byName(url.split('/')[4]);
+      } catch (e) {
+        printLog(e.toString());
+      }
 
       var newNotification = Notification(title: courseName, body: content, url: url, time: DateTime.now(), notificationType: notificationType);
       if (notificationList.contains(newNotification)) break;
