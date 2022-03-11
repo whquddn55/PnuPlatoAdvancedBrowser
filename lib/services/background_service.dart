@@ -145,33 +145,33 @@ void _onStart() async {
   Timer.periodic(
     const Duration(minutes: 3),
     (timer) async {
-      // final DateTime now = DateTime.now();
-      // printLog("currentTime : $now");
-      // var pref = await SharedPreferences.getInstance();
+      final DateTime now = DateTime.now();
+      printLog("currentTime : $now");
+      var pref = await SharedPreferences.getInstance();
 
-      // var lastFetchTodoTime = DateTime.fromMillisecondsSinceEpoch(pref.getInt("lastFetchTodoTime") ?? 0);
-      // printLog("lastFetchTodoTime : $lastFetchTodoTime");
+      var lastFetchTodoTime = DateTime.fromMillisecondsSinceEpoch(pref.getInt("lastFetchTodoTime") ?? 0);
+      printLog("lastFetchTodoTime : $lastFetchTodoTime");
 
-      // File file = File(
-      //     '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat.Hms().format(now)}.txt');
-      // await file.writeAsString('');
-      // // if (BackgroundLoginController.loginStatus == false) {
-      // //   file.writeAsString('return', mode: FileMode.append);
-      // //   return;
-      // // }
-      // await BackgroundNotificationController.updateNotificationList();
-
-      // var res = await requestGet(CommonUrl.notificationUrl + '1', isFront: false, retry: 2);
-      // if (res == null) {
-      //   await file.writeAsString('null', mode: FileMode.append);
+      File file = File(
+          '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat.Hms().format(now)}.txt');
+      await file.writeAsString('');
+      // if (BackgroundLoginController.loginStatus == false) {
+      //   file.writeAsString('return', mode: FileMode.append);
       //   return;
       // }
+      await BackgroundNotificationController.updateNotificationList();
 
-      // await File(
-      //         '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat.Hms().format(now)}.txt')
-      //     .writeAsString(res.data, mode: FileMode.append);
-      // await pref.setInt("lastFetchTodoTime", now.millisecondsSinceEpoch);
-      // printLog("successful!!");
+      var res = await requestGet(CommonUrl.notificationUrl + '1', isFront: false, retry: 2);
+      if (res == null) {
+        await file.writeAsString('null', mode: FileMode.append);
+        return;
+      }
+
+      await File(
+              '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat.Hms().format(now)}.txt')
+          .writeAsString(res.data, mode: FileMode.append);
+      await pref.setInt("lastFetchTodoTime", now.millisecondsSinceEpoch);
+      printLog("successful!!");
     },
   );
 }

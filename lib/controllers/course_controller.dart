@@ -376,21 +376,37 @@ class CourseController {
     final List<Course> courseList = <Course>[];
 
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await requestAction(PlatoActionType.courseList, isFront: true);
+    var response = await requestGet(CommonUrl.courseListUrl + 'year=$year&semester=$semester', options: options, isFront: true);
     if (response == null) {
       /* TODO: 에러 */
       return null;
     }
+    Document document = parse(response.data);
+    for (var e in document.getElementsByClassName('coursefullname')) {
+      var middle = e.text.split(' ');
 
-    Document document = parse(response.data["html"]);
-    for (var e in document.getElementsByClassName('course-label-r')) {
-      var middle = e.attributes["title"]!.split(' ');
       courseList.add(Course(
         title: middle[0],
         sub: middle[1].split('-')[1].substring(0, middle[1].split('-')[1].length - 1),
         id: e.attributes['href']!.split('id=')[1],
       ));
     }
+
+    // var response = await requestAction(PlatoActionType.courseList, isFront: true);
+    // if (response == null) {
+    //   /* TODO: 에러 */
+    //   return null;
+    // }
+
+    // Document document = parse(response.data["html"]);
+    // for (var e in document.getElementsByClassName('course-label-r')) {
+    //   var middle = e.attributes["title"]!.split(' ');
+    //   courseList.add(Course(
+    //     title: middle[0],
+    //     sub: middle[1].split('-')[1].substring(0, middle[1].split('-')[1].length - 1),
+    //     id: e.attributes['href']!.split('id=')[1],
+    //   ));
+    // }
 
     return courseList;
   }

@@ -63,95 +63,6 @@ class _CourseMainPageState extends State<CourseMainPage> {
 
         _refreshTodoList();
 
-        final targetActivityKey = GlobalKey();
-        final currenrWeekKey = GlobalKey();
-        WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-          if (widget.targetActivityId != null) {
-            if (targetActivityKey.currentContext == null) return;
-            Scrollable.ensureVisible(targetActivityKey.currentContext!, alignment: 0.5, duration: const Duration(milliseconds: 500));
-          } else {
-            Scrollable.ensureVisible(currenrWeekKey.currentContext!, duration: const Duration(milliseconds: 500));
-          }
-        });
-
-        final currentWeekIndex = widget.course.activityMap.keys.toList().indexOf(widget.course.currentWeek!);
-        final List<Widget> weekTielWidgetList = [];
-        final weekList = widget.course.activityMap.values.toList();
-        for (int weekIndex = 0; weekIndex < weekList.length; ++weekIndex) {
-          final week = weekList[weekIndex];
-          final weekTitle = widget.course.activityMap.keys.toList()[weekIndex];
-
-          _weekTileControllerList.add(ExpandedTileController());
-          if (weekIndex == currentWeekIndex) {
-            _weekTileControllerList[currentWeekIndex].expand();
-          }
-
-          /* build widget */
-          final List<Widget> activityButtonList = [];
-          for (int activityIndex = 0; activityIndex < week.length; ++activityIndex) {
-            final activity = week[activityIndex];
-
-            activityButtonList.addAll([
-              const Divider(),
-              ActivityButton(
-                key: (activity.id == widget.targetActivityId) ? targetActivityKey : null,
-                activity: activity,
-                courseTitle: widget.course.title,
-                courseId: widget.course.id,
-                isTarget: (activity.id == widget.targetActivityId),
-              ),
-            ]);
-          }
-
-          weekTielWidgetList.add(Column(
-            children: [
-              const Divider(
-                height: 3,
-                thickness: 3,
-              ),
-              ExpandedTile(
-                key: (weekIndex == currentWeekIndex) ? currenrWeekKey : null,
-                onTap: () {
-                  for (var controller in _weekTileControllerList) {
-                    if (controller != _weekTileControllerList[weekIndex] && controller.isExpanded) {
-                      controller.collapse();
-                    }
-                  }
-                  _articleTileController.collapse();
-                },
-                controller: _weekTileControllerList[weekIndex],
-                theme: ExpandedTileThemeData(
-                  headerPadding: const EdgeInsets.all(3.0),
-                  headerColor: Get.theme.secondaryHeaderColor,
-                  headerRadius: 0.0,
-                  contentRadius: 0.0,
-                  contentPadding: const EdgeInsets.all(0.0),
-                  contentBackgroundColor: Get.theme.scaffoldBackgroundColor,
-                ),
-                contentSeperator: 0,
-                title: Text(weekTitle),
-                content: Column(
-                  children: [
-                    widget.course.summaryMap[weekTitle] == ''
-                        ? const SizedBox.shrink()
-                        : Container(
-                            child: renderHtml(weekTitle),
-                            decoration: BoxDecoration(
-                              border: Border.all(width: 1, color: Get.theme.hintColor),
-                              borderRadius: BorderRadius.circular(3.0),
-                            ),
-                            margin: const EdgeInsets.only(bottom: 20.0),
-                          ),
-                    Column(
-                      children: activityButtonList,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ));
-        }
-
         return Scaffold(
           appBar: AppBar(
             title: Text('${widget.course.title} - ${widget.course.professor!.name}'),
@@ -162,7 +73,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
           body: ListView(
             children: [
               _renderArticleList(),
-              ...weekTielWidgetList,
+              ..._renderWeekTileList(),
             ],
           ),
         );
@@ -317,5 +228,109 @@ class _CourseMainPageState extends State<CourseMainPage> {
         ),
       ),
     );
+  }
+
+  List<Widget> _renderWeekTileList() {
+    final targetActivityKey = GlobalKey();
+    final currenrWeekKey = GlobalKey();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      if (widget.targetActivityId != null) {
+        if (targetActivityKey.currentContext == null) return;
+        Scrollable.ensureVisible(targetActivityKey.currentContext!, alignment: 0.5, duration: const Duration(milliseconds: 500));
+      } else {
+        Scrollable.ensureVisible(currenrWeekKey.currentContext!, duration: const Duration(milliseconds: 500));
+      }
+    });
+
+    final currentWeekIndex = widget.course.activityMap.keys.toList().indexOf(widget.course.currentWeek!);
+    final List<Widget> weekTileWidgetList = [];
+    final weekList = widget.course.activityMap.values.toList();
+    for (int weekIndex = 0; weekIndex < weekList.length; ++weekIndex) {
+      final week = weekList[weekIndex];
+      final weekTitle = widget.course.activityMap.keys.toList()[weekIndex];
+
+      bool isTargetWeek = false;
+      /* Build activityButtons */
+      final List<Widget> activityButtonList = [];
+      for (int activityIndex = 0; activityIndex < week.length; ++activityIndex) {
+        final activity = week[activityIndex];
+
+        activityButtonList.addAll([
+          const Divider(),
+          ActivityButton(
+            key: (activity.id == widget.targetActivityId) ? targetActivityKey : null,
+            activity: activity,
+            courseTitle: widget.course.title,
+            courseId: widget.course.id,
+            isTarget: (activity.id == widget.targetActivityId),
+          ),
+        ]);
+
+        if (activity.id == widget.targetActivityId) {
+          isTargetWeek = true;
+        }
+      }
+
+      _weekTileControllerList.add(ExpandedTileController());
+
+      if (widget.targetActivityId != null) {
+        if (isTargetWeek && !_weekTileControllerList[weekIndex].isExpanded) {
+          _weekTileControllerList[weekIndex].expand();
+        }
+      } else if (weekIndex == currentWeekIndex) {
+        _weekTileControllerList[weekIndex].expand();
+      }
+
+      /* Build weekTile */
+      weekTileWidgetList.add(Column(
+        children: [
+          const Divider(
+            height: 3,
+            thickness: 3,
+          ),
+          ExpandedTile(
+            key: (weekIndex == currentWeekIndex) ? currenrWeekKey : null,
+            onTap: () {
+              for (var controller in _weekTileControllerList) {
+                if (controller != _weekTileControllerList[weekIndex] && controller.isExpanded) {
+                  controller.collapse();
+                }
+              }
+              _articleTileController.collapse();
+            },
+            controller: _weekTileControllerList[weekIndex],
+            theme: ExpandedTileThemeData(
+              headerPadding: const EdgeInsets.all(3.0),
+              headerColor: Get.theme.secondaryHeaderColor,
+              headerRadius: 0.0,
+              contentRadius: 0.0,
+              contentPadding: const EdgeInsets.all(0.0),
+              contentBackgroundColor: Get.theme.scaffoldBackgroundColor,
+            ),
+            contentSeperator: 0,
+            title: Text(weekTitle),
+            content: Column(
+              children: [
+                widget.course.summaryMap[weekTitle] == ''
+                    ? const SizedBox.shrink()
+                    : Container(
+                        child: renderHtml(weekTitle),
+                        decoration: BoxDecoration(
+                          border: Border.all(width: 1, color: Get.theme.hintColor),
+                          borderRadius: BorderRadius.circular(3.0),
+                        ),
+                        margin: const EdgeInsets.only(bottom: 20.0),
+                      ),
+                Column(
+                  children: activityButtonList,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ));
+    }
+
+    return weekTileWidgetList;
   }
 }
