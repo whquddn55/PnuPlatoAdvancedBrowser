@@ -25,42 +25,40 @@ class NavigatorBody extends StatelessWidget {
               bottomNavigationBar: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
                 reverseDuration: const Duration(milliseconds: 50),
-                child: controller.showBottomNavBar == false
-                    ? const SizedBox.shrink()
-                    : TabBar(
-                        onTap: (index) => controller.currentIndex = index,
-                        indicator: BoxDecoration(
-                          border: Border(
-                            top: BorderSide(
-                              color: Get.theme.colorScheme.secondary,
-                              width: 3.0,
-                            ),
-                          ),
-                        ),
-                        tabs: [
-                          const Tab(child: Icon(Icons.home)),
-                          const Tab(child: Icon(Icons.calendar_today_outlined)),
-                          const Tab(child: Icon(Icons.email)),
-                          Tab(
-                            child: StreamBuilder<List<DownloadInformation>>(
-                              stream: Get.find<DownloadController>().stream,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.active) {
-                                  List<DownloadInformation> list = snapshot.data!;
-                                  return Badge(
-                                    badgeContent: Text(list.length.toString()),
-                                    child: const Icon(Icons.download_rounded),
-                                    showBadge: list.isNotEmpty,
-                                  );
-                                } else {
-                                  return const Icon(Icons.download_rounded);
-                                }
-                              },
-                            ),
-                          ),
-                          const Tab(child: Icon(Icons.notifications)),
-                        ],
+                child: TabBar(
+                  onTap: (index) => controller.currentIndex = index,
+                  indicator: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: Get.theme.colorScheme.secondary,
+                        width: 3.0,
                       ),
+                    ),
+                  ),
+                  tabs: [
+                    const Tab(child: Icon(Icons.home)),
+                    const Tab(child: Icon(Icons.calendar_today_outlined)),
+                    const Tab(child: Icon(Icons.email)),
+                    Tab(
+                      child: StreamBuilder<List<DownloadInformation>>(
+                        stream: Get.find<DownloadController>().stream,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.active) {
+                            List<DownloadInformation> list = snapshot.data!;
+                            return Badge(
+                              badgeContent: Text(list.length.toString()),
+                              child: const Icon(Icons.download_rounded),
+                              showBadge: list.isNotEmpty,
+                            );
+                          } else {
+                            return const Icon(Icons.download_rounded);
+                          }
+                        },
+                      ),
+                    ),
+                    const Tab(child: Icon(Icons.notifications)),
+                  ],
+                ),
               ),
             ),
           ),

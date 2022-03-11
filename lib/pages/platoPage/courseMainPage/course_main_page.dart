@@ -14,14 +14,22 @@ import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sectio
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/article_button.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/smartAbsencePage/smart_absence_page.dart';
 
-class CourseMainPage extends StatelessWidget {
+class CourseMainPage extends StatefulWidget {
   final Course course;
   final String? targetActivityId;
 
   const CourseMainPage({Key? key, required this.course, this.targetActivityId}) : super(key: key);
 
+  @override
+  State<CourseMainPage> createState() => _CourseMainPageState();
+}
+
+class _CourseMainPageState extends State<CourseMainPage> {
+  final _articleTileController = ExpandedTileController();
+  final _weekTileControllerList = <ExpandedTileController>[];
+
   void _refreshTodoList() async {
-    final vodStatusMap = await Get.find<CourseController>().getVodStatus(course.id);
+    final vodStatusMap = await Get.find<CourseController>().getVodStatus(widget.course.id);
     List<Map<String, dynamic>> vodStatusList = [];
     for (var values in vodStatusMap.values) {
       for (var vodStatus in values) {
@@ -29,144 +37,131 @@ class CourseMainPage extends StatelessWidget {
       }
     }
 
-    TodoController.to.refreshTodoList([course.id], vodStatusList);
+    TodoController.to.refreshTodoList([widget.course.id], vodStatusList);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _articleTileController.dispose();
+    for (var controller in _weekTileControllerList) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final _articleTileController = ExpandedTileController();
-    final _weekTileControllerList = <ExpandedTileController>[];
-    int? targetWeekIndex;
-
     return FutureBuilder(
-      future: Get.find<CourseController>().updateCourseSpecification(course),
+      future: Get.find<CourseController>().updateCourseSpecification(widget.course),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '강의 정보를 로딩 중입니다...'));
 
-        for (var i = 0; i < course.activityMap.keys.length; ++i) {
-          _weekTileControllerList.add(ExpandedTileController());
-        }
-
-        if (targetActivityId != null) {
-          var weekList = course.activityMap.values.toList();
-          for (int i = 0; i < weekList.length; ++i) {
-            var week = weekList[i];
-            bool isTargetWeek = week.firstWhereOrNull((activity) => activity.id == targetActivityId) != null;
-
-            if (isTargetWeek) targetWeekIndex = i;
-          }
-        }
-
         _refreshTodoList();
+
+        final targetActivityKey = GlobalKey();
+        final currenrWeekKey = GlobalKey();
+        WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+          if (widget.targetActivityId != null) {
+            Scrollable.ensureVisible(targetActivityKey.currentContext!, alignment: 0.5, duration: const Duration(milliseconds: 500));
+          } else {
+            Scrollable.ensureVisible(currenrWeekKey.currentContext!, duration: const Duration(milliseconds: 500));
+          }
+        });
+
+        final currentWeekIndex = widget.course.activityMap.keys.toList().indexOf(widget.course.currentWeek!);
+        final List<Widget> weekTielWidgetList = [];
+        final weekList = widget.course.activityMap.values.toList();
+        for (int weekIndex = 0; weekIndex < weekList.length; ++weekIndex) {
+          final week = weekList[weekIndex];
+          final weekTitle = widget.course.activityMap.keys.toList()[weekIndex];
+
+          _weekTileControllerList.add(ExpandedTileController());
+          if (weekIndex == currentWeekIndex) {
+            _weekTileControllerList[currentWeekIndex].expand();
+          }
+
+          /* build widget */
+          final List<Widget> activityButtonList = [];
+          for (int activityIndex = 0; activityIndex < week.length; ++activityIndex) {
+            final activity = week[activityIndex];
+
+            activityButtonList.addAll([
+              const Divider(),
+              ActivityButton(
+                key: (activity.id == widget.targetActivityId) ? targetActivityKey : null,
+                activity: activity,
+                courseTitle: widget.course.title,
+                courseId: widget.course.id,
+                isTarget: (activity.id == widget.targetActivityId),
+              ),
+            ]);
+          }
+
+          weekTielWidgetList.add(Column(
+            children: [
+              const Divider(
+                height: 3,
+                thickness: 3,
+              ),
+              ExpandedTile(
+                key: (weekIndex == currentWeekIndex) ? currenrWeekKey : null,
+                onTap: () {
+                  for (var controller in _weekTileControllerList) {
+                    if (controller != _weekTileControllerList[weekIndex] && controller.isExpanded) {
+                      controller.collapse();
+                    }
+                  }
+                  _articleTileController.collapse();
+                },
+                controller: _weekTileControllerList[weekIndex],
+                theme: ExpandedTileThemeData(
+                  headerPadding: const EdgeInsets.all(3.0),
+                  headerColor: Get.theme.secondaryHeaderColor,
+                  headerRadius: 0.0,
+                  contentRadius: 0.0,
+                  contentPadding: const EdgeInsets.all(0.0),
+                  contentBackgroundColor: Get.theme.scaffoldBackgroundColor,
+                ),
+                contentSeperator: 0,
+                title: Text(weekTitle),
+                content: Column(
+                  children: [
+                    widget.course.summaryMap[weekTitle] == ''
+                        ? const SizedBox.shrink()
+                        : Container(
+                            child: renderHtml(weekTitle),
+                            decoration: BoxDecoration(
+                              border: Border.all(width: 1, color: Get.theme.hintColor),
+                              borderRadius: BorderRadius.circular(3.0),
+                            ),
+                            margin: const EdgeInsets.only(bottom: 20.0),
+                          ),
+                    Column(
+                      children: activityButtonList,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ));
+        }
 
         return Scaffold(
           appBar: AppBar(
-            title: Text('${course.title} - ${course.professor!.name}'),
+            title: Text('${widget.course.title} - ${widget.course.professor!.name}'),
             centerTitle: true,
             leading: const BackButton(),
           ),
           endDrawer: _renderEndDrawer(context),
           body: ListView(
             children: [
-              ExpandedTile(
-                onTap: () {
-                  for (var controller in _weekTileControllerList) {
-                    controller.collapse();
-                  }
-                },
-                controller: _articleTileController,
-                theme: const ExpandedTileThemeData(
-                  headerPadding: EdgeInsets.all(10.0),
-                  headerColor: Color(0xfff3f2dd),
-                  headerRadius: 0.0,
-                  contentRadius: 0.0,
-                ),
-                contentSeperator: 0,
-                title: const Text(
-                  '공지사항',
-                  style: TextStyle(color: Colors.black87),
-                ),
-                trailing: const Icon(Icons.chevron_right, color: Colors.black87),
-                content: Container(
-                  padding: const EdgeInsets.only(left: 8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xfff3f2dd),
-                    border: Border.all(
-                      color: const Color(0xffdad9c6),
-                    ),
-                  ),
-                  child: Column(
-                    children:
-                        course.articleList.map((article) => ArticleButton(article: article, courseTitle: course.title, courseId: course.id)).toList(),
-                  ),
-                ),
-              ),
-              ...course.activityMap.keys.map((key) {
-                int index = course.activityMap.keys.toList().indexOf(key);
-
-                if (targetWeekIndex != null) {
-                  if (index == targetWeekIndex) _weekTileControllerList[index].expand();
-                } else {
-                  if (course.currentWeek != null) {
-                    int currentWeekIndex = course.activityMap.keys.toList().indexOf(course.currentWeek!);
-                    _weekTileControllerList[currentWeekIndex].expand();
-                  }
-                }
-
-                return Column(
-                  children: [
-                    const Divider(
-                      height: 3,
-                      thickness: 3,
-                    ),
-                    ExpandedTile(
-                      onTap: () {
-                        for (var controller in _weekTileControllerList) {
-                          if (controller != _weekTileControllerList[index]) {
-                            controller.collapse();
-                          }
-                        }
-                        _articleTileController.collapse();
-                      },
-                      controller: _weekTileControllerList[index],
-                      theme: ExpandedTileThemeData(
-                        headerPadding: const EdgeInsets.all(3.0),
-                        headerColor: Get.theme.secondaryHeaderColor,
-                        headerRadius: 0.0,
-                        contentRadius: 0.0,
-                        contentPadding: const EdgeInsets.all(0.0),
-                        contentBackgroundColor: Get.theme.scaffoldBackgroundColor,
-                      ),
-                      contentSeperator: 0,
-                      title: Text(key),
-                      content: Column(
-                        children: [
-                          course.summaryMap[key] == ''
-                              ? const SizedBox.shrink()
-                              : Container(
-                                  child: renderHtml(course.summaryMap[key]!),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(width: 1, color: Get.theme.hintColor),
-                                    borderRadius: BorderRadius.circular(3.0),
-                                  ),
-                                  margin: const EdgeInsets.only(bottom: 20.0),
-                                ),
-                          Column(
-                            children: course.activityMap[key]!.fold<List<Widget>>([], (prv, activity) {
-                              prv.addAll([
-                                const Divider(),
-                                ActivityButton(
-                                    activity: activity, courseTitle: course.title, courseId: course.id, isTarget: (activity.id == targetActivityId))
-                              ]);
-                              return prv;
-                            }),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
+              _renderArticleList(),
+              ...weekTielWidgetList,
             ],
           ),
         );
@@ -179,9 +174,9 @@ class CourseMainPage extends StatelessWidget {
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(course.professor!.name),
+            accountName: Text(widget.course.professor!.name),
             accountEmail: null,
-            currentAccountPicture: CircleAvatar(backgroundImage: CachedNetworkImageProvider(course.professor!.iconUri.toString())),
+            currentAccountPicture: CircleAvatar(backgroundImage: CachedNetworkImageProvider(widget.course.professor!.iconUri.toString())),
             otherAccountsPictures: [
               IconButton(
                 icon: Icon(Icons.email, color: Get.theme.primaryIconTheme.color),
@@ -194,7 +189,7 @@ class CourseMainPage extends StatelessWidget {
           ExpansionTile(
             title: const Text('팀티칭/조교'),
             expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
-            children: course.assistantList.map((assistant) {
+            children: widget.course.assistantList.map((assistant) {
               return TextButton.icon(
                 icon: CircleAvatar(
                   backgroundImage: CachedNetworkImageProvider(assistant.iconUri.toString()),
@@ -228,7 +223,7 @@ class CourseMainPage extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => PlannerPage(
                     title: '국문 계획표',
-                    uri: course.koreanPlanUri,
+                    uri: widget.course.koreanPlanUri,
                   ),
                 ),
               );
@@ -242,7 +237,7 @@ class CourseMainPage extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => PlannerPage(
                     title: '영문 계획표',
-                    uri: course.englishPlanUri,
+                    uri: widget.course.englishPlanUri,
                   ),
                 ),
               );
@@ -255,7 +250,7 @@ class CourseMainPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => OnlineAbsencePage(courseId: course.id),
+                  builder: (context) => OnlineAbsencePage(courseId: widget.course.id),
                 ),
               );
             },
@@ -266,7 +261,7 @@ class CourseMainPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SmartAbsencePage(courseId: course.id),
+                  builder: (context) => SmartAbsencePage(courseId: widget.course.id),
                 ),
               );
             },
@@ -277,11 +272,48 @@ class CourseMainPage extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => GradePage(courseId: course.id),
+                    builder: (context) => GradePage(courseId: widget.course.id),
                   ));
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _renderArticleList() {
+    return ExpandedTile(
+      onTap: () {
+        for (var controller in _weekTileControllerList) {
+          controller.collapse();
+        }
+      },
+      controller: _articleTileController,
+      theme: const ExpandedTileThemeData(
+        headerPadding: EdgeInsets.all(10.0),
+        headerColor: Color(0xfff3f2dd),
+        headerRadius: 0.0,
+        contentRadius: 0.0,
+      ),
+      contentSeperator: 0,
+      title: const Text(
+        '공지사항',
+        style: TextStyle(color: Colors.black87),
+      ),
+      trailing: const Icon(Icons.chevron_right, color: Colors.black87),
+      content: Container(
+        padding: const EdgeInsets.only(left: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xfff3f2dd),
+          border: Border.all(
+            color: const Color(0xffdad9c6),
+          ),
+        ),
+        child: Column(
+          children: widget.course.articleList
+              .map((article) => ArticleButton(article: article, courseTitle: widget.course.title, courseId: widget.course.id))
+              .toList(),
+        ),
       ),
     );
   }
