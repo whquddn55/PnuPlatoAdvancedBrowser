@@ -3,7 +3,11 @@ import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
-import 'package:pnu_plato_advanced_browser/data/todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/vod_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
 
 class LectureTile extends StatelessWidget {
@@ -50,17 +54,17 @@ class LectureTile extends StatelessWidget {
 
                   for (var todo in controller.todoList) {
                     if (todo.courseId == course.id) {
-                      switch (todo.type) {
-                        case TodoType.assign:
-                        case TodoType.quiz:
+                      switch (todo.runtimeType) {
+                        case AssignTodo:
+                        case QuizTodo:
                           totalAssignCnt++;
                           if (todo.status != TodoStatus.done) undoneAssignCnt++;
                           break;
-                        case TodoType.vod:
+                        case VodTodo:
                           totalVodCnt++;
                           if (todo.status != TodoStatus.done) undoneVodCnt++;
                           break;
-                        case TodoType.zoom:
+                        case ZoomTodo:
                           totalZoomCnt++;
                           if (todo.status != TodoStatus.done) undoneZoomCnt++;
                           break;

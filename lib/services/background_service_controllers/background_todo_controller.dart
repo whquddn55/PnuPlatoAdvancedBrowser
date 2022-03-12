@@ -1,7 +1,11 @@
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/data/todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 import 'package:html/dom.dart' as html;
 import 'package:html/parser.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/vod_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 
 abstract class BackgroundTodoController {
   static Future<List<Todo>> fetchTodoList(final List<String> courseIdList, final List<Map<String, dynamic>> vodStatusList) async {
@@ -35,11 +39,6 @@ abstract class BackgroundTodoController {
         continue;
       }
 
-      final TodoType? type = _getType(activity);
-      if (type == null) {
-        continue;
-      }
-
       final String title = _getTitle(activity);
       bool? done;
       for (var vod in vodStatusList) {
@@ -60,14 +59,13 @@ abstract class BackgroundTodoController {
       final Uri iconUri = _getIconUri(activity);
       final bool availablility = activity.getElementsByTagName('a').isNotEmpty;
 
-      todoList.add(Todo(
+      todoList.add(VodTodo(
         availability: availablility,
         courseId: courseId,
         dueDate: dueDate[1]!,
         iconUri: iconUri,
         id: id,
         title: title,
-        type: TodoType.vod,
         status: done ? TodoStatus.done : TodoStatus.undone,
       ));
     }
@@ -92,14 +90,13 @@ abstract class BackgroundTodoController {
         DateTime dueDate = DateTime.tryParse(tr.getElementsByClassName('cell c2')[0].text.trim()) ?? DateTime.now();
         bool done = tr.getElementsByClassName('cell c3')[0].text.trim().contains('완료');
 
-        todoList.add(Todo(
+        todoList.add(AssignTodo(
           availability: true,
           courseId: courseId,
           dueDate: dueDate,
           iconUri: Uri.parse("https://plato.pusan.ac.kr/theme/image.php/coursemosv2/assign/1641196863/icon"),
           id: id,
           title: title,
-          type: TodoType.assign,
           status: done ? TodoStatus.done : TodoStatus.undone,
         ));
       }
@@ -127,14 +124,13 @@ abstract class BackgroundTodoController {
             (tr.getElementsByClassName('cell c3')[0].text.trim() != "-") ||
             (dueDate.compareTo(DateTime.now()) <= 0);
 
-        todoList.add(Todo(
+        todoList.add(QuizTodo(
           availability: true,
           courseId: courseId,
           dueDate: dueDate,
           iconUri: Uri.parse("https://plato.pusan.ac.kr/theme/image.php/coursemosv2/assign/1641196863/icon"),
           id: id,
           title: title,
-          type: TodoType.quiz,
           status: done ? TodoStatus.done : TodoStatus.undone,
         ));
       }
@@ -158,14 +154,13 @@ abstract class BackgroundTodoController {
         DateTime dueDate = DateTime.parse(tr.getElementsByClassName('cell c2')[0].text.trim());
         bool done = tr.parent!.parent!.classes.contains('mod_index') == false;
 
-        todoList.add(Todo(
+        todoList.add(ZoomTodo(
           availability: true,
           courseId: courseId,
           dueDate: dueDate,
           iconUri: Uri.parse("https://plato.pusan.ac.kr/theme/image.php/coursemosv2/zoom/1641196863/icon"),
           id: id,
           title: title,
-          type: TodoType.zoom,
           status: done ? TodoStatus.done : TodoStatus.undone,
         ));
       }
@@ -202,16 +197,6 @@ abstract class BackgroundTodoController {
       }
     }
     return res;
-  }
-
-  static TodoType? _getType(html.Element activity) {
-    TodoType? type;
-    for (var typeValue in TodoType.values) {
-      if (typeValue.name == activity.classes.elementAt(1).trim()) {
-        type = typeValue;
-      }
-    }
-    return type;
   }
 
   static String _getId(html.Element activity) {

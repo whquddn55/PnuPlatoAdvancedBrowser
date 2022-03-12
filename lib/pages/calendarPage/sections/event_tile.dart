@@ -3,54 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/todo.dart';
-import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 
 class EventTile extends StatelessWidget {
   final Todo event;
   final int index;
   const EventTile({Key? key, required this.event, required this.index}) : super(key: key);
 
-  void _eventTabEvent(final BuildContext context) {
-    var course = Get.find<CourseController>().getCourseById(event.courseId);
-    if (course == null) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const ErrorPage(msg: "없는... 강의인데요??")));
-      return;
-    }
-    Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: event.id)));
-
-    // showDialog(
-    //   context: context,
-    //   builder: (context) {
-    //     return Dialog(
-    //       child: CourseMainPage(course: course, targetActivityId: event.id),
-    //       insetPadding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.2),
-    //     );
-    //   },
-    // );
-  }
-
   @override
   Widget build(BuildContext context) {
     var course = Get.find<CourseController>().getCourseById(event.courseId);
     if (course == null) return const SizedBox.shrink();
 
-    late final Color eventColor;
-    switch (event.type) {
-      case TodoType.vod:
-        eventColor = vodColor;
-        break;
-      case TodoType.assign:
-      case TodoType.quiz:
-        eventColor = assignColor;
-        break;
-      case TodoType.zoom:
-        eventColor = zoomColor;
-        break;
-    }
+    final Color eventColor = event.getColor();
 
     return Opacity(
       opacity: event.status == TodoStatus.done ? 0.3 : 1.0,
@@ -58,7 +24,7 @@ class EventTile extends StatelessWidget {
         alignment: Alignment.centerLeft,
         children: [
           InkWell(
-            onTap: () => _eventTabEvent(context),
+            onTap: () => event.open(context),
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
             child: Container(

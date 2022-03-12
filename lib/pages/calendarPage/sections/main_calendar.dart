@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/data/todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/vod_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 import 'package:pnu_plato_advanced_browser/pages/calendarPage/sections/event_tile.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -35,7 +39,7 @@ class _MainCalendarState extends State<MainCalendar> {
   }
 
   Widget _buildMarker(final List<Todo> events) {
-    int videoCnt = 0;
+    int vodCnt = 0;
     int assignCnt = 0;
     int zoomCnt = 0;
     int doneCnt = 0;
@@ -44,16 +48,17 @@ class _MainCalendarState extends State<MainCalendar> {
         doneCnt++;
         continue;
       }
-      switch (event.type) {
-        case TodoType.vod:
-          videoCnt++;
-          break;
-        case TodoType.assign:
-        case TodoType.quiz:
+      switch (event.runtimeType) {
+        case AssignTodo:
+        case QuizTodo:
           assignCnt++;
           break;
-        case TodoType.zoom:
+        case VodTodo:
+          vodCnt++;
+          break;
+        case ZoomTodo:
           zoomCnt++;
+          break;
       }
     }
     return Column(
@@ -69,7 +74,7 @@ class _MainCalendarState extends State<MainCalendar> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            if (videoCnt != 0) _renderMarker(videoCnt, vodColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
+            if (vodCnt != 0) _renderMarker(vodCnt, vodColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
             if (assignCnt != 0) _renderMarker(assignCnt, assignColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
             if (zoomCnt != 0) _renderMarker(zoomCnt, zoomColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
           ],
