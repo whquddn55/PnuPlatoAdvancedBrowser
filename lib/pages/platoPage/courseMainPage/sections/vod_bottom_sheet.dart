@@ -24,7 +24,7 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
   @override
   initState() {
     super.initState();
-    _future = Get.find<CourseController>().getVodStatus(widget.courseId);
+    _future = CourseController.getVodStatus(widget.courseId);
   }
 
   _viewHanlder(BuildContext context) async {
@@ -32,7 +32,7 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
   }
 
   _downloadHandler(BuildContext context) async {
-    Uri uri = await Get.find<CourseController>().getM3u8Uri(widget.activity.id);
+    Uri uri = await CourseController.getM3u8Uri(widget.activity.id);
     if (uri.toString() == '') {
     } else {
       var downloadResult = await Get.find<DownloadController>().enQueue(

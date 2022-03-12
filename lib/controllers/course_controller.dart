@@ -12,31 +12,30 @@ import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assistant.dart';
 import 'package:pnu_plato_advanced_browser/data/professor.dart';
 
-/* TODO: abstract, static */
-class CourseController {
-  final List<Course> _currentSemesterCourseList = <Course>[];
+abstract class CourseController {
+  static final List<Course> _currentSemesterCourseList = <Course>[];
 
-  List<Course> get currentSemesterCourseList => _currentSemesterCourseList;
+  static List<Course> get currentSemesterCourseList => _currentSemesterCourseList;
 
-  Course? getCourseById(final String courseId) {
+  static Course? getCourseById(final String courseId) {
     for (var course in _currentSemesterCourseList) {
       if (course.id == courseId) return course;
     }
     return null;
   }
 
-  Course? getCourseByTitle(final String courseTitle) {
+  static Course? getCourseByTitle(final String courseTitle) {
     for (var course in _currentSemesterCourseList) {
       if (course.title == courseTitle) return course;
     }
     return null;
   }
 
-  Future<List<Course>?> fetchCourseList(int year, int semester) async {
+  static Future<List<Course>?> fetchCourseList(int year, int semester) async {
     return await _fetchCourseList(year: year, semester: semester);
   }
 
-  Future<bool> updateCurrentSemesterCourseList() async {
+  static Future<bool> updateCurrentSemesterCourseList() async {
     var res = await _fetchCourseList(year: 2022, semester: 10);
     if (res == null) {
       return false;
@@ -64,7 +63,7 @@ class CourseController {
     return true;
   }
 
-  Future<bool> updateCourseSpecification(final Course course) async {
+  static Future<bool> updateCourseSpecification(final Course course) async {
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
     var response = await requestGet(CommonUrl.courseMainUrl + course.id, options: options, isFront: true);
     if (response == null) {
@@ -138,7 +137,7 @@ class CourseController {
     return true;
   }
 
-  Future<Map<int, List<Map<String, dynamic>>>> getVodStatus(final String courseId) async {
+  static Future<Map<int, List<Map<String, dynamic>>>> getVodStatus(final String courseId) async {
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
     var response = await requestGet(CommonUrl.courseOnlineAbsenceUrl + courseId, options: options, isFront: true);
 
@@ -198,7 +197,7 @@ class CourseController {
     return res;
   }
 
-  List<CourseActivity> getBoardList(final String courseId) {
+  static List<CourseActivity> getBoardList(final String courseId) {
     var res = <CourseActivity>[];
     for (var course in _currentSemesterCourseList) {
       if (course.id == courseId) {
@@ -212,7 +211,7 @@ class CourseController {
     return res;
   }
 
-  Future<Map<String, dynamic>> getBoardInfo(final String boardId, final int page) async {
+  static Future<Map<String, dynamic>> getBoardInfo(final String boardId, final int page) async {
     /*
       title: 게시판 이름
       content: 게시판 설명
@@ -248,7 +247,7 @@ class CourseController {
     return res;
   }
 
-  Future<Uri> getM3u8Uri(final String activityId) async {
+  static Future<Uri> getM3u8Uri(final String activityId) async {
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
     var response = await requestGet(CommonUrl.vodViewerUrl + activityId, options: options, isFront: true);
 
@@ -260,7 +259,7 @@ class CourseController {
     return Uri.parse(document.getElementsByTagName('source')[0].attributes['src'] ?? '');
   }
 
-  List<DateTime?> _getDueTime(Element activity) {
+  static List<DateTime?> _getDueTime(Element activity) {
     var res = <DateTime?>[null, null, null];
     if (activity.getElementsByClassName('text-ubstrap').isEmpty) {
       /* TODO: duetime 가져오기 */
@@ -282,7 +281,7 @@ class CourseController {
     return res;
   }
 
-  String _getInfo(Element activity, String type) {
+  static String _getInfo(Element activity, String type) {
     if (activity.getElementsByClassName('text-info').isEmpty) {
       return '';
     } else {
@@ -294,7 +293,7 @@ class CourseController {
     }
   }
 
-  String _getTitle(Element activity) {
+  static String _getTitle(Element activity) {
     if (activity.getElementsByClassName('instancename').isEmpty) {
       return '';
     } else {
@@ -310,24 +309,24 @@ class CourseController {
     }
   }
 
-  String _getDescription(Element activity) {
+  static String _getDescription(Element activity) {
     return activity.getElementsByClassName('contentwithoutlink ').fold<String>('', (prv, e) => prv + e.innerHtml) +
         activity.getElementsByClassName('contentafterlink').fold<String>('', (prv, e) => prv + e.innerHtml);
   }
 
-  String _getType(Element activity) {
+  static String _getType(Element activity) {
     return activity.classes.elementAt(1);
   }
 
-  String _getWeeks(Element activity) {
+  static String _getWeeks(Element activity) {
     return activity.parent!.parent!.getElementsByClassName('sectionname')[0].text;
   }
 
-  String _getId(Element activity) {
+  static String _getId(Element activity) {
     return activity.id.split('-')[1];
   }
 
-  Professor _getProfessorInfo(Document document) {
+  static Professor _getProfessorInfo(Document document) {
     return Professor(
       name: document.getElementsByClassName('prof-user-name')[0].text.trim(),
       id: document.getElementsByClassName('prof-user-message')[0].children[0].attributes['href']!.split('?id=')[1],
@@ -335,7 +334,7 @@ class CourseController {
     );
   }
 
-  List<CourseAssistant> _getAssistantInfoList(Document document, Professor professor) {
+  static List<CourseAssistant> _getAssistantInfoList(Document document, Professor professor) {
     var res = <CourseAssistant>[];
     if (document.getElementsByClassName('prof').isEmpty) {
       return res;
@@ -355,7 +354,7 @@ class CourseController {
     return res;
   }
 
-  List<CourseArticleMetaData> _getArticleList(Document document) {
+  static List<CourseArticleMetaData> _getArticleList(Document document) {
     var res = <CourseArticleMetaData>[];
     if (document.getElementsByClassName('article-list-item').isEmpty) {
       return res;
@@ -372,7 +371,7 @@ class CourseController {
     return res;
   }
 
-  Future<List<Course>?> _fetchCourseList({int year = 0, int semester = 0}) async {
+  static Future<List<Course>?> _fetchCourseList({int year = 0, int semester = 0}) async {
     final List<Course> courseList = <Course>[];
 
     var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
@@ -411,16 +410,16 @@ class CourseController {
     return courseList;
   }
 
-  Uri? _getIconUri(Element activity) {
+  static Uri? _getIconUri(Element activity) {
     if (activity.getElementsByTagName('img').isEmpty) return null;
     return Uri.parse(activity.getElementsByTagName('img')[0].attributes['src']!);
   }
 
-  Uri _getKoreanPlanUri(Document document) {
+  static Uri _getKoreanPlanUri(Document document) {
     return Uri.parse(document.getElementsByClassName('submenu-item')[0].children[0].attributes['href']!);
   }
 
-  Uri _getEnglishPlanUri(Document document) {
+  static Uri _getEnglishPlanUri(Document document) {
     return Uri.parse(document.getElementsByClassName('submenu-item')[1].children[0].attributes['href']!);
   }
 }

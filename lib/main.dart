@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
@@ -18,7 +17,6 @@ void main() async {
   await initializeDateFormatting();
   await Firebase.initializeApp();
   Get.put(LoginController());
-  Get.put(CourseController());
   Get.put(RouteController());
   Get.put(DownloadController());
   Get.put(NoticeController());

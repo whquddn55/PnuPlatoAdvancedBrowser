@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/unknown_todo.dart';
@@ -123,7 +121,7 @@ abstract class Todo {
   }
 
   void open(final BuildContext context) {
-    var course = Get.find<CourseController>().getCourseById(courseId);
+    var course = CourseController.getCourseById(courseId);
     if (course == null) {
       Navigator.push(context, MaterialPageRoute(builder: (context) => const ErrorPage(msg: "없는... 강의인데요??")));
       return;

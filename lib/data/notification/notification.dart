@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/assign_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/file_notification.dart';
@@ -80,7 +79,7 @@ abstract class Notification {
   Color getColor();
 
   void open(final BuildContext context) {
-    final course = Get.find<CourseController>().getCourseByTitle(title);
+    final course = CourseController.getCourseByTitle(title);
     if (course == null) {
       showDialog(
         context: context,

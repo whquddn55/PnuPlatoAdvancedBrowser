@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
@@ -13,7 +12,7 @@ class EventTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var course = Get.find<CourseController>().getCourseById(event.courseId);
+    var course = CourseController.getCourseById(event.courseId);
     if (course == null) return const SizedBox.shrink();
 
     final Color eventColor = event.getColor();

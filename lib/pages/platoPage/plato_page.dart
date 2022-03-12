@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/main_appbar.dart';
@@ -21,7 +20,7 @@ class PlatoPage extends StatelessWidget {
       drawer: const MainDrawer(),
       body: LoginBuilderPage(
         () => FutureBuilder(
-            future: Get.find<CourseController>().updateCurrentSemesterCourseList(),
+            future: CourseController.updateCurrentSemesterCourseList(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return RefreshIndicator(
@@ -41,7 +40,7 @@ class PlatoPage extends StatelessWidget {
                           controller: _expandedTileController,
                           content: Column(
                             children: [
-                              for (Course course in Get.find<CourseController>().currentSemesterCourseList) ...[
+                              for (Course course in CourseController.currentSemesterCourseList) ...[
                                 LectureTile(course: course),
                                 const SizedBox(height: 10),
                               ],

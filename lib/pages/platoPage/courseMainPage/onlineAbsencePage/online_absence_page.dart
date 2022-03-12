@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/onlineAbsencePage/sections/column_vod.dart';
@@ -18,7 +17,7 @@ class OnlineAbsencePage extends StatelessWidget {
           centerTitle: true,
         ),
         body: FutureBuilder(
-          future: Get.find<CourseController>().getVodStatus(courseId),
+          future: CourseController.getVodStatus(courseId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               var data = snapshot.data! as Map<int, List<Map<String, dynamic>>>;

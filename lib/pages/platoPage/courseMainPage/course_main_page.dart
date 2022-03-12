@@ -29,7 +29,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
   final _weekTileControllerList = <ExpandedTileController>[];
 
   void _refreshTodoList() async {
-    final vodStatusMap = await Get.find<CourseController>().getVodStatus(widget.course.id);
+    final vodStatusMap = await CourseController.getVodStatus(widget.course.id);
     List<Map<String, dynamic>> vodStatusList = [];
     for (var values in vodStatusMap.values) {
       for (var vodStatus in values) {
@@ -57,7 +57,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Get.find<CourseController>().updateCourseSpecification(widget.course),
+      future: CourseController.updateCourseSpecification(widget.course),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '강의 정보를 로딩 중입니다...'));
 

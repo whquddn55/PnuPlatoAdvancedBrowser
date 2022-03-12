@@ -18,10 +18,10 @@ class TodoController extends GetxController {
   }
 
   Future<void> refreshTodoListAll() async {
-    var courseIdList = Get.find<CourseController>().currentSemesterCourseList.map((course) => course.id).toList();
+    var courseIdList = CourseController.currentSemesterCourseList.map((course) => course.id).toList();
     var vodStatusList = <Map<String, dynamic>>[];
     for (var courseId in courseIdList) {
-      for (var values in (await Get.find<CourseController>().getVodStatus(courseId)).values) {
+      for (var values in (await CourseController.getVodStatus(courseId)).values) {
         for (var vodStatus in values) {
           vodStatusList.add(vodStatus);
         }
