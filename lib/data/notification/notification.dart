@@ -21,7 +21,6 @@ abstract class Notification {
   Notification({required this.title, required this.body, required this.url, required this.time, required this.color});
 
   static Notification fromJson(Map<String, dynamic> json) {
-    printLog(json["type"]);
     switch (json["type"]) {
       case "folder":
         return FolderNotification(title: json["title"], body: json["body"], url: json["url"], time: DateTime.parse(json["time"]));
