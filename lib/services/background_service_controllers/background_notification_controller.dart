@@ -25,7 +25,7 @@ abstract class BackgroundNotificationController {
   }
 
   static void _onSelectNotification(String? arg) {
-    printLog("[DEBUG] $arg");
+    printLog("$arg");
   }
 
   static Future<void> updateNotificationList() async {

@@ -20,6 +20,7 @@ Color vodColor = Colors.blue.withOpacity(0.7);
 Color assignColor = Colors.red.withOpacity(0.7);
 Color zoomColor = Colors.green.withOpacity(0.7);
 Color folderColor = Colors.orange.withOpacity(0.7);
+Color articleColor = Colors.purple.withOpacity(0.7);
 Color unknownColor = Colors.grey.withOpacity(0.7);
 
 void printLog(final String msg) {
@@ -147,7 +148,7 @@ Future<dio.Response?> requestGet(final String url, {dio.Options? options, bool? 
         options.headers!["Cookie"] = BackgroundLoginController.moodleSessionKey;
       }
 
-      printLog("[DEBUG] ${options.headers!["Cookie"]}");
+      printLog("${options.headers!["Cookie"]}");
     }
     try {
       response = await dio.Dio().get(url, options: options);
@@ -184,7 +185,7 @@ Future<dio.Response?> requestPost(final String url, final dynamic data, {dio.Opt
       } else {
         options.headers!["Cookie"] = BackgroundLoginController.moodleSessionKey;
       }
-      printLog("[DEBUG] ${options.headers!["Cookie"]}");
+      printLog("${options.headers!["Cookie"]}");
     }
     try {
       response = await dio.Dio().post(url, data: data, options: options);
@@ -234,7 +235,7 @@ Future<dio.Response?> requestAction(final PlatoActionType type, {required final 
       }
     }
 
-    printLog("[DEBUG] ${options.headers}");
+    printLog("${options.headers}");
 
     try {
       response = await dio.Dio().post("https://plato.pusan.ac.kr/theme/coursemosv2/action.php", data: body, options: options);

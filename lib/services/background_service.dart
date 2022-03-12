@@ -47,7 +47,7 @@ abstract class BackgroundService {
         return;
       }
 
-      printLog("[DEBUG] recevied app: $data");
+      printLog("recevied app: $data");
 
       BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
 
@@ -110,7 +110,7 @@ void _onStart() async {
 
     BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
 
-    printLog("[DEBUG] receive service: $data");
+    printLog("receive service: $data");
 
     var res = <String, dynamic>{"action": data["action"], "hashCode": data["hashCode"]};
 

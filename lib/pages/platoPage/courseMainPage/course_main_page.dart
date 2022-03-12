@@ -6,6 +6,7 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
+import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/gradePage/grade_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/plannerPage/planner_page.dart';
@@ -28,18 +29,6 @@ class _CourseMainPageState extends State<CourseMainPage> {
   final _articleTileController = ExpandedTileController();
   final _weekTileControllerList = <ExpandedTileController>[];
 
-  void _refreshTodoList() async {
-    final vodStatusMap = await CourseController.getVodStatus(widget.course.id);
-    List<Map<String, dynamic>> vodStatusList = [];
-    for (var values in vodStatusMap.values) {
-      for (var vodStatus in values) {
-        vodStatusList.add(vodStatus);
-      }
-    }
-
-    TodoController.to.refreshTodoList([widget.course.id], vodStatusList);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -52,6 +41,27 @@ class _CourseMainPageState extends State<CourseMainPage> {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  void _refreshTodoList() async {
+    final vodStatusMap = await CourseController.getVodStatus(widget.course.id);
+    List<Map<String, dynamic>> vodStatusList = [];
+    for (var values in vodStatusMap.values) {
+      for (var vodStatus in values) {
+        vodStatusList.add(vodStatus);
+      }
+    }
+
+    TodoController.to.refreshTodoList([widget.course.id], vodStatusList);
+  }
+
+  void _scrollToTarget(final BuildContext? targetActivityContext, final BuildContext? targetWeekContext) {
+    if (widget.targetActivityId != null) {
+      if (targetActivityContext == null) return;
+      Scrollable.ensureVisible(targetActivityContext, alignment: 0.5, duration: const Duration(milliseconds: 500));
+    } else {
+      Scrollable.ensureVisible(targetWeekContext!, duration: const Duration(milliseconds: 500));
+    }
   }
 
   @override
@@ -70,12 +80,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
             leading: const BackButton(),
           ),
           endDrawer: _renderEndDrawer(context),
-          body: ListView(
-            children: [
-              _renderArticleList(),
-              ..._renderWeekTileList(),
-            ],
-          ),
+          body: ListView(children: _renderAcivityList()),
         );
       },
     );
@@ -193,7 +198,31 @@ class _CourseMainPageState extends State<CourseMainPage> {
     );
   }
 
-  Widget _renderArticleList() {
+  List<Widget> _renderAcivityList() {
+    final targetActivityKey = GlobalKey();
+    final currentWeekKey = GlobalKey();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) => _scrollToTarget(targetActivityKey.currentContext, currentWeekKey.currentContext));
+    return [_renderArticleList(targetActivityKey), ..._renderWeekTileList(targetActivityKey, currentWeekKey)];
+  }
+
+  Widget _renderArticleList(final GlobalKey targetActivityKey) {
+    final List<Widget> articleWidgetList = [];
+
+    printLog(widget.targetActivityId.toString());
+    for (var article in widget.course.articleList) {
+      printLog(article.id);
+      if (article.id == widget.targetActivityId) {
+        _articleTileController.expand();
+      }
+
+      articleWidgetList.add(ArticleButton(
+        key: targetActivityKey,
+        article: article,
+        courseTitle: widget.course.title,
+        courseId: widget.course.id,
+      ));
+    }
+
     return ExpandedTile(
       onTap: () {
         for (var controller in _weekTileControllerList) {
@@ -221,30 +250,15 @@ class _CourseMainPageState extends State<CourseMainPage> {
             color: const Color(0xffdad9c6),
           ),
         ),
-        child: Column(
-          children: widget.course.articleList
-              .map((article) => ArticleButton(article: article, courseTitle: widget.course.title, courseId: widget.course.id))
-              .toList(),
-        ),
+        child: Column(children: articleWidgetList),
       ),
     );
   }
 
-  List<Widget> _renderWeekTileList() {
-    final targetActivityKey = GlobalKey();
-    final currenrWeekKey = GlobalKey();
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      if (widget.targetActivityId != null) {
-        if (targetActivityKey.currentContext == null) return;
-        Scrollable.ensureVisible(targetActivityKey.currentContext!, alignment: 0.5, duration: const Duration(milliseconds: 500));
-      } else {
-        Scrollable.ensureVisible(currenrWeekKey.currentContext!, duration: const Duration(milliseconds: 500));
-      }
-    });
-
-    final currentWeekIndex = widget.course.activityMap.keys.toList().indexOf(widget.course.currentWeek!);
+  List<Widget> _renderWeekTileList(final GlobalKey targetActivityKey, final GlobalKey currentWeekKey) {
+    final int currentWeekIndex = widget.course.activityMap.keys.toList().indexOf(widget.course.currentWeek!);
     final List<Widget> weekTileWidgetList = [];
-    final weekList = widget.course.activityMap.values.toList();
+    final List<List<CourseActivity>> weekList = widget.course.activityMap.values.toList();
     for (int weekIndex = 0; weekIndex < weekList.length; ++weekIndex) {
       final week = weekList[weekIndex];
       final weekTitle = widget.course.activityMap.keys.toList()[weekIndex];
@@ -289,7 +303,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
             thickness: 3,
           ),
           ExpandedTile(
-            key: (weekIndex == currentWeekIndex) ? currenrWeekKey : null,
+            key: (weekIndex == currentWeekIndex) ? currentWeekKey : null,
             onTap: () {
               for (var controller in _weekTileControllerList) {
                 if (controller != _weekTileControllerList[weekIndex] && controller.isExpanded) {

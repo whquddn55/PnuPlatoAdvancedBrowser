@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/data/notification/article_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/assign_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/file_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/folder_notification.dart';
@@ -20,6 +21,8 @@ abstract class Notification {
 
   static Notification fromJson(Map<String, dynamic> json) {
     switch (json["type"]) {
+      case "ubboard":
+        return ArticleNotification(title: json["title"], body: json["body"], url: json["url"], time: DateTime.parse(json["time"]));
       case "folder":
         return FolderNotification(title: json["title"], body: json["body"], url: json["url"], time: DateTime.parse(json["time"]));
       case "ubfile":
@@ -40,6 +43,9 @@ abstract class Notification {
   Map<String, dynamic> toJson() {
     String typeString = "unknown";
     switch (runtimeType) {
+      case ArticleNotification:
+        typeString = "ubboard";
+        break;
       case FolderNotification:
         typeString = "folder";
         break;
