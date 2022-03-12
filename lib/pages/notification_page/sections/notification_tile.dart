@@ -30,7 +30,7 @@ class NotificationTile extends StatelessWidget {
           width: 30.0,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30.0),
-            color: notification.color,
+            color: notification.getColor(),
             border: Border.all(
               color: Colors.white,
               width: 2.0,

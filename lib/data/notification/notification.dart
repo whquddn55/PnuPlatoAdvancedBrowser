@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/assign_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/file_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/folder_notification.dart';
@@ -17,9 +16,8 @@ abstract class Notification {
   final String body;
   final String url;
   final DateTime time;
-  final Color color;
 
-  Notification({required this.title, required this.body, required this.url, required this.time, required this.color});
+  Notification({required this.title, required this.body, required this.url, required this.time});
 
   static Notification fromJson(Map<String, dynamic> json) {
     switch (json["type"]) {
@@ -76,9 +74,10 @@ abstract class Notification {
 
   @override
   int get hashCode => url.hashCode;
-
   @override
   bool operator ==(final Object other) => other.runtimeType == runtimeType && hashCode == other.hashCode;
+
+  Color getColor();
 
   void open(final BuildContext context) {
     final course = Get.find<CourseController>().getCourseByTitle(title);
