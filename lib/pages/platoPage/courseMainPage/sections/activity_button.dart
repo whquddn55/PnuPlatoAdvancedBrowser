@@ -4,6 +4,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/components/emphasis_container.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
@@ -86,106 +87,106 @@ class ActivityButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool avilablity = activity.iconUri != null && activity.availablility == true;
-    return Container(
-      decoration: isTarget == false
-          ? null
-          : BoxDecoration(
-              //boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 0.5, spreadRadius: 0.5, offset: Offset(1.0, 1.0))],
-              color: Colors.blue.withOpacity(0.1),
-            ),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Opacity(
-        opacity: avilablity == false ? 0.5 : 1.0,
-        child: InkWell(
-          onTap: avilablity == false ? null : () async => await _tabEvent(context),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+    return Stack(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Opacity(
+            opacity: avilablity == false ? 0.5 : 1.0,
+            child: InkWell(
+              onTap: avilablity == false ? null : () async => await _tabEvent(context),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      margin: const EdgeInsets.only(right: 10),
-                      child: activity.iconUri == null
-                          ? const SizedBox.shrink()
-                          : CachedNetworkImage(
-                              imageUrl: activity.iconUri.toString(),
-                              placeholder: (context, url) => const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(strokeWidth: 1),
-                              ),
-                              errorWidget: (context, url, error) => const Icon(Icons.error),
-                              height: 20,
-                              width: 20,
-                            ),
-                    ),
-                    Flexible(
-                      child: GetBuilder<TodoController>(builder: (controller) {
-                        Todo? sameTodo = controller.todoList.firstWhereOrNull((todo) => todo.courseId == activity.courseId && todo.id == activity.id);
-
-                        Color titleColor = Colors.black;
-                        if (sameTodo != null) {
-                          switch (sameTodo.status) {
-                            case TodoStatus.done:
-                              titleColor = Colors.green;
-                              break;
-                            case TodoStatus.undone:
-                            case TodoStatus.doing:
-                              titleColor = Colors.red;
-                              break;
-                          }
-                        }
-
-                        return Text.rich(
-                          TextSpan(
-                            text: activity.title,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: titleColor,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: '   ${activity.info}',
-                                style: const TextStyle(
-                                  color: Colors.blueAccent,
-                                  fontWeight: FontWeight.normal,
+                    Row(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(right: 10),
+                          child: activity.iconUri == null
+                              ? const SizedBox.shrink()
+                              : CachedNetworkImage(
+                                  imageUrl: activity.iconUri.toString(),
+                                  placeholder: (context, url) => const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(strokeWidth: 1),
+                                  ),
+                                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                                  height: 20,
+                                  width: 20,
                                 ),
-                              ),
-                              if (activity.startDate != null)
-                                if (activity.lateDate != null)
+                        ),
+                        Flexible(
+                          child: GetBuilder<TodoController>(builder: (controller) {
+                            Todo? sameTodo =
+                                controller.todoList.firstWhereOrNull((todo) => todo.courseId == activity.courseId && todo.id == activity.id);
+
+                            Color titleColor = Colors.black;
+                            if (sameTodo != null) {
+                              switch (sameTodo.status) {
+                                case TodoStatus.done:
+                                  titleColor = Colors.green;
+                                  break;
+                                case TodoStatus.undone:
+                                case TodoStatus.doing:
+                                  titleColor = Colors.red;
+                                  break;
+                              }
+                            }
+
+                            return Text.rich(
+                              TextSpan(
+                                text: activity.title,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: titleColor,
+                                ),
+                                children: [
                                   TextSpan(
-                                    text:
-                                        '\n${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.endDate!)}\n(지각: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.lateDate!)})',
+                                    text: '   ${activity.info}',
                                     style: const TextStyle(
-                                      color: Colors.orangeAccent,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  )
-                                else
-                                  TextSpan(
-                                    text:
-                                        '\n${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.endDate!)}',
-                                    style: const TextStyle(
-                                      color: Colors.orangeAccent,
+                                      color: Colors.blueAccent,
                                       fontWeight: FontWeight.normal,
                                     ),
                                   ),
-                            ],
-                          ),
-                        );
-                      }),
+                                  if (activity.startDate != null)
+                                    if (activity.lateDate != null)
+                                      TextSpan(
+                                        text:
+                                            '\n${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.endDate!)}\n(지각: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.lateDate!)})',
+                                        style: const TextStyle(
+                                          color: Colors.orangeAccent,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      )
+                                    else
+                                      TextSpan(
+                                        text:
+                                            '\n${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.startDate!)} ~ ${DateFormat('yyyy-MM-dd HH:mm:ss').format(activity.endDate!)}',
+                                        style: const TextStyle(
+                                          color: Colors.orangeAccent,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ),
+                      ],
                     ),
+                    if (activity.availablilityInfo != '') renderHtml(activity.availablilityInfo),
+                    if (activity.description != '') renderHtml(activity.description)
                   ],
                 ),
-                if (activity.availablilityInfo != '') renderHtml(activity.availablilityInfo),
-                if (activity.description != '') renderHtml(activity.description)
-              ],
+              ),
             ),
           ),
         ),
-      ),
+        if (isTarget) const Positioned.fill(child: IgnorePointer(child: EmphasisContainer()))
+      ],
     );
   }
 }

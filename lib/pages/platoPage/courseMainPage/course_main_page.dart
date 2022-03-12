@@ -208,11 +208,11 @@ class _CourseMainPageState extends State<CourseMainPage> {
   Widget _renderArticleList(final GlobalKey targetActivityKey) {
     final List<Widget> articleWidgetList = [];
 
-    printLog(widget.targetActivityId.toString());
     for (var article in widget.course.articleList) {
-      printLog(article.id);
+      bool isTarget = false;
       if (article.id == widget.targetActivityId) {
         _articleTileController.expand();
+        isTarget = true;
       }
 
       articleWidgetList.add(ArticleButton(
@@ -220,6 +220,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
         article: article,
         courseTitle: widget.course.title,
         courseId: widget.course.id,
+        isTarget: isTarget,
       ));
     }
 
@@ -243,7 +244,6 @@ class _CourseMainPageState extends State<CourseMainPage> {
       ),
       trailing: const Icon(Icons.chevron_right, color: Colors.black87),
       content: Container(
-        padding: const EdgeInsets.only(left: 8),
         decoration: BoxDecoration(
           color: const Color(0xfff3f2dd),
           border: Border.all(
