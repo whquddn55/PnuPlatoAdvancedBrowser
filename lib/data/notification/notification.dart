@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/assign_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/file_notification.dart';
@@ -79,7 +80,24 @@ abstract class Notification {
   @override
   bool operator ==(final Object other) => other.runtimeType == runtimeType && hashCode == other.hashCode;
 
-  void open(final BuildContext context, final Course course) {
+  void open(final BuildContext context) {
+    final course = Get.find<CourseController>().getCourseByTitle(title);
+    if (course == null) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("에러"),
+          content: const Text("강의를 찾을 수 없습니다."),
+          actions: [
+            TextButton(
+              child: const Text("확인"),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        ),
+      );
+      return;
+    }
     Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: url.split('?id=')[1])));
   }
 
