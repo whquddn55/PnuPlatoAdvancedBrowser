@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
@@ -6,21 +9,26 @@ import 'package:html/dom.dart' as html;
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/vod_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class BackgroundTodoController {
-  static Future<List<Todo>> fetchTodoList(final List<String> courseIdList, final List<Map<String, dynamic>> vodStatusList) async {
+  static Future<List<Todo>> fetchTodoList(final List<String> courseIdList) async {
     final List<Todo> todoList = <Todo>[];
     for (var courseId in courseIdList) {
-      todoList.addAll(await _fetchVod(courseId, vodStatusList));
+      todoList.addAll(await _fetchVod(courseId));
       todoList.addAll(await _fetchAssign(courseId));
       todoList.addAll(await _fetchQuiz(courseId));
       todoList.addAll(await _fetchZoom(courseId));
     }
 
+    final preference = await SharedPreferences.getInstance();
+    await preference.setString("todoList", jsonEncode(todoList));
+
     return todoList;
   }
 
-  static Future<List<Todo>> _fetchVod(final String courseId, final List<Map<String, dynamic>> vodStatusList) async {
+  static Future<List<Todo>> _fetchVod(final String courseId) async {
+    final List<Map<String, dynamic>> vodStatusList = await _fetchVodStatusList(courseId);
     if (vodStatusList.isEmpty) {
       return [];
     }
@@ -72,7 +80,7 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>> _fetchAssign(String courseId) async {
+  static Future<List<Todo>> _fetchAssign(final String courseId) async {
     var response = await requestGet(CommonUrl.courseAssignUrl + courseId, isFront: false);
 
     if (response == null) {
@@ -104,7 +112,7 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>> _fetchQuiz(String courseId) async {
+  static Future<List<Todo>> _fetchQuiz(final String courseId) async {
     var response = await requestGet(CommonUrl.courseQuizUrl + courseId, isFront: false);
 
     if (response == null) {
@@ -138,7 +146,7 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>> _fetchZoom(String courseId) async {
+  static Future<List<Todo>> _fetchZoom(final String courseId) async {
     var response = await requestGet(CommonUrl.courseZoomUrl + courseId, isFront: false);
 
     if (response == null) {
@@ -167,6 +175,16 @@ abstract class BackgroundTodoController {
     }
 
     return todoList;
+  }
+
+  static Future<List<Map<String, dynamic>>> _fetchVodStatusList(final String courseId) async {
+    var vodStatusList = <Map<String, dynamic>>[];
+    for (var values in (await CourseController.getVodStatus(courseId, false)).values) {
+      for (var vodStatus in values) {
+        vodStatusList.add(vodStatus);
+      }
+    }
+    return vodStatusList;
   }
 
   static String _getTitle(html.Element activity) {

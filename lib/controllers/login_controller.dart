@@ -1,52 +1,47 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart' as dio;
 
 class LoginController extends GetxController {
-  bool _loginStatus = false;
-  String _sessionKey = '';
-  String _moodleSessionKey = '';
-  String _loginMsg = '';
-  String _debugMsg = '';
+  static LoginController get to => Get.find<LoginController>();
 
-  int _studentId = 123456789;
-  String _name = 'thuthi';
-  String _department = '전기컴퓨터공학부';
-  String _imgUrl = CommonUrl.defaultAvatarUrl;
-  String _lastSyncTime = DateTime(1946, 05, 15).toString();
+  LoginInformation loginInformation = LoginInformation();
 
-  bool get loginStatus => _loginStatus;
-  String get sessionKey => _sessionKey;
-  String get moodleSessionKey => _moodleSessionKey;
-  String get loginMsg => _loginMsg;
-  String get debugMsg => _debugMsg;
+  static Future<bool> _checkLogin() async {
+    final preference = await SharedPreferences.getInstance();
+    if (preference.getString("loginInformation") == null) return false;
+    final LoginInformation loginInformation = LoginInformation.fromJson(jsonDecode(preference.getString("loginInformation")!));
 
-  int get studentId => _studentId;
-  String get name => _name;
-  String get department => _department;
-  String get imgUrl => _imgUrl;
-  String get lastSyncTime => _lastSyncTime;
+    String body = '[{"index":0,"methodname":"core_fetch_notifications","args":{"contextid":2}}]';
+    final dio.Options options = dio.Options(
+      contentType: 'application/json',
+      headers: {"X-Requested-With": "XMLHttpRequest"},
+    );
+    options.headers!["Cookie"] = loginInformation.moodleSessionKey;
+
+    var response = await dio.Dio().post("https://plato.pusan.ac.kr/lib/ajax/service.php?info=core_fetch_notifications", data: body, options: options);
+    return response.data != null && response.data[0]["error"] == false;
+  }
 
   Future<void> login({required final bool autologin, String? username, String? password}) async {
-    var res =
-        await BackgroundService.sendData(BackgroundServiceAction.login, data: {"autologin": autologin, "username": username, "password": password});
-
-    _loginStatus = res["loginStatus"];
-    _loginMsg = res["loginMsg"];
-    _debugMsg = res["debugMsg"];
-    if (_loginStatus == true) {
-      _moodleSessionKey = res["moodleSessionKey"];
-      _sessionKey = res["sessionKey"];
-      _studentId = res["studentId"];
-      _department = res["department"];
-      _name = res["name"];
-      _imgUrl = res["imgUrl"];
+    bool before = loginInformation.loginStatus;
+    if (await _checkLogin() == true) {
+      final preference = await SharedPreferences.getInstance();
+      loginInformation = LoginInformation.fromJson(jsonDecode(preference.getString("loginInformation")!));
+    } else {
+      loginInformation = LoginInformation.fromJson(await BackgroundService.sendData(BackgroundServiceAction.login,
+          data: {"autologin": autologin, "username": username, "password": password}));
     }
 
-    update();
+    if (before != loginInformation.loginStatus) update();
   }
 
   Future<void> logout() async {
+    bool before = loginInformation.loginStatus;
     var res = await BackgroundService.sendData(BackgroundServiceAction.logout);
 
     if (res == false) {
@@ -54,18 +49,8 @@ class LoginController extends GetxController {
       return;
     }
 
-    _loginStatus = false;
-    _sessionKey = '';
-    _moodleSessionKey = '';
-    _loginMsg = '';
-    _debugMsg = '';
-    _studentId = 123456789;
-    _name = 'thuthi';
-    _department = '전기컴퓨터공학부';
-    _imgUrl = CommonUrl.defaultAvatarUrl;
-    _lastSyncTime = DateTime(1946, 05, 15).toString();
-    _loginStatus = false;
-    update();
+    loginInformation = LoginInformation();
+    if (before != loginInformation.loginStatus) update();
     return;
   }
 }

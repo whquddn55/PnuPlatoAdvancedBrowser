@@ -37,8 +37,8 @@ class NavigatorPage extends StatelessWidget {
 
         String? studentId;
 
-        if (Get.find<LoginController>().loginStatus == true) {
-          Get.find<LoginController>().studentId.toString();
+        if (LoginController.to.loginInformation.loginStatus == true) {
+          LoginController.to.loginInformation.studentId;
         }
 
         return FutureBuilder<void>(

@@ -5,7 +5,7 @@ import 'package:pnu_plato_advanced_browser/data/acamedic_calendar_item.dart';
 
 abstract class AcademicCalendarController {
   static Future<List<AcademicCalendarItem>?> getAcademicCalendar() async {
-    var response = await requestGet(CommonUrl.academicCalendarUrl);
+    var response = await requestGet(CommonUrl.academicCalendarUrl, isFront: true);
     if (response == null) {
       /* TODO: 에러 */
       return null;

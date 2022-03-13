@@ -1,10 +1,8 @@
-import 'package:dio/dio.dart' as dio;
 import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_article_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
@@ -64,8 +62,8 @@ abstract class CourseController {
   }
 
   static Future<bool> updateCourseSpecification(final Course course) async {
-    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await requestGet(CommonUrl.courseMainUrl + course.id, options: options, isFront: true);
+    var response = await requestGet(CommonUrl.courseMainUrl + course.id, isFront: true);
+    printLog("updateCourseSpecification");
     if (response == null) {
       /* TODO : 에러 */
       return false;
@@ -137,9 +135,8 @@ abstract class CourseController {
     return true;
   }
 
-  static Future<Map<int, List<Map<String, dynamic>>>> getVodStatus(final String courseId) async {
-    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await requestGet(CommonUrl.courseOnlineAbsenceUrl + courseId, options: options, isFront: true);
+  static Future<Map<int, List<Map<String, dynamic>>>> getVodStatus(final String courseId, final bool isFront) async {
+    var response = await requestGet(CommonUrl.courseOnlineAbsenceUrl + courseId, isFront: isFront);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -192,8 +189,6 @@ abstract class CourseController {
       }
     }
 
-    Get.find<TodoController>().updateTodoStatus(res);
-
     return res;
   }
 
@@ -219,8 +214,7 @@ abstract class CourseController {
       pageLength: 게시판 페이지 수
       writable: 글쓰기 권한 확인
     */
-    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await requestGet(CommonUrl.courseBoardUrl + '$boardId&page=$page', options: options, isFront: true);
+    var response = await requestGet(CommonUrl.courseBoardUrl + '$boardId&page=$page', isFront: true);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -248,8 +242,7 @@ abstract class CourseController {
   }
 
   static Future<Uri> getM3u8Uri(final String activityId) async {
-    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await requestGet(CommonUrl.vodViewerUrl + activityId, options: options, isFront: true);
+    var response = await requestGet(CommonUrl.vodViewerUrl + activityId, isFront: true);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -374,8 +367,8 @@ abstract class CourseController {
   static Future<List<Course>?> _fetchCourseList({int year = 0, int semester = 0}) async {
     final List<Course> courseList = <Course>[];
 
-    var options = dio.Options(headers: {'Cookie': Get.find<LoginController>().moodleSessionKey});
-    var response = await requestGet(CommonUrl.courseListUrl + 'year=$year&semester=$semester', options: options, isFront: true);
+    var response = await requestGet(CommonUrl.courseListUrl + 'year=$year&semester=$semester', isFront: true);
+
     if (response == null) {
       /* TODO: 에러 */
       return null;

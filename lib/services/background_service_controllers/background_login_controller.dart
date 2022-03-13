@@ -1,26 +1,55 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class BackgroundLoginController {
-  static String moodleSessionKey = '';
+  static LoginInformation loginInformation = LoginInformation();
 
-  static Future<Map<String, dynamic>> login({required final bool autologin, String? username, String? password}) async {
+  static Future<bool> _checkLogin() async {
+    final preference = await SharedPreferences.getInstance();
+    if (preference.getString("loginInformation") == null) return false;
+    final LoginInformation loginInformation = LoginInformation.fromJson(jsonDecode(preference.getString("loginInformation")!));
+
+    String body = '[{"index":0,"methodname":"core_fetch_notifications","args":{"contextid":2}}]';
+    final dio.Options options = dio.Options(
+      contentType: 'application/json',
+      headers: {"X-Requested-With": "XMLHttpRequest"},
+    );
+    options.headers!["Cookie"] = loginInformation.moodleSessionKey;
+
+    var response = await dio.Dio().post("https://plato.pusan.ac.kr/lib/ajax/service.php?info=core_fetch_notifications", data: body, options: options);
+    printLog(response.data);
+    printLog(response.data != null && response.data[0]["error"] == false);
+    return response.data != null && response.data[0]["error"] == false;
+  }
+
+  static Future<void> login({required final bool autologin, String? username, String? password}) async {
     assert(autologin == false ? username != null && password != null : true);
-    final Map<String, dynamic> res = <String, dynamic>{};
+
     final preference = await SharedPreferences.getInstance();
     if (autologin == true) {
+      bool loginStatus = await _checkLogin();
+      if (loginStatus == true) {
+        loginInformation = LoginInformation.fromJson(jsonDecode(preference.getString("loginInformation")!));
+        loginInformation.loginMsg = "이미 로그인 되어있음!";
+        return;
+      }
+
       username = preference.getString('username');
       password = preference.getString('password');
     }
 
     if (username == null || password == null) {
-      return {"loginStatus": false, "debugMsg": "username, password가 null임", "loginMsg": "login failed with UnknownError"};
+      loginInformation.loginStatus = false;
+      loginInformation.loginMsg = "아이디, 비밀번호가 저장되어 있지 않습니다.";
+      return;
     }
 
     String body = 'username=$username&password=${Uri.encodeQueryComponent(password)}';
@@ -47,11 +76,10 @@ abstract class BackgroundLoginController {
           }));
 
       /* always return 303 */
-      res["debugMsg"] = 'does not return 303';
-      res["loginMsg"] = 'login failed with UnknownError';
+      loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
       /* TODO: popup error report */
-      res["loginStatus"] = false;
-      return res;
+      loginInformation.loginStatus = false;
+      return;
     } on dio.DioError catch (e, _) {
       /* successfully login */
       if (e.response!.statusCode == 303) {
@@ -59,122 +87,66 @@ abstract class BackgroundLoginController {
       }
       /* unknownError */
       else {
-        res["debugMsg"] = e.toString();
-        res["loginMsg"] = 'login failed with UnknownError';
+        loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
         /* TODO: popup error report */
-        res["loginStatus"] = false;
-        return res;
+        loginInformation.loginStatus = false;
+        return;
       }
     }
     /* unknownError */
     catch (e) {
-      res["debugMsg"] = e.toString();
-      res["loginMsg"] = 'login failed with UnknownError';
+      loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
       /* TODO: popup error report */
-      res["loginStatus"] = false;
-      return res;
+      loginInformation.loginStatus = false;
+      return;
     }
 
     /* wrong id/pw */
     if (response.headers.map['location']![0] == CommonUrl.loginErrorUrl) {
-      res["debugMsg"] = 'login failed with wrong ID/PW';
-      res["loginMsg"] = '잘못된 ID 또는 PW입니다. 다시 확인해주세요.';
-      res["loginStatus"] = false;
-      return res;
+      loginInformation.loginMsg = '잘못된 ID 또는 PW입니다. 다시 확인해주세요.';
+      loginInformation.loginStatus = false;
+      return;
     }
 
     /* successfully login */
-    res["moodleSessionKey"] = response.headers.map['set-cookie']![1];
-    res["debugMsg"] = 'login success';
-    res["loginMsg"] = '로그인 성공!';
+    loginInformation.moodleSessionKey = response.headers.map['set-cookie']![1];
+    loginInformation.loginMsg = '로그인 성공!';
+    await _getInformation(loginInformation);
 
-    _updateSyncTime();
-    res.addAll(await _getInformation(res["moodleSessionKey"]));
+    await _setCooKie(loginInformation);
+    loginInformation.loginStatus = true;
 
     await preference.setString('username', username);
     await preference.setString('password', password);
+    await preference.setString("loginInformation", jsonEncode(loginInformation));
 
-    CookieManager cookieManager = CookieManager.instance();
-    await cookieManager.deleteAllCookies();
-    await cookieManager.setCookie(
-      url: Uri.parse('https://plato.pusan.ac.kr'),
-      name: 'MoodleSession',
-      value: res["moodleSessionKey"].split('=')[1],
-      domain: 'plato.pusan.ac.kr',
-      path: '/',
-    );
-    res["loginStatus"] = true;
+    printLog("Sync With Plato : loginInformation");
+    _updateSyncTime();
 
-    printLog("Sync With Plato : ${moodleSessionKey}");
-    moodleSessionKey = res["moodleSessionKey"];
-    return res;
+    return;
   }
 
   static Future<bool> logout() async {
-    String? sessionKey = await _getSessionKey(moodleSessionKey);
+    final preference = await SharedPreferences.getInstance();
+    LoginInformation loginInformation = jsonDecode(preference.getString("loginInformation")!);
+
+    String? sessionKey = await _getSessionKey(loginInformation.moodleSessionKey);
     if (sessionKey == null) {
       return false;
     }
     await dio.Dio().get(CommonUrl.logoutUrl + sessionKey);
 
-    final preference = await SharedPreferences.getInstance();
     preference.remove("username");
     preference.remove("password");
+    preference.remove("loginInformation");
 
     return true;
   }
 
-  // static Future<bool> getNotifications() async {
-  //   var options = dio.Options(headers: {'Cookie': moodleSessionKey});
-  //   var response = await requestGet(CommonUrl.notificationUrl, options: options, isFront: false);
-
-  //   if (response == null) {
-  //     /* TODO: 에러 */
-
-  //     return false;
-  //   }
-
-  //   Document document = parse(response.data);
-  //   int i = 0;
-  //   /* TODO: 파일 추가해야 됨 */
-  //   const typeNames = {'ubboard': '공지사항', 'assign': '과제', 'vod': '동영상', 'quiz': '퀴즈'};
-  //   for (var element in document.getElementsByClassName("well wellnopadding")[0].children) {
-  //     if (element.localName == 'a') {
-  //       String url = element.attributes['href']!;
-  //       String title = element.getElementsByClassName('media-heading')[0].text.split(' ')[0];
-  //       String timeago = element.getElementsByClassName('timeago')[0].innerHtml;
-  //       String type = typeNames[url.split('/')[4]]!;
-  //       String body = await _getBody(url, type);
-  //       var notification = noti.Notification(id: ++i, title: '$title($timeago)', body: '[$type]$body', url: url);
-  //       print('$url, $title, $timeago, $type');
-  //       await notification.notify();
-  //     }
-  //   }
-
-  //   return true;
-  // }
-
-  // static Future<String> _getBody(String url, String type) async {
-  //   var options = dio.Options(headers: {'Cookie': moodleSessionKey});
-  //   var response = await requestGet(url, options: options, isFront: false);
-  //   if (response == null) {
-  //     return 'Undefined1';
-  //   }
-  //   Document document = parse(response.data);
-  //   if (type == '공지사항') {
-  //     return document.getElementsByTagName('h3')[0].text;
-  //   } else if (type == '과제' || type == '동영상' || type == '퀴즈') {
-  //     return document.getElementsByClassName('breadcrumb')[0].children.last.children[0].text;
-  //   }
-  //   /* TODO: 에러 */
-
-  //   return 'Undefined2';
-  // }
-
   static Future<String?> _getSessionKey(final String moodleSessionKey) async {
     var options = dio.Options(headers: {'Cookie': moodleSessionKey});
 
-    var response = await requestGet(CommonUrl.platoCalendarUrl, options: options);
+    var response = await requestGet(CommonUrl.platoCalendarUrl, options: options, isFront: false);
 
     if (response == null) {
       /* TODO: 에러 */
@@ -198,24 +170,36 @@ abstract class BackgroundLoginController {
     preference.setString("lastSyncTime", DateTime(now.year, now.month, now.day, now.hour, now.minute, now.second).toString());
   }
 
-  static Future<Map<String, dynamic>> _getInformation(final String moddleSessionKey) async {
-    var options = dio.Options(headers: {'Cookie': moddleSessionKey});
-    var response = await requestGet(CommonUrl.platoUserInformationUrl, options: options);
+  static Future<void> _getInformation(LoginInformation loginInformation) async {
+    var response =
+        await dio.Dio().get(CommonUrl.platoUserInformationUrl, options: dio.Options(headers: {"Cookie": loginInformation.moodleSessionKey}));
 
     if (response == null) {
       /* TODO: 에러 */
 
-      return {};
+      return;
     }
     Document document = parse(response.data);
 
-    final res = <String, dynamic>{};
-    res["studentId"] = int.parse(document.getElementById('fitem_id_idnumber')!.children[1].text.trim());
-    res["department"] = document.getElementById('fitem_id_department')!.children[1].text.trim();
-    res["name"] = document.getElementById('id_firstname')!.attributes['value']!.trim();
-    res["imgUrl"] = document.getElementsByClassName('userpicture')[0].attributes['src']!;
-    res["sessionKey"] = document.getElementsByTagName('input').firstWhere((element) => element.attributes['name'] == 'sesskey').attributes['value'];
+    loginInformation.studentId = document.getElementById('fitem_id_idnumber')!.children[1].text.trim();
+    loginInformation.department = document.getElementById('fitem_id_department')!.children[1].text.trim();
+    loginInformation.name = document.getElementById('id_firstname')!.attributes['value']!.trim();
+    loginInformation.imgUrl = document.getElementsByClassName('userpicture')[0].attributes['src']!;
+    loginInformation.sessionKey =
+        document.getElementsByTagName('input').firstWhere((element) => element.attributes['name'] == 'sesskey').attributes['value']!;
 
-    return res;
+    return;
+  }
+
+  static Future<void> _setCooKie(final LoginInformation loginInformation) async {
+    CookieManager cookieManager = CookieManager.instance();
+    await cookieManager.deleteAllCookies();
+    await cookieManager.setCookie(
+      url: Uri.parse('https://plato.pusan.ac.kr'),
+      name: 'MoodleSession',
+      value: loginInformation.moodleSessionKey.split('=')[1],
+      domain: 'plato.pusan.ac.kr',
+      path: '/',
+    );
   }
 }

@@ -24,13 +24,12 @@ class _LoginFormState extends State<LoginForm> {
     var dialogContext = await showProgressDialog(context, "로그인 중입니다...");
     _formKey.currentState!.save();
 
-    final _userDataController = Get.find<LoginController>();
-    await _userDataController.login(autologin: false, username: _username, password: _password);
+    await LoginController.to.login(autologin: false, username: _username, password: _password);
     closeProgressDialog(dialogContext);
 
-    if (_userDataController.loginStatus == false) {
+    if (LoginController.to.loginInformation.loginStatus == false) {
       setState(() {
-        _loginMsg = _userDataController.loginMsg;
+        _loginMsg = LoginController.to.loginInformation.loginMsg;
       });
       _idFocusNode.requestFocus();
     } else {

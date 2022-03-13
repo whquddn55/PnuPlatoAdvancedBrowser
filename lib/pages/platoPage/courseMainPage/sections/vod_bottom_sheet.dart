@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/vodPage/vod_page.dart';
@@ -24,7 +25,10 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
   @override
   initState() {
     super.initState();
-    _future = CourseController.getVodStatus(widget.courseId);
+    _future = CourseController.getVodStatus(widget.courseId, true).then((value) async {
+      await TodoController.to.updateTodoStatus(value);
+      return value;
+    });
   }
 
   _viewHanlder(BuildContext context) async {
@@ -101,38 +105,38 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
               FutureBuilder(
                 future: _future,
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    var data = snapshot.data as Map<int, List<Map<String, dynamic>>>;
-                    Widget? status;
-                    for (var weeks in data.values) {
-                      for (var activities in weeks) {
-                        if (activities["title"] == widget.activity.title) {
-                          if (activities["status"] == true) {
-                            status = const Icon(
-                              Icons.check,
-                              color: Colors.lightGreen,
-                            );
-                          } else {
-                            status = const Icon(
-                              Icons.close,
-                              color: Colors.red,
-                            );
-                          }
+                  if (snapshot.connectionState != ConnectionState.done) {
+                    return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
+                  }
+                  var data = snapshot.data as Map<int, List<Map<String, dynamic>>>;
+
+                  Widget? status;
+                  for (var weeks in data.values) {
+                    for (var activities in weeks) {
+                      if (activities["title"] == widget.activity.title) {
+                        if (activities["status"] == true) {
+                          status = const Icon(
+                            Icons.check,
+                            color: Colors.lightGreen,
+                          );
+                        } else {
+                          status = const Icon(
+                            Icons.close,
+                            color: Colors.red,
+                          );
                         }
                       }
                     }
-                    if (status == null) {
-                      return const SizedBox.shrink();
-                    } else {
-                      return Row(
-                        children: [
-                          const Text('출석 상태: '),
-                          status,
-                        ],
-                      );
-                    }
+                  }
+                  if (status == null) {
+                    return const SizedBox.shrink();
                   } else {
-                    return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
+                    return Row(
+                      children: [
+                        const Text('출석 상태: '),
+                        status,
+                      ],
+                    );
                   }
                 },
               ),

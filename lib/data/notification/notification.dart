@@ -108,8 +108,13 @@ abstract class Notification {
   Future<void> show() async {
     final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-    const android = AndroidNotificationDetails('thuthi_plato_noti', '플라토 브라우저 알림',
-        channelDescription: '플라토 브라우저에서 새 알림을 보여줌', importance: Importance.max, priority: Priority.high);
+    const android = AndroidNotificationDetails(
+      'thuthi_plato_noti',
+      '플라토 브라우저 알림',
+      channelDescription: '플라토 브라우저에서 새 알림을 보여줌',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
     const detail = NotificationDetails(android: android);
 
     await flutterLocalNotificationsPlugin.show(hashCode, title, body, detail, payload: url);

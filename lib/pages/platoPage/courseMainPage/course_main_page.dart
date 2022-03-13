@@ -44,15 +44,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
   }
 
   void _refreshTodoList() async {
-    final vodStatusMap = await CourseController.getVodStatus(widget.course.id);
-    List<Map<String, dynamic>> vodStatusList = [];
-    for (var values in vodStatusMap.values) {
-      for (var vodStatus in values) {
-        vodStatusList.add(vodStatus);
-      }
-    }
-
-    TodoController.to.refreshTodoList([widget.course.id], vodStatusList);
+    TodoController.to.refreshTodoList([widget.course.id]);
   }
 
   void _scrollToTarget(final BuildContext? targetActivityContext, final BuildContext? targetWeekContext) {

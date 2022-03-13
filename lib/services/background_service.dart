@@ -26,11 +26,9 @@ abstract class BackgroundService {
   static Future<void> initializeService() async {
     await _service.configure(
       androidConfiguration: AndroidConfiguration(
-        // this will executed when app is in foreground or background in separated isolate
         onStart: _onStart,
-        // auto start service
-        autoStart: true,
-        isForegroundMode: false,
+        autoStart: false,
+        isForegroundMode: true,
       ),
       iosConfiguration: IosConfiguration(
         // auto start service
@@ -50,29 +48,30 @@ abstract class BackgroundService {
       printLog("recevied app: $data");
 
       BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
-
       switch (action) {
         case BackgroundServiceAction.login:
-          _completerMap[data["hashCode"]]!.complete(data["data"]);
+          _completerMap[data["hashCode"]]?.complete(data["data"]);
           break;
         case BackgroundServiceAction.logout:
-          _completerMap[data["hashCode"]]!.complete(data["data"]);
+          _completerMap[data["hashCode"]]?.complete(data["data"]);
           break;
         case BackgroundServiceAction.fetchTodoList:
-          _completerMap[data["hashCode"]]!.complete(jsonDecode(data["data"]).map((map) => Todo.fromJson(map)).toList());
+          _completerMap[data["hashCode"]]?.complete(jsonDecode(data["data"]).map((map) => Todo.fromJson(map)).toList());
           break;
         case BackgroundServiceAction.fetchNotificationList:
-          _completerMap[data["hashCode"]]!.complete(jsonDecode(data["data"]).map((map) => noti.Notification.fromJson(map)).toList());
+          _completerMap[data["hashCode"]]?.complete(jsonDecode(data["data"]).map((map) => noti.Notification.fromJson(map)).toList());
           break;
 
         case BackgroundServiceAction.clearNotificationList:
-          _completerMap[data["hashCode"]]!.complete(data["data"]);
+          _completerMap[data["hashCode"]]?.complete(data["data"]);
           break;
       }
     });
   }
 
-  static Future<dynamic> sendData(final BackgroundServiceAction action, {Map<String, dynamic>? data}) {
+  static Future<dynamic> sendData(final BackgroundServiceAction action, {Map<String, dynamic>? data}) async {
+    await _runService();
+
     var completer = Completer();
     _completerMap[completer.hashCode] = completer;
 
@@ -83,6 +82,11 @@ abstract class BackgroundService {
     }
 
     return completer.future;
+  }
+
+  static Future<void> _runService() async {
+    if (await _service.isServiceRunning()) return;
+    await _service.start();
   }
 }
 
@@ -103,42 +107,65 @@ void _onStart() async {
   printLog("Service start");
 
   final service = FlutterBackgroundService();
+  int runningActionCnt = 0;
   service.onDataReceived.listen((data) async {
     if (data == null) {
       return;
     }
-
-    BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
-
     printLog("receive service: $data");
 
-    var res = <String, dynamic>{"action": data["action"], "hashCode": data["hashCode"]};
+    ++runningActionCnt;
 
+    /* ensure login */
+
+    var res = <String, dynamic>{"action": data["action"], "hashCode": data["hashCode"]};
+    final BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
     switch (action) {
       case BackgroundServiceAction.login:
-        res["data"] = await BackgroundLoginController.login(autologin: data["autologin"], username: data["username"], password: data["password"]);
+        service.setNotificationInfo(title: "PPAB", content: "로그인 중입니다...");
+        await BackgroundLoginController.login(autologin: data["autologin"], username: data["username"], password: data["password"]);
+        res["data"] = BackgroundLoginController.loginInformation;
         service.sendData(res);
         break;
       case BackgroundServiceAction.logout:
+        service.setNotificationInfo(title: "PPAB", content: "로그아웃 중입니다...");
         res["data"] = await BackgroundLoginController.logout();
         service.sendData(res);
         break;
       case BackgroundServiceAction.fetchTodoList:
+        /* ensure login */
+        service.setNotificationInfo(title: "PPAB", content: "로그인 중입니다...");
+        await BackgroundLoginController.login(autologin: true, username: null, password: null);
+
+        service.setNotificationInfo(title: "PPAB", content: "할 일 정보를 가져오는 중입니다...");
         var courseIdList = List<String>.from(data["courseIdList"]);
-        var vodStatusList = List<Map<String, dynamic>>.from(data["vodStatusList"]);
-        res["data"] = jsonEncode((await BackgroundTodoController.fetchTodoList(courseIdList, vodStatusList)).map((todo) => todo.toJson()).toList());
+        res["data"] = jsonEncode((await BackgroundTodoController.fetchTodoList(courseIdList)).map((todo) => todo.toJson()).toList());
         service.sendData(res);
         break;
       case BackgroundServiceAction.fetchNotificationList:
+        /* ensure login */
+        service.setNotificationInfo(title: "PPAB", content: "로그인 중입니다...");
+        await BackgroundLoginController.login(autologin: true, username: null, password: null);
+
+        service.setNotificationInfo(title: "PPAB", content: "알림 정보를 가져오는 중입니다...");
         await BackgroundNotificationController.updateNotificationList();
         res["data"] = jsonEncode(BackgroundNotificationController.notificationList.reversed.toList());
         service.sendData(res);
         break;
       case BackgroundServiceAction.clearNotificationList:
+        service.setNotificationInfo(title: "PPAB", content: "알림 정보를 초기화 중입니다...");
         await BackgroundNotificationController.clearNotificationList();
         res["data"] = true;
         service.sendData(res);
         break;
+    }
+
+    printLog("send service: ${res["data"].toString()}");
+
+    --runningActionCnt;
+
+    if (runningActionCnt == 0) {
+      service.stopBackgroundService();
     }
   });
 

@@ -19,28 +19,18 @@ class TodoController extends GetxController {
 
   Future<void> refreshTodoListAll() async {
     var courseIdList = CourseController.currentSemesterCourseList.map((course) => course.id).toList();
-    var vodStatusList = <Map<String, dynamic>>[];
-    for (var courseId in courseIdList) {
-      for (var values in (await CourseController.getVodStatus(courseId)).values) {
-        for (var vodStatus in values) {
-          vodStatusList.add(vodStatus);
-        }
-      }
-    }
-    await Get.find<TodoController>().refreshTodoList(courseIdList, vodStatusList);
+
+    await refreshTodoList(courseIdList);
   }
 
-  Future<void> refreshTodoList(List<String> courseIdList, final List<Map<String, dynamic>> vodStatusList) async {
+  Future<void> refreshTodoList(List<String> courseIdList) async {
     /* 중복 업데이트 방지 Lock */
     courseIdList = _lockCourseId(courseIdList);
     if (courseIdList.isEmpty) return;
 
     var newTodoList = await BackgroundService.sendData(
       BackgroundServiceAction.fetchTodoList,
-      data: {
-        "courseIdList": courseIdList,
-        "vodStatusList": vodStatusList,
-      },
+      data: {"courseIdList": courseIdList},
     );
     await _updateTodoList(List<Todo>.from(newTodoList));
 
@@ -48,7 +38,7 @@ class TodoController extends GetxController {
     _unlockCourseId();
   }
 
-  void updateTodoStatus(final Map<int, List<Map<String, dynamic>>> vodStatusMap) async {
+  Future<void> updateTodoStatus(final Map<int, List<Map<String, dynamic>>> vodStatusMap) async {
     bool modified = false;
     for (var todo in todoList) {
       for (var vodStatusList in vodStatusMap.values) {
@@ -93,9 +83,6 @@ class TodoController extends GetxController {
       for (var candidate in candidateList) {
         todoList.add(candidate);
       }
-
-      final preference = await SharedPreferences.getInstance();
-      await preference.setString("todoList", jsonEncode(todoList));
       update();
 
       Fluttertoast.cancel();

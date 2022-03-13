@@ -9,10 +9,12 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:html/parser.dart';
 import 'package:get/get.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:logger/logger.dart';
 import 'package:marquee/marquee.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/components/inner_player.dart';
+import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -23,8 +25,11 @@ Color folderColor = Colors.orange.withOpacity(0.7);
 Color articleColor = Colors.purple.withOpacity(0.7);
 Color unknownColor = Colors.grey.withOpacity(0.7);
 
-void printLog(final String msg) {
-  print("[DEBUG] $msg");
+final logger = Logger();
+
+void printLog(final dynamic msg) {
+  //logger.d(msg);
+  print("[DEBUG] ${msg.toString()}");
 }
 
 abstract class CommonUrl {
@@ -134,33 +139,30 @@ class NFMarquee extends StatelessWidget {
   }
 }
 
-Future<dio.Response?> requestGet(final String url, {dio.Options? options, bool? isFront, final int retry = 5}) async {
+Future<dio.Response?> requestGet(final String url, {dio.Options? options, required bool isFront, final int retry = 5}) async {
   dio.Response? response;
   int time = 0;
 
   options ??= dio.Options();
   options.headers ??= {};
   while (time < retry) {
-    if (isFront != null) {
-      if (isFront == true) {
-        options.headers!["Cookie"] = Get.find<LoginController>().moodleSessionKey;
-      } else {
-        options.headers!["Cookie"] = BackgroundLoginController.moodleSessionKey;
-      }
-
-      printLog("${options.headers!["Cookie"]}");
+    late final LoginInformation loginInformation;
+    if (isFront == true) {
+      await LoginController.to.login(autologin: true);
+      loginInformation = LoginController.to.loginInformation;
+    } else {
+      loginInformation = BackgroundLoginController.loginInformation;
+      //loginInformation = await BackgroundLoginController.login(autologin: true);
     }
+
+    options.headers!["Cookie"] = loginInformation.moodleSessionKey;
+    printLog("${options.headers!["Cookie"]}");
+
     try {
       response = await dio.Dio().get(url, options: options);
       if (parse(response.data).children[0].attributes['class'] == 'html_login') {
         time++;
-        if (isFront != null) {
-          if (isFront == true) {
-            await Get.find<LoginController>().login(autologin: true);
-          } else {
-            await BackgroundLoginController.login(autologin: true);
-          }
-        }
+        printLog("[RETRY] $retry");
       } else {
         break;
       }
@@ -179,25 +181,20 @@ Future<dio.Response?> requestPost(final String url, final dynamic data, {dio.Opt
   options ??= dio.Options();
   options.headers ??= {};
   while (time < retry) {
-    if (isFront != null) {
-      if (isFront == true) {
-        options.headers!["Cookie"] = Get.find<LoginController>().moodleSessionKey;
-      } else {
-        options.headers!["Cookie"] = BackgroundLoginController.moodleSessionKey;
-      }
-      printLog("${options.headers!["Cookie"]}");
+    late final LoginInformation loginInformation;
+    if (isFront == true) {
+      await LoginController.to.login(autologin: true);
+      loginInformation = LoginController.to.loginInformation;
+    } else {
+      loginInformation = BackgroundLoginController.loginInformation;
+      //loginInformation = await BackgroundLoginController.login(autologin: true);
     }
+
+    options.headers!["Cookie"] = loginInformation.moodleSessionKey;
     try {
       response = await dio.Dio().post(url, data: data, options: options);
       if (parse(response.data).children[0].attributes['class'] == 'html_login') {
         time++;
-        if (isFront != null) {
-          if (isFront == true) {
-            await Get.find<LoginController>().login(autologin: true);
-          } else {
-            await BackgroundLoginController.login(autologin: true);
-          }
-        }
       } else {
         break;
       }
@@ -220,35 +217,28 @@ Future<dio.Response?> requestAction(final PlatoActionType type, {required final 
     headers: {"X-Requested-With": "XMLHttpRequest"},
   );
   while (time < retry) {
-    String body = "sesskey=${Get.find<LoginController>().sessionKey}";
+    late final LoginInformation loginInformation;
+    if (isFront == true) {
+      await LoginController.to.login(autologin: true);
+      loginInformation = LoginController.to.loginInformation;
+    } else {
+      loginInformation = BackgroundLoginController.loginInformation;
+      //loginInformation = await BackgroundLoginController.login(autologin: true);
+    }
+
+    options.headers!["Cookie"] = loginInformation.moodleSessionKey;
+    String body = "sesskey=${LoginController.to.loginInformation.sessionKey}";
     switch (type) {
       case PlatoActionType.courseList:
         body += "&type=userInfoMy";
         break;
     }
 
-    if (isFront != null) {
-      if (isFront == true) {
-        options.headers!["Cookie"] = Get.find<LoginController>().moodleSessionKey;
-      } else {
-        options.headers!["Cookie"] = BackgroundLoginController.moodleSessionKey;
-      }
-    }
-
-    printLog("${options.headers}");
-
     try {
       response = await dio.Dio().post("https://plato.pusan.ac.kr/theme/coursemosv2/action.php", data: body, options: options);
 
       if (response.data["code"] != "100") {
         time++;
-        if (isFront != null) {
-          if (isFront == true) {
-            await Get.find<LoginController>().login(autologin: true);
-          } else {
-            await BackgroundLoginController.login(autologin: true);
-          }
-        }
       } else {
         break;
       }
@@ -342,7 +332,7 @@ HtmlWidget renderHtml(String html) {
         case "video":
           return InnerPlayer(
             element.getElementsByTagName('source')[0].attributes["src"]!,
-            headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
+            headers: {"Cookie": LoginController.to.loginInformation.moodleSessionKey},
           );
       }
       return null;

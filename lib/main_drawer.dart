@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/admin_bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.dart';
@@ -22,18 +23,18 @@ class MainDrawer extends StatelessWidget {
     return Drawer(
       child: GetBuilder<LoginController>(
         builder: (controller) {
-          if (controller.loginStatus) {
-            final String studentId = controller.studentId.toString();
+          if (controller.loginInformation.loginStatus) {
+            final String studentId = controller.loginInformation.studentId.toString();
             return ListView(children: [
               UserAccountsDrawerHeader(
                 currentAccountPicture: CircleAvatar(
-                  backgroundImage: CachedNetworkImageProvider(controller.imgUrl),
+                  backgroundImage: CachedNetworkImageProvider(controller.loginInformation.imgUrl),
                 ),
-                accountEmail: Text(controller.department),
-                accountName: Text(controller.name),
+                accountEmail: Text(controller.loginInformation.department),
+                accountName: Text(controller.loginInformation.name),
               ),
               ListTile(
-                title: Text('동기화 시간: ${controller.lastSyncTime}'),
+                title: Text('동기화 시간: ${controller.loginInformation.lastSyncTime}'),
                 dense: true,
                 onTap: null,
               ),
@@ -94,18 +95,17 @@ class MainDrawer extends StatelessWidget {
                   title: const Text('디버그버튼'),
                   onTap: () async {
                     await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
-                    TodoController.to.todoList = [];
-                    TodoController.to.update();
+                    await NotificationController.clearNotificationList();
                   }),
             ]);
           } else {
             return ListView(children: [
               UserAccountsDrawerHeader(
                 currentAccountPicture: CircleAvatar(
-                  backgroundImage: CachedNetworkImageProvider(controller.imgUrl),
+                  backgroundImage: CachedNetworkImageProvider(controller.loginInformation.imgUrl),
                 ),
-                accountEmail: Text(controller.department),
-                accountName: Text(controller.name),
+                accountEmail: Text(controller.loginInformation.department),
+                accountName: Text(controller.loginInformation.name),
                 decoration: BoxDecoration(color: Get.theme.disabledColor),
               ),
               ListTile(

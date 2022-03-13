@@ -14,11 +14,11 @@ class MainAppbar extends AppBar {
           centerTitle: true,
           bottom: bottomWidget,
           leading: GetBuilder<LoginController>(builder: (userDataController) {
-            if (userDataController.loginStatus == true) {
+            if (userDataController.loginInformation.loginStatus == true) {
               Get.find<NoticeController>().updateReadMap();
               return GetBuilder<NoticeController>(builder: (controller) {
                 return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance.collection("users").doc(Get.find<LoginController>().studentId.toString()).snapshots(),
+                  stream: FirebaseFirestore.instance.collection("users").doc(userDataController.loginInformation.studentId.toString()).snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState != ConnectionState.active) {
                       return IconButton(icon: const Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer());

@@ -17,7 +17,7 @@ class OnlineAbsencePage extends StatelessWidget {
           centerTitle: true,
         ),
         body: FutureBuilder(
-          future: CourseController.getVodStatus(courseId),
+          future: CourseController.getVodStatus(courseId, true),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               var data = snapshot.data! as Map<int, List<Map<String, dynamic>>>;

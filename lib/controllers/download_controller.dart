@@ -60,7 +60,7 @@ class DownloadController {
         saveDir = '$externalDir/$courseTitle\$$courseId';
 
         final Options options = Options(
-          headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
+          headers: {"Cookie": LoginController.to.loginInformation.moodleSessionKey},
           followRedirects: false,
           validateStatus: (status) => status == 303 || status == 200,
         );
@@ -108,7 +108,7 @@ class DownloadController {
       type: type,
       saveDir: saveDir,
       title: title,
-      headers: {"Cookie": Get.find<LoginController>().moodleSessionKey},
+      headers: {"Cookie": LoginController.to.loginInformation.moodleSessionKey},
       status: DownloadStatus.queueing,
     ));
     return DownloadQueueingStatus.downloading;

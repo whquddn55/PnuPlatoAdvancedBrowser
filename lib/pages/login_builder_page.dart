@@ -9,7 +9,7 @@ class LoginBuilderPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<LoginController>(builder: (controller) {
-      if (controller.loginStatus == false) {
+      if (controller.loginInformation.loginStatus == false) {
         return Builder(builder: (context) {
           return GestureDetector(
             behavior: HitTestBehavior.translucent,
