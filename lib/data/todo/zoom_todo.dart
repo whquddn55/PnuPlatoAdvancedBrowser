@@ -5,7 +5,8 @@ import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 
 class ZoomTodo extends Todo {
   ZoomTodo(
-      {required String id,
+      {required int index,
+      required String id,
       required String title,
       required String courseId,
       required DateTime dueDate,
@@ -13,6 +14,7 @@ class ZoomTodo extends Todo {
       required Uri iconUri,
       required TodoStatus status})
       : super(
+          index: index,
           id: id,
           title: title,
           courseId: courseId,

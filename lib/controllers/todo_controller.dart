@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
@@ -15,7 +16,6 @@ class TodoController extends GetxController {
   Future<void> initiate() async {
     final preference = await SharedPreferences.getInstance();
     todoList = List<Map<String, dynamic>>.from(jsonDecode(preference.getString("todoList") ?? "[]")).map<Todo>((m) => Todo.fromJson(m)).toList();
-    update();
   }
 
   Future<void> refreshTodoListAll() async {
@@ -29,11 +29,19 @@ class TodoController extends GetxController {
     courseIdList = _lockCourseId(courseIdList);
     if (courseIdList.isEmpty) return;
 
-    var newTodoList = await BackgroundService.sendData(
+    await BackgroundService.sendData(
       BackgroundServiceAction.fetchTodoList,
       data: {"courseIdList": courseIdList},
     );
-    await _updateTodoList(List<Todo>.from(newTodoList));
+    final preference = await SharedPreferences.getInstance();
+    await preference.reload();
+    printLog(preference.getString("todoList"));
+    todoList = List<Map<String, dynamic>>.from(jsonDecode(preference.getString("todoList") ?? "[]")).map<Todo>((m) => Todo.fromJson(m)).toList();
+    update();
+    // final preference = await SharedPreferences.getInstance();
+    // var newTodoList =
+    //     List<Map<String, dynamic>>.from(jsonDecode(preference.getString("todoList") ?? "[]")).map<Todo>((m) => Todo.fromJson(m)).toList();
+    // await _updateTodoList(newTodoList);
 
     /* unlock */
     _unlockCourseId();
@@ -56,40 +64,40 @@ class TodoController extends GetxController {
 
     if (modified) {
       final preference = await SharedPreferences.getInstance();
-      preference.setString("todoList", jsonEncode(todoList));
+      await preference.setString("todoList", jsonEncode(todoList));
       update();
     }
   }
 
-  Future<void> _updateTodoList(final List<Todo> newTodoList) async {
-    bool updated = false;
-    var candidateList = [];
-    for (var newTodo in newTodoList) {
-      var sameTodo = todoList.firstWhereOrNull((todo) => todo == newTodo);
-      if (sameTodo == null) {
-        updated = true;
-        candidateList.add(newTodo);
-      } else if (!(newTodo.availability == newTodo.availability &&
-          newTodo.dueDate == newTodo.dueDate &&
-          newTodo.iconUri == newTodo.iconUri &&
-          newTodo.title == newTodo.title &&
-          newTodo.status == newTodo.status)) {
-        updated = true;
-        todoList.remove(sameTodo);
-        candidateList.add(newTodo);
-      }
-    }
+  // Future<void> _updateTodoList(final List<Todo> newTodoList) async {
+  //   bool updated = false;
+  //   var candidateList = [];
+  //   for (var newTodo in newTodoList) {
+  //     var sameTodo = todoList.firstWhereOrNull((todo) => todo == newTodo);
+  //     if (sameTodo == null) {
+  //       updated = true;
+  //       candidateList.add(newTodo);
+  //     } else if (!(newTodo.availability == newTodo.availability &&
+  //         newTodo.dueDate == newTodo.dueDate &&
+  //         newTodo.iconUri == newTodo.iconUri &&
+  //         newTodo.title == newTodo.title &&
+  //         newTodo.status == newTodo.status)) {
+  //       updated = true;
+  //       todoList.remove(sameTodo);
+  //       candidateList.add(newTodo);
+  //     }
+  //   }
 
-    if (updated) {
-      for (var candidate in candidateList) {
-        todoList.add(candidate);
-      }
-      update();
+  //   if (updated) {
+  //     for (var candidate in candidateList) {
+  //       todoList.add(candidate);
+  //     }
+  //     update();
 
-      Fluttertoast.cancel();
-      Fluttertoast.showToast(msg: "캘린더가 업데이트 되었습니다.");
-    }
-  }
+  //     Fluttertoast.cancel();
+  //     Fluttertoast.showToast(msg: "캘린더가 업데이트 되었습니다.");
+  //   }
+  // }
 
   List<String> _lockCourseId(List<String> courseIdList) {
     return courseIdList.where((courseId) {
@@ -102,35 +110,4 @@ class TodoController extends GetxController {
   void _unlockCourseId() {
     _refreshLock.clear();
   }
-
-  // void updateTodoList(final List<CourseActivity> activityList) {
-  //   bool modified = false;
-  //   for (var activity in activityList) {
-  //     final int index = TodoType.values.indexWhere((element) => element.name == activity.type);
-  //     if (index == -1) continue;
-
-  //     bool isIn = false;
-  //     for (var todo in todoList) {
-  //       if (todo.title == activity.title && todo.courseId == activity.courseId) {
-  //         isIn = true;
-  //       }
-  //     }
-
-  //     if (!isIn) {
-  //       todoList.add(Todo(
-  //         id: activity.id,
-  //         title: activity.title,
-  //         courseId: activity.courseId,
-  //         dueDate: activity.endDate!,
-  //         type: TodoType.values[index],
-  //         availability: activity.availablility,
-  //         iconUri: activity.iconUri!,
-  //         status: TodoStatus.undone,
-  //       ));
-  //       modified = true;
-  //     }
-  //   }
-
-  //   if (modified) update();
-  // }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
@@ -16,12 +17,14 @@ class FileBottomSheet extends StatelessWidget {
   final DownloadType fileType;
   const FileBottomSheet({Key? key, required this.file, required this.fileType, required this.courseTitle, required this.courseId}) : super(key: key);
 
-  void _viewHanlder(BuildContext context) async {
+  Future<void> _viewHanlder(BuildContext context) async {
+    final BuildContext dialogContext = await showProgressDialog(context, "파일을 다운로드 중입니다...");
     var cachedFile = await DefaultCacheManager().getSingleFile(
       file.url,
       headers: {"Cookie": LoginController.to.loginInformation.moodleSessionKey},
       key: file.url,
     );
+    closeProgressDialog(dialogContext);
     var result = await OpenFile.open(cachedFile.path);
     if (result.type != ResultType.done) {
       Fluttertoast.cancel();
@@ -29,7 +32,7 @@ class FileBottomSheet extends StatelessWidget {
     }
   }
 
-  void _downloadHandler(BuildContext context) async {
+  Future<void> _downloadHandler(BuildContext context) async {
     var downloadResult = await Get.find<DownloadController>().enQueue(
       title: file.title,
       url: file.url,

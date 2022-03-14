@@ -12,22 +12,37 @@ import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class BackgroundTodoController {
-  static Future<List<Todo>> fetchTodoList(final List<String> courseIdList) async {
-    final List<Todo> todoList = <Todo>[];
+  static Future<void> fetchTodoList(final List<String> courseIdList) async {
+    final List<Todo> newTodoList = <Todo>[];
+    int index = 0;
     for (var courseId in courseIdList) {
-      todoList.addAll(await _fetchVod(courseId));
-      todoList.addAll(await _fetchAssign(courseId));
-      todoList.addAll(await _fetchQuiz(courseId));
-      todoList.addAll(await _fetchZoom(courseId));
+      newTodoList.addAll(await _fetchVod(courseId, index));
+      newTodoList.addAll(await _fetchAssign(courseId, index));
+      newTodoList.addAll(await _fetchQuiz(courseId, index));
+      newTodoList.addAll(await _fetchZoom(courseId, index));
     }
 
     final preference = await SharedPreferences.getInstance();
+    await preference.reload();
+    var todoList = List<Map<String, dynamic>>.from(jsonDecode(preference.getString("todoList") ?? "[]")).map<Todo>((m) => Todo.fromJson(m)).toList();
+
+    _updateTodoList(todoList, newTodoList, courseIdList);
+    todoList.sort((a, b) {
+      if (a.courseId == b.courseId) return a.index - b.index;
+      return a.courseId.compareTo(b.courseId);
+    });
+    printLog(todoList);
     await preference.setString("todoList", jsonEncode(todoList));
 
-    return todoList;
+    return;
   }
 
-  static Future<List<Todo>> _fetchVod(final String courseId) async {
+  static void _updateTodoList(List<Todo> prvTodoList, List<Todo> newTodoList, final List<String> courseIdList) {
+    prvTodoList.removeWhere((todo) => courseIdList.contains(todo.courseId));
+    prvTodoList.addAll(newTodoList);
+  }
+
+  static Future<List<Todo>> _fetchVod(final String courseId, int index) async {
     final List<Map<String, dynamic>> vodStatusList = await _fetchVodStatusList(courseId);
     if (vodStatusList.isEmpty) {
       return [];
@@ -68,6 +83,7 @@ abstract class BackgroundTodoController {
       final bool availablility = activity.getElementsByTagName('a').isNotEmpty;
 
       todoList.add(VodTodo(
+        index: index,
         availability: availablility,
         courseId: courseId,
         dueDate: dueDate[1]!,
@@ -80,7 +96,7 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>> _fetchAssign(final String courseId) async {
+  static Future<List<Todo>> _fetchAssign(final String courseId, int index) async {
     var response = await requestGet(CommonUrl.courseAssignUrl + courseId, isFront: false);
 
     if (response == null) {
@@ -99,6 +115,7 @@ abstract class BackgroundTodoController {
         bool done = tr.getElementsByClassName('cell c3')[0].text.trim().contains('완료');
 
         todoList.add(AssignTodo(
+          index: index,
           availability: true,
           courseId: courseId,
           dueDate: dueDate,
@@ -112,7 +129,7 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>> _fetchQuiz(final String courseId) async {
+  static Future<List<Todo>> _fetchQuiz(final String courseId, int index) async {
     var response = await requestGet(CommonUrl.courseQuizUrl + courseId, isFront: false);
 
     if (response == null) {
@@ -133,6 +150,7 @@ abstract class BackgroundTodoController {
             (dueDate.compareTo(DateTime.now()) <= 0);
 
         todoList.add(QuizTodo(
+          index: index,
           availability: true,
           courseId: courseId,
           dueDate: dueDate,
@@ -146,7 +164,7 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>> _fetchZoom(final String courseId) async {
+  static Future<List<Todo>> _fetchZoom(final String courseId, int index) async {
     var response = await requestGet(CommonUrl.courseZoomUrl + courseId, isFront: false);
 
     if (response == null) {
@@ -163,6 +181,7 @@ abstract class BackgroundTodoController {
         bool done = tr.parent!.parent!.classes.contains('mod_index') == false;
 
         todoList.add(ZoomTodo(
+          index: index,
           availability: true,
           courseId: courseId,
           dueDate: dueDate,

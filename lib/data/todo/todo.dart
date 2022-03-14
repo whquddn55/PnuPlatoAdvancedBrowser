@@ -11,6 +11,7 @@ import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course
 enum TodoStatus { done, undone, doing }
 
 abstract class Todo {
+  final int index;
   final String id;
   final String title;
   final String courseId;
@@ -20,6 +21,7 @@ abstract class Todo {
   TodoStatus status;
 
   Todo({
+    required this.index,
     required this.id,
     required this.title,
     required this.courseId,
@@ -43,6 +45,7 @@ abstract class Todo {
     switch (json["type"]) {
       case "quiz":
         return QuizTodo(
+            index: json["index"],
             id: json["id"],
             title: json["title"],
             courseId: json["courseId"],
@@ -52,6 +55,7 @@ abstract class Todo {
             status: TodoStatus.values.byName(json["status"]));
       case "vod":
         return VodTodo(
+            index: json["index"],
             id: json["id"],
             title: json["title"],
             courseId: json["courseId"],
@@ -61,6 +65,7 @@ abstract class Todo {
             status: TodoStatus.values.byName(json["status"]));
       case "zoom":
         return ZoomTodo(
+            index: json["index"],
             id: json["id"],
             title: json["title"],
             courseId: json["courseId"],
@@ -70,6 +75,7 @@ abstract class Todo {
             status: TodoStatus.values.byName(json["status"]));
       case "assign":
         return AssignTodo(
+            index: json["index"],
             id: json["id"],
             title: json["title"],
             courseId: json["courseId"],
@@ -79,6 +85,7 @@ abstract class Todo {
             status: TodoStatus.values.byName(json["status"]));
       default:
         return UnknownTodo(
+            index: json["index"],
             id: json["id"],
             title: json["title"],
             courseId: json["courseId"],
@@ -109,6 +116,7 @@ abstract class Todo {
         break;
     }
     return {
+      "index": index,
       "id": id,
       "title": title,
       "courseId": courseId,

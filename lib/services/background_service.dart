@@ -56,7 +56,8 @@ abstract class BackgroundService {
           _completerMap[data["hashCode"]]?.complete(data["data"]);
           break;
         case BackgroundServiceAction.fetchTodoList:
-          _completerMap[data["hashCode"]]?.complete(jsonDecode(data["data"]).map((map) => Todo.fromJson(map)).toList());
+          _completerMap[data["hashCode"]]?.complete(data);
+
           break;
         case BackgroundServiceAction.fetchNotificationList:
           _completerMap[data["hashCode"]]?.complete(jsonDecode(data["data"]).map((map) => noti.Notification.fromJson(map)).toList());
@@ -66,6 +67,7 @@ abstract class BackgroundService {
           _completerMap[data["hashCode"]]?.complete(data["data"]);
           break;
       }
+      _completerMap.remove(data["hashCode"]);
     });
   }
 
@@ -134,7 +136,7 @@ void _onStart() async {
         await BackgroundLoginController.login(autologin: true, username: null, password: null);
 
         var courseIdList = List<String>.from(data["courseIdList"]);
-        res["data"] = jsonEncode((await BackgroundTodoController.fetchTodoList(courseIdList)).map((todo) => todo.toJson()).toList());
+        await BackgroundTodoController.fetchTodoList(courseIdList);
         service.sendData(res);
         break;
       case BackgroundServiceAction.fetchNotificationList:

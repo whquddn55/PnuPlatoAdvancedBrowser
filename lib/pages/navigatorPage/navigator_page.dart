@@ -11,8 +11,6 @@ class NavigatorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _loginFuture = Get.find<LoginController>().login(autologin: true);
-
     Future<void> _dbInitFuture(final String? studentId) async {
       if (studentId == null) {
         return;
@@ -30,21 +28,23 @@ class NavigatorPage extends StatelessWidget {
     }
 
     return GetBuilder<LoginController>(builder: (contoller) {
-      if (LoginController.to.loginInformation.loginStatus == true) {
-        final String studentId = LoginController.to.loginInformation.studentId;
-
-        return FutureBuilder<void>(
-          future: Future.wait([_dbInitFuture(studentId), BackgroundService.initializeService()]),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: 'DB 접속 중...'));
-            }
-
-            return const NavigatorBody();
-          },
-        );
+      if (LoginController.to.loginInformation.loginStatus != true) {
+        LoginController.to.login(autologin: true);
+        return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '로그인 중...'));
       }
-      return const NavigatorBody();
+
+      final String studentId = LoginController.to.loginInformation.studentId;
+
+      return FutureBuilder<void>(
+        future: Future.wait([_dbInitFuture(studentId), BackgroundService.initializeService()]),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: 'DB 접속 중...'));
+          }
+
+          return const NavigatorBody();
+        },
+      );
     });
   }
 }
