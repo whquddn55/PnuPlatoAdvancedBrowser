@@ -18,6 +18,7 @@ import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 enum DownloadQueueingStatus { denied, downloading }
 
 class DownloadController {
+  static DownloadController get to => Get.find<DownloadController>();
   late final Isolate _downloadIsolate;
   late final SendPort _downloadIsolateSendPort;
 

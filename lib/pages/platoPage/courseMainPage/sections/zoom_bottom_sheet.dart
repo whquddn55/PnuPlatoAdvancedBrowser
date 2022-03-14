@@ -2,15 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_zoom_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_zoom_controller.dart';
+import 'package:pnu_plato_advanced_browser/data/activity/zoom_course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course_zoom.dart';
 import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 
 class ZoomBottomSheet extends StatelessWidget {
   final String courseTitle;
   final String courseId;
-  final CourseActivity activity;
+  final ZoomCourseActivity activity;
   const ZoomBottomSheet({Key? key, required this.activity, required this.courseTitle, required this.courseId}) : super(key: key);
 
   Widget _renderZoomInfo() {
@@ -58,7 +58,7 @@ class ZoomBottomSheet extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: CachedNetworkImage(
-                      imageUrl: activity.iconUri!.toString(),
+                      imageUrl: activity.iconUrl!,
                       height: 20,
                     ),
                   ),
@@ -88,7 +88,7 @@ class ZoomBottomSheet extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   primary: Get.textTheme.bodyText1!.color,
                 ),
-                onPressed: () => null,
+                onPressed: () async => await activity.open(context),
               ),
               TextButton.icon(
                 icon: const Icon(Icons.cancel_outlined),

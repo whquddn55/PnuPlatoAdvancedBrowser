@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_treeview/flutter_treeview.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_assign_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_assign_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assign.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';

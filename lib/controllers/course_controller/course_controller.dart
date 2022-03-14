@@ -2,9 +2,10 @@ import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_article_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_article_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
+import 'package:pnu_plato_advanced_browser/data/activity/board_course_activity.dart';
+import 'package:pnu_plato_advanced_browser/data/activity/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assistant.dart';
@@ -109,24 +110,26 @@ abstract class CourseController {
       final String title = _getTitle(activity);
       final String info = _getInfo(activity, type);
       final List<DateTime?> dueDate = _getDueTime(activity);
-      final Uri? iconUri = _getIconUri(activity);
+      final String? iconUrl = _getIconUrl(activity);
       final String availablilityInfo =
           activity.getElementsByClassName('availabilityinfo').isEmpty ? '' : activity.getElementsByClassName('availabilityinfo')[0].innerHtml;
       final bool availablility = activity.getElementsByTagName('a').isNotEmpty;
-
-      var newActivity = CourseActivity(
-        type: type.trim(),
+      final String? url = availablility ? activity.getElementsByTagName('a')[0].attributes['href'] : null;
+      var newActivity = CourseActivity.fromType(
+        type: type,
         title: title.trim(),
         id: id,
         courseId: course.id,
+        courseTitle: course.title,
         description: description.trim(),
         info: info.trim(),
         startDate: dueDate[0],
         endDate: dueDate[1],
         lateDate: dueDate[2],
-        iconUri: iconUri,
+        iconUrl: iconUrl,
         availablilityInfo: availablilityInfo,
         availablility: availablility,
+        url: url,
       );
 
       course.activityMap[weeks]!.add(newActivity);
@@ -197,7 +200,7 @@ abstract class CourseController {
     for (var course in _currentSemesterCourseList) {
       if (course.id == courseId) {
         for (var activity in course.activityMap['강의 개요']!) {
-          if (activity.type == 'ubboard') {
+          if (activity.runtimeType == BoardCourseActivity) {
             res.add(activity);
           }
         }
@@ -403,9 +406,9 @@ abstract class CourseController {
     return courseList;
   }
 
-  static Uri? _getIconUri(Element activity) {
+  static String? _getIconUrl(Element activity) {
     if (activity.getElementsByTagName('img').isEmpty) return null;
-    return Uri.parse(activity.getElementsByTagName('img')[0].attributes['src']!);
+    return activity.getElementsByTagName('img')[0].attributes['src'];
   }
 
   static Uri _getKoreanPlanUri(Document document) {

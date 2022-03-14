@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_article_comment_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_article_comment_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/article_comment.dart';
 
 class ArticleCommentList extends StatefulWidget {

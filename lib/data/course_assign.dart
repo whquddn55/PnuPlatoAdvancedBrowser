@@ -18,7 +18,6 @@ class CourseAssign {
   final List<dynamic> attatchFileList;
   final CourseAssignGradeResult? gradeResult;
 
-  /* TODO: 팀으로 처리하기 */
   final String? team;
 
   CourseAssign({

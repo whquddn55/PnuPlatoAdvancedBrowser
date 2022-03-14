@@ -1,4 +1,4 @@
-import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
+import 'package:pnu_plato_advanced_browser/data/activity/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assistant.dart';
 import 'package:pnu_plato_advanced_browser/data/professor.dart';

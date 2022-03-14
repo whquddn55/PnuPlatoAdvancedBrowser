@@ -1,13 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
+import 'package:pnu_plato_advanced_browser/data/activity/url_course_activity.dart';
 
-class LinkBottomSheet extends StatelessWidget {
-  final CourseActivity activity;
-  const LinkBottomSheet({Key? key, required this.activity}) : super(key: key);
+class UrlBottomSheet extends StatelessWidget {
+  final UrlCourseActivity activity;
+  const UrlBottomSheet({Key? key, required this.activity}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +23,7 @@ class LinkBottomSheet extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: CachedNetworkImage(
-                      imageUrl: activity.iconUri!.toString(),
+                      imageUrl: activity.iconUrl!,
                       height: 20,
                     ),
                   ),
@@ -63,10 +62,7 @@ class LinkBottomSheet extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   primary: Get.textTheme.bodyText1!.color,
                 ),
-                onPressed: () => ChromeSafariBrowser().open(
-                    url: Uri.parse(CommonUrl.courseUrlViewUrl + activity.id + '&redirect=1'),
-                    options: ChromeSafariBrowserClassOptions(
-                        android: AndroidChromeCustomTabsOptions(showTitle: false, toolbarBackgroundColor: Colors.white), ios: IOSSafariOptions())),
+                onPressed: () async => await activity.open(context),
               ),
               TextButton.icon(
                 icon: const Icon(Icons.cancel_outlined),

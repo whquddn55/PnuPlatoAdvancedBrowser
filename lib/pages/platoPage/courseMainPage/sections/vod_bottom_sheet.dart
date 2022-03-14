@@ -2,17 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
-import 'package:pnu_plato_advanced_browser/data/download_information.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/vodPage/vod_page.dart';
+import 'package:pnu_plato_advanced_browser/data/activity/vod_course_activity.dart';
 
 class VodBottomSheet extends StatefulWidget {
   final String courseTitle;
   final String courseId;
-  final CourseActivity activity;
+  final VodCourseActivity activity;
   const VodBottomSheet({Key? key, required this.activity, required this.courseTitle, required this.courseId}) : super(key: key);
 
   @override
@@ -31,24 +28,6 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
     });
   }
 
-  _viewHanlder(BuildContext context) async {
-    return await Navigator.push(context, MaterialPageRoute(builder: (context) => VodPage(id: widget.activity.id)));
-  }
-
-  _downloadHandler(BuildContext context) async {
-    Uri uri = await CourseController.getM3u8Uri(widget.activity.id);
-    if (uri.toString() == '') {
-    } else {
-      var downloadResult = await Get.find<DownloadController>().enQueue(
-        url: uri.toString(),
-        title: widget.activity.title,
-        courseTitle: widget.courseTitle,
-        courseId: widget.courseId,
-        type: DownloadType.m3u8,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -64,7 +43,7 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: CachedNetworkImage(
-                      imageUrl: widget.activity.iconUri!.toString(),
+                      imageUrl: widget.activity.iconUrl!,
                       height: 20,
                     ),
                   ),
@@ -153,7 +132,7 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
                   alignment: Alignment.centerLeft,
                   primary: Get.textTheme.bodyText1!.color,
                 ),
-                onPressed: () => _downloadHandler(context),
+                onPressed: () async => await widget.activity.download(),
               ),
               TextButton.icon(
                 icon: const Icon(Icons.open_in_new),
@@ -162,7 +141,7 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
                   alignment: Alignment.centerLeft,
                   primary: Get.textTheme.bodyText1!.color,
                 ),
-                onPressed: () => _viewHanlder(context),
+                onPressed: () async => await widget.activity.open(context),
               ),
               TextButton.icon(
                 icon: const Icon(Icons.cancel_outlined),

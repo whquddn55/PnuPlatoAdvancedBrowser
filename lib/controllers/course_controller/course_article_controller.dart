@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_article_comment_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_article_comment_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/article_comment.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';

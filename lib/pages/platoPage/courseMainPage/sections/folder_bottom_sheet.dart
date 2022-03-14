@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_folder_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/course_activity.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_folder_controller.dart';
+import 'package:pnu_plato_advanced_browser/data/activity/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/file_bottom_sheet.dart';
@@ -28,7 +28,7 @@ class FolderBottomSheet extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: CachedNetworkImage(
-                      imageUrl: activity.iconUri!.toString(),
+                      imageUrl: activity.iconUrl.toString(),
                       height: 20,
                     ),
                   ),
@@ -58,37 +58,39 @@ class FolderBottomSheet extends StatelessWidget {
               builder: (context, snapshot) {
                 if (snapshot.connectionState != ConnectionState.done) {
                   return const CircularProgressIndicator();
-                } else {
-                  if (snapshot.data == null) {
-                    return Row(
-                      children: [
-                        SvgPicture.asset("assets/icons/lobster.svg"),
-                        const Text("어라..랍스타? 에러가 났어요"),
-                      ],
-                    );
-                  } else {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: snapshot.data!
-                          .map(
-                            (file) => TextButton.icon(
-                                style: TextButton.styleFrom(alignment: Alignment.centerLeft),
-                                icon: CachedNetworkImage(imageUrl: file.imgUrl),
-                                label: Text(file.title),
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                      context: context,
-                                      builder: (context) => FileBottomSheet(
-                                          file: CourseFile(imgUrl: file.imgUrl, url: file.url, title: file.title),
-                                          fileType: DownloadType.normal,
-                                          courseTitle: courseTitle,
-                                          courseId: courseId));
-                                }),
-                          )
-                          .toList(),
-                    );
-                  }
                 }
+
+                if (snapshot.data == null) {
+                  return Row(
+                    children: [
+                      SvgPicture.asset("assets/icons/lobster.svg"),
+                      const Text("어라..랍스타? 에러가 났어요"),
+                    ],
+                  );
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: List.generate(snapshot.data!.length, (index) {
+                    CourseFile file = snapshot.data![index];
+                    return TextButton.icon(
+                      style: TextButton.styleFrom(alignment: Alignment.centerLeft),
+                      icon: CachedNetworkImage(imageUrl: file.imgUrl),
+                      label: Text(file.title),
+                      onPressed: () async {
+                        await showModalBottomSheet(
+                          context: context,
+                          builder: (context) => FileBottomSheet(
+                            file: CourseFile(imgUrl: file.imgUrl, url: file.url, title: file.title),
+                            fileType: DownloadType.normal,
+                            courseTitle: courseTitle,
+                            courseId: courseId,
+                          ),
+                        );
+                      },
+                    );
+                  }),
+                );
               }),
         ],
       ),
