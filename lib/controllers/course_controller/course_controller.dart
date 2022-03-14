@@ -64,7 +64,6 @@ abstract class CourseController {
 
   static Future<bool> updateCourseSpecification(final Course course) async {
     var response = await requestGet(CommonUrl.courseMainUrl + course.id, isFront: true);
-    printLog("updateCourseSpecification");
     if (response == null) {
       /* TODO : 에러 */
       return false;

@@ -10,7 +10,7 @@ abstract class BackgroundNotificationController {
 
   static Future<void> initialize() async {
     final preference = await SharedPreferences.getInstance();
-    //notificationList = preference.getStringList("notificationList")?.map<Notification>((e) => Notification.fromJson(jsonDecode(e))).toList() ?? [];
+    notificationList = preference.getStringList("notificationList")?.map<Notification>((e) => Notification.fromJson(jsonDecode(e))).toList() ?? [];
 
     var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = const IOSInitializationSettings();

@@ -15,6 +15,7 @@ class TodoController extends GetxController {
   Future<void> initiate() async {
     final preference = await SharedPreferences.getInstance();
     todoList = List<Map<String, dynamic>>.from(jsonDecode(preference.getString("todoList") ?? "[]")).map<Todo>((m) => Todo.fromJson(m)).toList();
+    update();
   }
 
   Future<void> refreshTodoListAll() async {

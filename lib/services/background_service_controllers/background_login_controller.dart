@@ -118,7 +118,7 @@ abstract class BackgroundLoginController {
     await preference.setString('password', password);
     await preference.setString("loginInformation", jsonEncode(loginInformation));
 
-    printLog("Sync With Plato : loginInformation");
+    printLog("Sync With Plato : ${loginInformation.moodleSessionKey}");
     _updateSyncTime();
 
     return;

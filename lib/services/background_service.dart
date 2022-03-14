@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart' as noti;
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
@@ -27,8 +26,8 @@ abstract class BackgroundService {
     await _service.configure(
       androidConfiguration: AndroidConfiguration(
         onStart: _onStart,
-        autoStart: false,
-        isForegroundMode: true,
+        autoStart: true,
+        isForegroundMode: false,
       ),
       iosConfiguration: IosConfiguration(
         // auto start service
@@ -50,6 +49,7 @@ abstract class BackgroundService {
       BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
       switch (action) {
         case BackgroundServiceAction.login:
+          throw UnimplementedError("백그라운드 서비스 login 호출");
           _completerMap[data["hashCode"]]?.complete(data["data"]);
           break;
         case BackgroundServiceAction.logout:
@@ -106,54 +106,46 @@ void _onStart() async {
 
   printLog("Service start");
 
+  /* ensure login */
+  await BackgroundLoginController.login(autologin: true, username: null, password: null);
+
   final service = FlutterBackgroundService();
-  int runningActionCnt = 0;
   service.onDataReceived.listen((data) async {
     if (data == null) {
       return;
     }
     printLog("receive service: $data");
 
-    ++runningActionCnt;
-
-    /* ensure login */
-
     var res = <String, dynamic>{"action": data["action"], "hashCode": data["hashCode"]};
     final BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
     switch (action) {
       case BackgroundServiceAction.login:
-        service.setNotificationInfo(title: "PPAB", content: "로그인 중입니다...");
+        throw UnimplementedError("백그라운드 서비스 login 호출");
         await BackgroundLoginController.login(autologin: data["autologin"], username: data["username"], password: data["password"]);
         res["data"] = BackgroundLoginController.loginInformation;
         service.sendData(res);
         break;
       case BackgroundServiceAction.logout:
-        service.setNotificationInfo(title: "PPAB", content: "로그아웃 중입니다...");
         res["data"] = await BackgroundLoginController.logout();
         service.sendData(res);
         break;
       case BackgroundServiceAction.fetchTodoList:
         /* ensure login */
-        service.setNotificationInfo(title: "PPAB", content: "로그인 중입니다...");
         await BackgroundLoginController.login(autologin: true, username: null, password: null);
 
-        service.setNotificationInfo(title: "PPAB", content: "할 일 정보를 가져오는 중입니다...");
         var courseIdList = List<String>.from(data["courseIdList"]);
         res["data"] = jsonEncode((await BackgroundTodoController.fetchTodoList(courseIdList)).map((todo) => todo.toJson()).toList());
         service.sendData(res);
         break;
       case BackgroundServiceAction.fetchNotificationList:
         /* ensure login */
-        service.setNotificationInfo(title: "PPAB", content: "로그인 중입니다...");
         await BackgroundLoginController.login(autologin: true, username: null, password: null);
 
-        service.setNotificationInfo(title: "PPAB", content: "알림 정보를 가져오는 중입니다...");
         await BackgroundNotificationController.updateNotificationList();
         res["data"] = jsonEncode(BackgroundNotificationController.notificationList.reversed.toList());
         service.sendData(res);
         break;
       case BackgroundServiceAction.clearNotificationList:
-        service.setNotificationInfo(title: "PPAB", content: "알림 정보를 초기화 중입니다...");
         await BackgroundNotificationController.clearNotificationList();
         res["data"] = true;
         service.sendData(res);
@@ -161,44 +153,32 @@ void _onStart() async {
     }
 
     printLog("send service: ${res["data"].toString()}");
-
-    --runningActionCnt;
-
-    if (runningActionCnt == 0) {
-      service.stopBackgroundService();
-    }
   });
+
+  var pref = await SharedPreferences.getInstance();
+  var lastFetchTodoTime = DateTime.fromMillisecondsSinceEpoch(pref.getInt("lastFetchTodoTime") ?? 0);
+  if (DateTime.now().difference(lastFetchTodoTime).inSeconds >= 300) {
+    timerBody();
+  }
 
   Timer.periodic(
     const Duration(minutes: 3),
-    (timer) async {
-      final DateTime now = DateTime.now();
-      printLog("currentTime : $now");
-      var pref = await SharedPreferences.getInstance();
-
-      var lastFetchTodoTime = DateTime.fromMillisecondsSinceEpoch(pref.getInt("lastFetchTodoTime") ?? 0);
-      printLog("lastFetchTodoTime : $lastFetchTodoTime");
-
-      File file = File(
-          '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat.Hms().format(now)}.txt');
-      await file.writeAsString('');
-      // if (BackgroundLoginController.loginStatus == false) {
-      //   file.writeAsString('return', mode: FileMode.append);
-      //   return;
-      // }
-      await BackgroundNotificationController.updateNotificationList();
-
-      var res = await requestGet(CommonUrl.notificationUrl + '1', isFront: false, retry: 2);
-      if (res == null) {
-        await file.writeAsString('null', mode: FileMode.append);
-        return;
-      }
-
-      await File(
-              '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat.Hms().format(now)}.txt')
-          .writeAsString(res.data, mode: FileMode.append);
-      await pref.setInt("lastFetchTodoTime", now.millisecondsSinceEpoch);
-      printLog("successful!!");
-    },
+    (timer) async => timerBody,
   );
+}
+
+Future<void> timerBody() async {
+  await BackgroundNotificationController.updateNotificationList();
+
+  var res = await requestGet(CommonUrl.notificationUrl + '1', isFront: false, retry: 1);
+  if (res == null) {
+    return;
+  }
+
+  await File(
+          '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat("MM-dd_HH:mm").format(DateTime.now())}.txt')
+      .writeAsString(res.data, mode: FileMode.append);
+
+  var pref = await SharedPreferences.getInstance();
+  await pref.setInt("lastFetchTodoTime", DateTime.now().millisecondsSinceEpoch);
 }

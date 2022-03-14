@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
+import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart' as dio;
 
@@ -28,15 +29,15 @@ class LoginController extends GetxController {
   }
 
   Future<void> login({required final bool autologin, String? username, String? password}) async {
+    final preference = await SharedPreferences.getInstance();
+
     bool before = loginInformation.loginStatus;
-    if (await _checkLogin() == true) {
-      final preference = await SharedPreferences.getInstance();
-      loginInformation = LoginInformation.fromJson(jsonDecode(preference.getString("loginInformation")!));
-    } else {
-      loginInformation = LoginInformation.fromJson(await BackgroundService.sendData(BackgroundServiceAction.login,
-          data: {"autologin": autologin, "username": username, "password": password}));
+    if (await _checkLogin() == false) {
+      await BackgroundLoginController.login(autologin: autologin, username: username, password: password);
     }
 
+    if (preference.getString("loginInformation") == null) return;
+    loginInformation = LoginInformation.fromJson(jsonDecode(preference.getString("loginInformation")!));
     if (before != loginInformation.loginStatus) update();
   }
 
