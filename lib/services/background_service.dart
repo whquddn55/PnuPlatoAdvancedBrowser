@@ -14,6 +14,8 @@ import 'package:pnu_plato_advanced_browser/services/background_service_controlle
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:shared_preferences_ios/shared_preferences_ios.dart';
+import 'package:path_provider_android/path_provider_android.dart';
+import 'package:path_provider_ios/path_provider_ios.dart';
 
 enum BackgroundServiceAction { login, logout, fetchTodoList, fetchNotificationList, clearNotificationList }
 
@@ -101,12 +103,16 @@ void _onIosBackground() {
 void _onStart() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (Platform.isAndroid) SharedPreferencesAndroid.registerWith();
-  if (Platform.isIOS) SharedPreferencesIOS.registerWith();
+  if (Platform.isAndroid) {
+    SharedPreferencesAndroid.registerWith();
+    PathProviderAndroid.registerWith();
+  }
+  if (Platform.isIOS) {
+    SharedPreferencesIOS.registerWith();
+    PathProviderIOS.registerWith();
+  }
 
   await BackgroundNotificationController.initialize();
-
-  printLog("Service start");
 
   /* ensure login */
   await BackgroundLoginController.login(autologin: true, username: null, password: null);
@@ -165,7 +171,7 @@ void _onStart() async {
 
   Timer.periodic(
     const Duration(minutes: 3),
-    (timer) async => timerBody,
+    (timer) async => timerBody(),
   );
 }
 

@@ -27,24 +27,33 @@ class NavigatorPage extends StatelessWidget {
       }
     }
 
-    return GetBuilder<LoginController>(builder: (contoller) {
-      if (LoginController.to.loginInformation.loginStatus != true) {
-        LoginController.to.login(autologin: true);
-        return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '로그인 중...'));
-      }
+    return FutureBuilder(
+      future: LoginController.to.login(autologin: true),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '로그인 중...'));
+        }
+        return GetBuilder<LoginController>(
+          builder: (contoller) {
+            if (LoginController.to.loginInformation.loginStatus != true) {
+              return const NavigatorBody();
+            }
 
-      final String studentId = LoginController.to.loginInformation.studentId;
+            final String studentId = LoginController.to.loginInformation.studentId;
 
-      return FutureBuilder<void>(
-        future: Future.wait([_dbInitFuture(studentId), BackgroundService.initializeService()]),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: 'DB 접속 중...'));
-          }
+            return FutureBuilder<void>(
+              future: Future.wait([_dbInitFuture(studentId), BackgroundService.initializeService()]),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: 'DB 접속 중...'));
+                }
 
-          return const NavigatorBody();
-        },
-      );
-    });
+                return const NavigatorBody();
+              },
+            );
+          },
+        );
+      },
+    );
   }
 }
