@@ -6,6 +6,7 @@ import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.da
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
@@ -16,6 +17,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await HiveController.initialize();
+  await AppSettingController.initilize();
+  await NotificationController.initilize();
 
   await initializeDateFormatting();
   await Firebase.initializeApp();
@@ -24,8 +27,7 @@ void main() async {
   Get.put(DownloadController());
   Get.put(NoticeController());
   Get.put(TodoController());
-  await AppSettingController.initiate();
-  await Get.find<TodoController>().initiate();
+  await TodoController.to.initialize();
 
   runApp(const MyApp());
 }

@@ -9,7 +9,7 @@ abstract class AppSettingController {
     HiveController.storeIsFirst(isFirst);
   }
 
-  static Future<void> initiate() async {
+  static Future<void> initilize() async {
     _isFirst = await HiveController.loadIsFirst();
   }
 }

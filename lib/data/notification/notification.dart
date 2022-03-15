@@ -1,5 +1,5 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive/hive.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/article_notification.dart';
@@ -74,17 +74,18 @@ abstract class Notification {
   }
 
   Future<void> show() async {
-    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-    const android = AndroidNotificationDetails(
-      'thuthi_plato_noti',
-      '플라토 브라우저 알림',
-      channelDescription: '플라토 브라우저에서 새 알림을 보여줌',
-      importance: Importance.max,
-      priority: Priority.high,
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: hashCode,
+        channelKey: 'ppab_noti_normal',
+        title: title,
+        body: body,
+        payload: {"url": url},
+        displayOnForeground: true,
+        wakeUpScreen: true,
+        displayOnBackground: true,
+        showWhen: true,
+      ),
     );
-    const detail = NotificationDetails(android: android);
-
-    await flutterLocalNotificationsPlugin.show(hashCode, title, body, detail, payload: url);
   }
 }

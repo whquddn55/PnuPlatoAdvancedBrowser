@@ -10,7 +10,7 @@ class TodoController extends GetxController {
   static final Set<String> _refreshLock = {};
   List<Todo> todoList = <Todo>[];
 
-  Future<void> initiate() async {
+  Future<void> initialize() async {
     todoList = await HiveController.loadTodoList();
   }
 

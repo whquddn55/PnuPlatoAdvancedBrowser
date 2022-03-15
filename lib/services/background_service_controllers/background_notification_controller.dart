@@ -1,21 +1,9 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart';
 
 abstract class BackgroundNotificationController {
-  static Future<void> initialize() async {
-    var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
-    var initializationSettingsIOS = const IOSInitializationSettings();
-    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
-    await FlutterLocalNotificationsPlugin().initialize(initializationSettings, onSelectNotification: _onSelectNotification);
-  }
-
-  static void _onSelectNotification(String? arg) {
-    printLog("$arg");
-  }
-
   static Future<void> updateNotificationList() async {
     int page = 1;
 

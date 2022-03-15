@@ -96,8 +96,6 @@ void _onStart() async {
   }
   await HiveController.initialize();
 
-  await BackgroundNotificationController.initialize();
-
   /* ensure login */
   await BackgroundLoginController.login(autologin: true, username: null, password: null);
 
