@@ -1,12 +1,9 @@
-import 'dart:convert';
-
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class TodoController extends GetxController {
   static TodoController get to => Get.find<TodoController>();
@@ -14,8 +11,7 @@ class TodoController extends GetxController {
   List<Todo> todoList = <Todo>[];
 
   Future<void> initiate() async {
-    final preference = await SharedPreferences.getInstance();
-    todoList = List<Map<String, dynamic>>.from(jsonDecode(preference.getString("todoList") ?? "[]")).map<Todo>((m) => Todo.fromJson(m)).toList();
+    todoList = await HiveController.loadTodoList();
   }
 
   Future<void> refreshTodoListAll() async {
@@ -33,15 +29,9 @@ class TodoController extends GetxController {
       BackgroundServiceAction.fetchTodoList,
       data: {"courseIdList": courseIdList},
     );
-    final preference = await SharedPreferences.getInstance();
-    await preference.reload();
-    printLog(preference.getString("todoList"));
-    todoList = List<Map<String, dynamic>>.from(jsonDecode(preference.getString("todoList") ?? "[]")).map<Todo>((m) => Todo.fromJson(m)).toList();
+    todoList = await HiveController.loadTodoList();
+    printLog(todoList);
     update();
-    // final preference = await SharedPreferences.getInstance();
-    // var newTodoList =
-    //     List<Map<String, dynamic>>.from(jsonDecode(preference.getString("todoList") ?? "[]")).map<Todo>((m) => Todo.fromJson(m)).toList();
-    // await _updateTodoList(newTodoList);
 
     /* unlock */
     _unlockCourseId();
@@ -63,8 +53,7 @@ class TodoController extends GetxController {
     }
 
     if (modified) {
-      final preference = await SharedPreferences.getInstance();
-      await preference.setString("todoList", jsonEncode(todoList));
+      await HiveController.storeTodoList(todoList);
       update();
     }
   }

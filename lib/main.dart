@@ -2,9 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
@@ -14,6 +14,9 @@ import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.da
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await HiveController.initialize();
+
   await initializeDateFormatting();
   await Firebase.initializeApp();
   Get.put(LoginController());

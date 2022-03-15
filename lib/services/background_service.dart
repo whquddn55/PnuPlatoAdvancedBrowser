@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart' as noti;
-import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_todo_controller.dart';
@@ -74,8 +74,6 @@ abstract class BackgroundService {
   }
 
   static Future<dynamic> sendData(final BackgroundServiceAction action, {Map<String, dynamic>? data}) async {
-    await _runService();
-
     var completer = Completer();
     _completerMap[completer.hashCode] = completer;
 
@@ -86,11 +84,6 @@ abstract class BackgroundService {
     }
 
     return completer.future;
-  }
-
-  static Future<void> _runService() async {
-    if (await _service.isServiceRunning()) return;
-    await _service.start();
   }
 }
 
@@ -111,6 +104,7 @@ void _onStart() async {
     SharedPreferencesIOS.registerWith();
     PathProviderIOS.registerWith();
   }
+  await HiveController.initialize();
 
   await BackgroundNotificationController.initialize();
 

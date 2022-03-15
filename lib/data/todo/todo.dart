@@ -1,23 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
-import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
-import 'package:pnu_plato_advanced_browser/data/todo/unknown_todo.dart';
-import 'package:pnu_plato_advanced_browser/data/todo/vod_todo.dart';
-import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
 
-enum TodoStatus { done, undone, doing }
+part 'todo.g.dart';
+
+@HiveType(typeId: 5)
+enum TodoStatus {
+  @HiveField(0)
+  done,
+  @HiveField(1)
+  undone,
+  @HiveField(2)
+  doing
+}
 
 abstract class Todo {
+  @HiveField(0)
   final int index;
+  @HiveField(1)
   final String id;
+  @HiveField(2)
   final String title;
+  @HiveField(3)
   final String courseId;
+  @HiveField(4)
   final DateTime dueDate;
+  @HiveField(5)
   final bool availability;
-  final Uri iconUri;
+  @HiveField(6)
+  final String iconUrl;
+  @HiveField(7)
   TodoStatus status;
 
   Todo({
@@ -27,7 +41,7 @@ abstract class Todo {
     required this.courseId,
     required this.dueDate,
     required this.availability,
-    required this.iconUri,
+    required this.iconUrl,
     required this.status,
   });
 
@@ -39,93 +53,6 @@ abstract class Todo {
     if (other.runtimeType != runtimeType) return false;
     var otherTodo = other as Todo;
     return otherTodo.id == id && otherTodo.courseId == courseId;
-  }
-
-  static Todo fromJson(Map<String, dynamic> json) {
-    switch (json["type"]) {
-      case "quiz":
-        return QuizTodo(
-            index: json["index"],
-            id: json["id"],
-            title: json["title"],
-            courseId: json["courseId"],
-            dueDate: DateTime.parse(json["dueDate"]),
-            availability: json["availability"],
-            iconUri: Uri.parse(json["iconUri"]),
-            status: TodoStatus.values.byName(json["status"]));
-      case "vod":
-        return VodTodo(
-            index: json["index"],
-            id: json["id"],
-            title: json["title"],
-            courseId: json["courseId"],
-            dueDate: DateTime.parse(json["dueDate"]),
-            availability: json["availability"],
-            iconUri: Uri.parse(json["iconUri"]),
-            status: TodoStatus.values.byName(json["status"]));
-      case "zoom":
-        return ZoomTodo(
-            index: json["index"],
-            id: json["id"],
-            title: json["title"],
-            courseId: json["courseId"],
-            dueDate: DateTime.parse(json["dueDate"]),
-            availability: json["availability"],
-            iconUri: Uri.parse(json["iconUri"]),
-            status: TodoStatus.values.byName(json["status"]));
-      case "assign":
-        return AssignTodo(
-            index: json["index"],
-            id: json["id"],
-            title: json["title"],
-            courseId: json["courseId"],
-            dueDate: DateTime.parse(json["dueDate"]),
-            availability: json["availability"],
-            iconUri: Uri.parse(json["iconUri"]),
-            status: TodoStatus.values.byName(json["status"]));
-      default:
-        return UnknownTodo(
-            index: json["index"],
-            id: json["id"],
-            title: json["title"],
-            courseId: json["courseId"],
-            dueDate: DateTime.parse(json["dueDate"]),
-            availability: json["availability"],
-            iconUri: Uri.parse(json["iconUri"]),
-            status: TodoStatus.values.byName(json["status"]));
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    String typeString = "unknown";
-    switch (runtimeType) {
-      case QuizTodo:
-        typeString = "quiz";
-        break;
-      case VodTodo:
-        typeString = "vod";
-        break;
-      case ZoomTodo:
-        typeString = "zoom";
-        break;
-      case AssignTodo:
-        typeString = "assign";
-        break;
-      case UnknownTodo:
-        typeString = "unkown";
-        break;
-    }
-    return {
-      "index": index,
-      "id": id,
-      "title": title,
-      "courseId": courseId,
-      "dueDate": dueDate.toString(),
-      "type": typeString,
-      "availability": availability,
-      "iconUri": iconUri.toString(),
-      "status": status.name,
-    };
   }
 
   void open(final BuildContext context) {

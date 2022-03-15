@@ -1,8 +1,12 @@
 import 'dart:ui';
 
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 
+part 'quiz_todo.g.dart';
+
+@HiveType(typeId: 1)
 class QuizTodo extends Todo {
   QuizTodo({
     required int index,
@@ -11,7 +15,7 @@ class QuizTodo extends Todo {
     required String courseId,
     required DateTime dueDate,
     required bool availability,
-    required Uri iconUri,
+    required String iconUrl,
     required TodoStatus status,
   }) : super(
           index: index,
@@ -20,7 +24,7 @@ class QuizTodo extends Todo {
           courseId: courseId,
           dueDate: dueDate,
           availability: availability,
-          iconUri: iconUri,
+          iconUrl: iconUrl,
           status: status,
         );
 

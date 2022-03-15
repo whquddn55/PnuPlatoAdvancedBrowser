@@ -1,7 +1,6 @@
-import 'dart:convert';
-
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
@@ -9,7 +8,6 @@ import 'package:html/dom.dart' as html;
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/vod_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class BackgroundTodoController {
   static Future<void> fetchTodoList(final List<String> courseIdList) async {
@@ -22,9 +20,7 @@ abstract class BackgroundTodoController {
       newTodoList.addAll(await _fetchZoom(courseId, index));
     }
 
-    final preference = await SharedPreferences.getInstance();
-    await preference.reload();
-    var todoList = List<Map<String, dynamic>>.from(jsonDecode(preference.getString("todoList") ?? "[]")).map<Todo>((m) => Todo.fromJson(m)).toList();
+    var todoList = await HiveController.loadTodoList();
 
     _updateTodoList(todoList, newTodoList, courseIdList);
     todoList.sort((a, b) {
@@ -32,7 +28,7 @@ abstract class BackgroundTodoController {
       return a.courseId.compareTo(b.courseId);
     });
     printLog(todoList);
-    await preference.setString("todoList", jsonEncode(todoList));
+    await HiveController.storeTodoList(todoList);
 
     return;
   }
@@ -79,7 +75,7 @@ abstract class BackgroundTodoController {
       }
 
       final String id = _getId(activity);
-      final Uri iconUri = _getIconUri(activity);
+      final String iconUrl = _getIconUri(activity);
       final bool availablility = activity.getElementsByTagName('a').isNotEmpty;
 
       todoList.add(VodTodo(
@@ -87,7 +83,7 @@ abstract class BackgroundTodoController {
         availability: availablility,
         courseId: courseId,
         dueDate: dueDate[1]!,
-        iconUri: iconUri,
+        iconUrl: iconUrl,
         id: id,
         title: title,
         status: done ? TodoStatus.done : TodoStatus.undone,
@@ -119,7 +115,7 @@ abstract class BackgroundTodoController {
           availability: true,
           courseId: courseId,
           dueDate: dueDate,
-          iconUri: Uri.parse("https://plato.pusan.ac.kr/theme/image.php/coursemosv2/assign/1641196863/icon"),
+          iconUrl: "https://plato.pusan.ac.kr/theme/image.php/coursemosv2/assign/1641196863/icon",
           id: id,
           title: title,
           status: done ? TodoStatus.done : TodoStatus.undone,
@@ -154,7 +150,7 @@ abstract class BackgroundTodoController {
           availability: true,
           courseId: courseId,
           dueDate: dueDate,
-          iconUri: Uri.parse("https://plato.pusan.ac.kr/theme/image.php/coursemosv2/assign/1641196863/icon"),
+          iconUrl: "https://plato.pusan.ac.kr/theme/image.php/coursemosv2/assign/1641196863/icon",
           id: id,
           title: title,
           status: done ? TodoStatus.done : TodoStatus.undone,
@@ -185,7 +181,7 @@ abstract class BackgroundTodoController {
           availability: true,
           courseId: courseId,
           dueDate: dueDate,
-          iconUri: Uri.parse("https://plato.pusan.ac.kr/theme/image.php/coursemosv2/zoom/1641196863/icon"),
+          iconUrl: "https://plato.pusan.ac.kr/theme/image.php/coursemosv2/zoom/1641196863/icon",
           id: id,
           title: title,
           status: done ? TodoStatus.done : TodoStatus.undone,
@@ -240,7 +236,7 @@ abstract class BackgroundTodoController {
     return activity.id.split('-')[1];
   }
 
-  static Uri _getIconUri(html.Element activity) {
-    return Uri.parse(activity.getElementsByTagName('img')[0].attributes['src']!);
+  static String _getIconUri(html.Element activity) {
+    return activity.getElementsByTagName('img')[0].attributes['src']!;
   }
 }
