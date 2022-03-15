@@ -1,9 +1,7 @@
-import 'package:get/get.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_article_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/board_course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';

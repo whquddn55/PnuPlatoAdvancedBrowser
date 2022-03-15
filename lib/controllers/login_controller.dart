@@ -1,10 +1,8 @@
-import 'dart:convert';
-
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart' as dio;
 
 class LoginController extends GetxController {
@@ -13,9 +11,8 @@ class LoginController extends GetxController {
   LoginInformation loginInformation = LoginInformation();
 
   static Future<bool> _checkLogin() async {
-    final preference = await SharedPreferences.getInstance();
-    if (preference.getString("loginInformation") == null) return false;
-    final LoginInformation loginInformation = LoginInformation.fromJson(jsonDecode(preference.getString("loginInformation")!));
+    final LoginInformation? loginInformation = await HiveController.loadLoginInformation();
+    if (loginInformation == null) return false;
 
     String body = '[{"index":0,"methodname":"core_fetch_notifications","args":{"contextid":2}}]';
     final dio.Options options = dio.Options(
@@ -29,15 +26,14 @@ class LoginController extends GetxController {
   }
 
   Future<void> login({required final bool autologin, String? username, String? password}) async {
-    final preference = await SharedPreferences.getInstance();
-
     bool before = loginInformation.loginStatus;
     if (await _checkLogin() == false) {
       await BackgroundLoginController.login(autologin: autologin, username: username, password: password);
     }
 
-    if (preference.getString("loginInformation") == null) return;
-    loginInformation = LoginInformation.fromJson(jsonDecode(preference.getString("loginInformation")!));
+    final LoginInformation? _loginInformation = await HiveController.loadLoginInformation();
+    if (_loginInformation == null) return;
+    loginInformation = _loginInformation;
     if (before != loginInformation.loginStatus) update();
   }
 

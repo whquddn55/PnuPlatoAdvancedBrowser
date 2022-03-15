@@ -35,7 +35,7 @@ class _NotificationPageState extends State<NotificationPage> {
       appBar: MainAppbar("알림"),
       drawer: const MainDrawer(),
       body: LoginBuilderPage(() {
-        if (notificationList.isEmpty) return const LoadingPage(msg: "로딩중 입니다...");
+        if (_loaded == false) return const LoadingPage(msg: "로딩중 입니다...");
 
         return RefreshIndicator(
           onRefresh: () async {

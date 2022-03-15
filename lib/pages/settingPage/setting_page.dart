@@ -25,37 +25,37 @@ class SettingPage extends StatelessWidget {
           SettingDropdown(
             title: "테마",
             itemList: const ["화이트", "다크", "시스템"],
-            onChanged: (index) => _setTheme(context, index),
-            initialIndex: (AppSettingController.themeMode.index + 2) % 3,
+            onChanged: (index) => null, //_setTheme(context, index),
+            initialIndex: 1,
           ),
         ],
       ),
     );
   }
 
-  Future<bool> _setTheme(BuildContext context, int index) async {
-    return await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            content: const Text("앱이 재시작 됩니다."),
-            actions: [
-              TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context, false)),
-              TextButton(
-                child: const Text("확인"),
-                onPressed: () {
-                  if (index == 0) {
-                    AppSettingController.themeMode = ThemeMode.light;
-                  } else if (index == 1) {
-                    AppSettingController.themeMode = ThemeMode.dark;
-                  } else if (index == 2) {
-                    AppSettingController.themeMode = ThemeMode.system;
-                  }
-                  Navigator.pop(context, true);
-                },
-              ),
-            ],
-          ),
-        ) ??
-        false;
-  }
+  // Future<bool> _setTheme(BuildContext context, int index) async {
+  //   return await showDialog(
+  //         context: context,
+  //         builder: (context) => AlertDialog(
+  //           content: const Text("앱이 재시작 됩니다."),
+  //           actions: [
+  //             TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context, false)),
+  //             TextButton(
+  //               child: const Text("확인"),
+  //               onPressed: () {
+  //                 if (index == 0) {
+  //                   AppSettingController.themeMode = ThemeMode.light;
+  //                 } else if (index == 1) {
+  //                   AppSettingController.themeMode = ThemeMode.dark;
+  //                 } else if (index == 2) {
+  //                   AppSettingController.themeMode = ThemeMode.system;
+  //                 }
+  //                 Navigator.pop(context, true);
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //       ) ??
+  //       false;
+  // }
 }

@@ -31,17 +31,17 @@ abstract class CourseZoomController {
     return CourseZoom(startTime: startTime, runningTime: runningTime, status: status);
   }
 
-  static Duration _parseRunningTime(String text) {
-    int hours = 0;
-    int minutes = 0;
-    if (text.contains("시간")) {
-      hours = int.parse(text.split("시간")[0]);
-      text = text.split("시간")[1];
-    }
-    if (text.contains("분")) {
-      minutes = int.parse(text.split("분")[0]);
-    }
+  // static Duration _parseRunningTime(String text) {
+  //   int hours = 0;
+  //   int minutes = 0;
+  //   if (text.contains("시간")) {
+  //     hours = int.parse(text.split("시간")[0]);
+  //     text = text.split("시간")[1];
+  //   }
+  //   if (text.contains("분")) {
+  //     minutes = int.parse(text.split("분")[0]);
+  //   }
 
-    return Duration(hours: hours, minutes: minutes);
-  }
+  //   return Duration(hours: hours, minutes: minutes);
+  // }
 }

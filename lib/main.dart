@@ -49,8 +49,8 @@ class MyApp extends StatelessWidget {
           toolbarHeight: 50,
         ),
       ),
+      themeMode: ThemeMode.light,
       darkTheme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.dark, fontFamily: 'DoHyeonRegular'),
-      themeMode: AppSettingController.themeMode,
       home: AppSettingController.isFirst ? const LandingPage() : const NavigatorPage(),
     );
   }

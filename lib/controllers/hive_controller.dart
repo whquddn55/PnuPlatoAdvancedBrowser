@@ -1,4 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/article_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/assign_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/file_notification.dart';
@@ -33,11 +34,25 @@ abstract class HiveController {
     Hive.registerAdapter(UrlNotificationAdapter());
     Hive.registerAdapter(VodNotificationAdapter());
     Hive.registerAdapter(ZoomNotificationAdapter());
+    Hive.registerAdapter(LoginInformationAdapter());
   }
 
   static Future<void> clearByKey(final String key) async {
     final box = await Hive.openBox("userData");
     await box.delete(key);
+    await box.close();
+  }
+
+  static Future<bool> loadIsFirst() async {
+    final box = await Hive.openBox("userData");
+    final res = box.get("isFirst") ?? true;
+    await box.close();
+    return res;
+  }
+
+  static Future<void> storeIsFirst(final bool isFirst) async {
+    final box = await Hive.openBox("userData");
+    await box.put("isFirst", isFirst);
     await box.close();
   }
 
@@ -67,16 +82,58 @@ abstract class HiveController {
     await box.close();
   }
 
-  static Future<DateTime> loadLastTodoFetchTime() async {
+  static Future<DateTime> loadLastSyncTime() async {
     final box = await Hive.openBox("userData");
-    final res = box.get("lastTodoFetchTime") ?? 0;
+    final res = box.get("lastSyncTime") ?? DateTime.fromMillisecondsSinceEpoch(0);
     await box.close();
-    return DateTime.fromMillisecondsSinceEpoch(res);
+    return res;
   }
 
-  static Future<void> storeLastTodoFetchTime(final DateTime lastTodoFetchTime) async {
+  static Future<void> storeLastSyncTime(final DateTime lastSyncTime) async {
     final box = await Hive.openBox("userData");
-    await box.put("lastTodoFetchTime", lastTodoFetchTime.millisecondsSinceEpoch);
+    await box.put("lastSyncTime", lastSyncTime);
+    await box.close();
+  }
+
+  static Future<LoginInformation?> loadLoginInformation() async {
+    final box = await Hive.openBox("userData");
+    final res = box.get("loginInformation");
+    await box.close();
+
+    return res;
+  }
+
+  static Future<void> storeLoginInformation(final LoginInformation loginInformation) async {
+    final box = await Hive.openBox("userData");
+    await box.put("loginInformation", loginInformation);
+    await box.close();
+  }
+
+  static Future<String> loadUsername() async {
+    final box = await Hive.openBox("userData");
+    final res = box.get("username");
+    await box.close();
+
+    return res;
+  }
+
+  static Future<void> storeUsername(final String username) async {
+    final box = await Hive.openBox("userData");
+    await box.put("username", username);
+    await box.close();
+  }
+
+  static Future<String> loadPassword() async {
+    final box = await Hive.openBox("userData");
+    final res = box.get("password");
+    await box.close();
+
+    return res;
+  }
+
+  static Future<void> storePassword(final String password) async {
+    final box = await Hive.openBox("userData");
+    await box.put("password", password);
     await box.close();
   }
 }

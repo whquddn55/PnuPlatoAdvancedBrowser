@@ -1,15 +1,28 @@
+import 'package:hive_flutter/adapters.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 
+part 'login_information.g.dart';
+
+@HiveType(typeId: 14)
 class LoginInformation {
+  @HiveField(0)
   bool loginStatus;
+  @HiveField(1)
   String sessionKey;
+  @HiveField(2)
   String moodleSessionKey;
+  @HiveField(3)
   String loginMsg;
 
+  @HiveField(4)
   String studentId;
+  @HiveField(5)
   String name;
+  @HiveField(6)
   String department;
+  @HiveField(7)
   String imgUrl;
+  @HiveField(8)
   String lastSyncTime;
 
   LoginInformation({
@@ -24,18 +37,8 @@ class LoginInformation {
     this.lastSyncTime = "1946-05-15 00:00:00.000",
   });
 
-  LoginInformation.fromJson(Map<String, dynamic> json)
-      : loginStatus = json["loginStatus"],
-        sessionKey = json["sessionKey"],
-        moodleSessionKey = json["moodleSessionKey"],
-        loginMsg = json["loginMsg"],
-        studentId = json["studentId"],
-        name = json["name"],
-        department = json["department"],
-        imgUrl = json["imgUrl"],
-        lastSyncTime = json["lastSyncTime"];
-
-  Map<String, dynamic> toJson() => {
+  @override
+  String toString() => {
         "loginStatus": loginStatus,
         "sessionKey": sessionKey,
         "moodleSessionKey": moodleSessionKey,
@@ -45,8 +48,5 @@ class LoginInformation {
         "department": department,
         "imgUrl": imgUrl,
         "lastSyncTime": lastSyncTime,
-      };
-
-  @override
-  String toString() => toJson().toString();
+      }.toString();
 }

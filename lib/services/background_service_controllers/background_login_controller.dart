@@ -1,21 +1,19 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class BackgroundLoginController {
   static LoginInformation loginInformation = LoginInformation();
 
   static Future<bool> _checkLogin() async {
-    final preference = await SharedPreferences.getInstance();
-    if (preference.getString("loginInformation") == null) return false;
-    final LoginInformation loginInformation = LoginInformation.fromJson(jsonDecode(preference.getString("loginInformation")!));
+    final LoginInformation? loginInformation = await HiveController.loadLoginInformation();
+    if (loginInformation == null) return false;
 
     String body = '[{"index":0,"methodname":"core_fetch_notifications","args":{"contextid":2}}]';
     final dio.Options options = dio.Options(
@@ -31,17 +29,16 @@ abstract class BackgroundLoginController {
   static Future<void> login({required final bool autologin, String? username, String? password}) async {
     assert(autologin == false ? username != null && password != null : true);
 
-    final preference = await SharedPreferences.getInstance();
     if (autologin == true) {
       bool loginStatus = await _checkLogin();
       if (loginStatus == true) {
-        loginInformation = LoginInformation.fromJson(jsonDecode(preference.getString("loginInformation")!));
+        loginInformation = (await HiveController.loadLoginInformation())!;
         loginInformation.loginMsg = "이미 로그인 되어있음!";
         return;
       }
 
-      username = preference.getString('username');
-      password = preference.getString('password');
+      username = await HiveController.loadUsername();
+      password = await HiveController.loadPassword();
     }
 
     if (username == null || password == null) {
@@ -114,19 +111,17 @@ abstract class BackgroundLoginController {
     await _setCooKie(loginInformation);
     loginInformation.loginStatus = true;
 
-    await preference.setString('username', username);
-    await preference.setString('password', password);
-    await preference.setString("loginInformation", jsonEncode(loginInformation));
+    await HiveController.storeUsername(username);
+    await HiveController.storePassword(password);
+    await HiveController.storeLoginInformation(loginInformation);
 
     printLog("Sync With Plato : ${loginInformation.moodleSessionKey}");
-    _updateSyncTime();
 
     return;
   }
 
   static Future<bool> logout() async {
-    final preference = await SharedPreferences.getInstance();
-    LoginInformation loginInformation = jsonDecode(preference.getString("loginInformation")!);
+    final LoginInformation loginInformation = (await HiveController.loadLoginInformation())!;
 
     String? sessionKey = await _getSessionKey(loginInformation.moodleSessionKey);
     if (sessionKey == null) {
@@ -134,9 +129,9 @@ abstract class BackgroundLoginController {
     }
     await dio.Dio().get(CommonUrl.logoutUrl + sessionKey);
 
-    preference.remove("username");
-    preference.remove("password");
-    preference.remove("loginInformation");
+    await HiveController.clearByKey("username");
+    await HiveController.clearByKey("password");
+    await HiveController.clearByKey("loginInformation");
 
     return true;
   }
@@ -160,12 +155,6 @@ abstract class BackgroundLoginController {
     } catch (e) {
       return null;
     }
-  }
-
-  static void _updateSyncTime() async {
-    final preference = await SharedPreferences.getInstance();
-    var now = DateTime.now();
-    preference.setString("lastSyncTime", DateTime(now.year, now.month, now.day, now.hour, now.minute, now.second).toString());
   }
 
   static Future<void> _getInformation(LoginInformation loginInformation) async {

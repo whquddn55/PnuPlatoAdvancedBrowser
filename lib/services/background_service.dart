@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
@@ -11,8 +12,6 @@ import 'package:pnu_plato_advanced_browser/services/background_service_controlle
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_todo_controller.dart';
 import 'package:path_provider_android/path_provider_android.dart';
 import 'package:path_provider_ios/path_provider_ios.dart';
-import 'package:shared_preferences_android/shared_preferences_android.dart';
-import 'package:shared_preferences_ios/shared_preferences_ios.dart';
 
 enum BackgroundServiceAction { login, logout, fetchTodoList, fetchNotificationList }
 
@@ -91,11 +90,9 @@ void _onStart() async {
 
   if (Platform.isAndroid) {
     PathProviderAndroid.registerWith();
-    SharedPreferencesAndroid.registerWith();
   }
   if (Platform.isIOS) {
     PathProviderIOS.registerWith();
-    SharedPreferencesIOS.registerWith();
   }
   await HiveController.initialize();
 
@@ -144,7 +141,7 @@ void _onStart() async {
     printLog("send service: ${res["data"].toString()}");
   });
 
-  var lastFetchTodoTime = await HiveController.loadLastTodoFetchTime();
+  var lastFetchTodoTime = await HiveController.loadLastSyncTime();
   if (DateTime.now().difference(lastFetchTodoTime).inSeconds >= 300) {
     timerBody();
   }
@@ -163,9 +160,11 @@ Future<void> timerBody() async {
     return;
   }
 
-  await File(
-          '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat("MM-dd_HH:mm").format(DateTime.now())}.txt')
-      .writeAsString(res.data, mode: FileMode.append);
+  //var document = await getApplicationSupportDirectory();
 
-  HiveController.storeLastTodoFetchTime(DateTime.now());
+  // await File(
+  //         '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat("MM-dd_HH:mm").format(DateTime.now())}.txt')
+  //     .writeAsString(res.data, mode: FileMode.append);
+
+  await HiveController.storeLastSyncTime(DateTime.now());
 }
