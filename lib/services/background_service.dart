@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,17 +6,15 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/notification/notification.dart' as noti;
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_todo_controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shared_preferences_android/shared_preferences_android.dart';
-import 'package:shared_preferences_ios/shared_preferences_ios.dart';
 import 'package:path_provider_android/path_provider_android.dart';
 import 'package:path_provider_ios/path_provider_ios.dart';
+import 'package:shared_preferences_android/shared_preferences_android.dart';
+import 'package:shared_preferences_ios/shared_preferences_ios.dart';
 
-enum BackgroundServiceAction { login, logout, fetchTodoList, fetchNotificationList, clearNotificationList }
+enum BackgroundServiceAction { login, logout, fetchTodoList, fetchNotificationList }
 
 /* APP 부분 */
 abstract class BackgroundService {
@@ -55,18 +52,14 @@ abstract class BackgroundService {
           _completerMap[data["hashCode"]]?.complete(data["data"]);
           break;
         case BackgroundServiceAction.logout:
-          _completerMap[data["hashCode"]]?.complete(data["data"]);
+          _completerMap[data["hashCode"]]?.complete(data);
           break;
         case BackgroundServiceAction.fetchTodoList:
           _completerMap[data["hashCode"]]?.complete(data);
 
           break;
         case BackgroundServiceAction.fetchNotificationList:
-          _completerMap[data["hashCode"]]?.complete(jsonDecode(data["data"]).map((map) => noti.Notification.fromJson(map)).toList());
-          break;
-
-        case BackgroundServiceAction.clearNotificationList:
-          _completerMap[data["hashCode"]]?.complete(data["data"]);
+          _completerMap[data["hashCode"]]?.complete(data);
           break;
       }
       _completerMap.remove(data["hashCode"]);
@@ -97,12 +90,12 @@ void _onStart() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (Platform.isAndroid) {
-    SharedPreferencesAndroid.registerWith();
     PathProviderAndroid.registerWith();
+    SharedPreferencesAndroid.registerWith();
   }
   if (Platform.isIOS) {
-    SharedPreferencesIOS.registerWith();
     PathProviderIOS.registerWith();
+    SharedPreferencesIOS.registerWith();
   }
   await HiveController.initialize();
 
@@ -123,10 +116,10 @@ void _onStart() async {
     switch (action) {
       case BackgroundServiceAction.login:
         throw UnimplementedError("백그라운드 서비스 login 호출");
-        await BackgroundLoginController.login(autologin: data["autologin"], username: data["username"], password: data["password"]);
-        res["data"] = BackgroundLoginController.loginInformation;
-        service.sendData(res);
-        break;
+      // await BackgroundLoginController.login(autologin: data["autologin"], username: data["username"], password: data["password"]);
+      // res["data"] = BackgroundLoginController.loginInformation;
+      // service.sendData(res);
+      // break;
       case BackgroundServiceAction.logout:
         res["data"] = await BackgroundLoginController.logout();
         service.sendData(res);
@@ -144,12 +137,6 @@ void _onStart() async {
         await BackgroundLoginController.login(autologin: true, username: null, password: null);
 
         await BackgroundNotificationController.updateNotificationList();
-        res["data"] = jsonEncode(BackgroundNotificationController.notificationList.reversed.toList());
-        service.sendData(res);
-        break;
-      case BackgroundServiceAction.clearNotificationList:
-        await BackgroundNotificationController.clearNotificationList();
-        res["data"] = true;
         service.sendData(res);
         break;
     }
@@ -157,8 +144,7 @@ void _onStart() async {
     printLog("send service: ${res["data"].toString()}");
   });
 
-  var pref = await SharedPreferences.getInstance();
-  var lastFetchTodoTime = DateTime.fromMillisecondsSinceEpoch(pref.getInt("lastFetchTodoTime") ?? 0);
+  var lastFetchTodoTime = await HiveController.loadLastTodoFetchTime();
   if (DateTime.now().difference(lastFetchTodoTime).inSeconds >= 300) {
     timerBody();
   }
@@ -181,6 +167,5 @@ Future<void> timerBody() async {
           '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat("MM-dd_HH:mm").format(DateTime.now())}.txt')
       .writeAsString(res.data, mode: FileMode.append);
 
-  var pref = await SharedPreferences.getInstance();
-  await pref.setInt("lastFetchTodoTime", DateTime.now().millisecondsSinceEpoch);
+  HiveController.storeLastTodoFetchTime(DateTime.now());
 }

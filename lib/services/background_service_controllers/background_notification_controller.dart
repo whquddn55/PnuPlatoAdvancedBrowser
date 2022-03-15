@@ -1,27 +1,15 @@
-import 'dart:convert';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class BackgroundNotificationController {
-  static List<Notification> notificationList = [];
-
   static Future<void> initialize() async {
-    final preference = await SharedPreferences.getInstance();
-    notificationList = preference.getStringList("notificationList")?.map<Notification>((e) => Notification.fromJson(jsonDecode(e))).toList() ?? [];
-
     var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = const IOSInitializationSettings();
     var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     await FlutterLocalNotificationsPlugin().initialize(initializationSettings, onSelectNotification: _onSelectNotification);
-  }
-
-  static Future<void> clearNotificationList() async {
-    final preference = await SharedPreferences.getInstance();
-    await preference.remove('notificationList');
-    notificationList.clear();
   }
 
   static void _onSelectNotification(String? arg) {
@@ -42,12 +30,10 @@ abstract class BackgroundNotificationController {
     }
 
     await _updateNotificationList(newNotificationList);
-
-    final preference = await SharedPreferences.getInstance();
-    await preference.setStringList("notificationList", notificationList.map<String>((e) => jsonEncode(e)).toList());
   }
 
   static Future<void> _updateNotificationList(final List<Notification> newNotificationList) async {
+    var notificationList = await HiveController.loadNotificationList();
     while (newNotificationList.isNotEmpty) {
       var newNotification = newNotificationList.last;
       newNotificationList.removeLast();
@@ -62,6 +48,8 @@ abstract class BackgroundNotificationController {
       splitIndex = i;
     }
     notificationList = notificationList.sublist(splitIndex);
+
+    await HiveController.storeNotificationList(notificationList);
   }
 
   static Future<List<Notification>?> _fetchNewNotificationList(int page) async {
@@ -73,6 +61,7 @@ abstract class BackgroundNotificationController {
 
     Document document = Document.html(response.data);
 
+    List<Notification> notificationList = await HiveController.loadNotificationList();
     List<Notification> newNotificationList = [];
     for (var notificationItem in document.getElementsByClassName('notification-item')) {
       if (notificationItem.localName != 'a') continue;

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart' as noti;
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
 
+part 'article_notification.g.dart';
+
+@HiveType(typeId: 6)
 class ArticleNotification extends noti.Notification {
   ArticleNotification({required String title, required String body, required String url, required DateTime time})
       : super(title: title, body: body, url: url, time: time);
