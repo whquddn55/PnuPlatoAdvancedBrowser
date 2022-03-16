@@ -116,66 +116,86 @@ class _MainCalendarState extends State<MainCalendar> {
     );
   }
 
+  Widget _renderUndatedEvents() {
+    final List<Todo> undateEventList = widget.todoList.where((todo) => todo.dueDate == null).toList();
+    final List<Widget> children = [];
+    children.add(const Text("진행중이거나 마감기한이 없는 할 일"));
+    for (int i = 0; i < undateEventList.length; ++i) {
+      children.add(EventTile(event: undateEventList[i], index: i));
+    }
+
+    if (children.length == 1) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: children,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return TableCalendar<Todo>(
-      availableGestures: AvailableGestures.horizontalSwipe,
-      focusedDay: _focusedDay,
-      firstDay: DateTime(2020, 01, 01),
-      lastDay: DateTime(2025, 12, 31),
-      locale: 'ko-KR',
-      sixWeekMonthsEnforced: true,
-      headerStyle: const HeaderStyle(
-        headerMargin: EdgeInsets.zero,
-        headerPadding: EdgeInsets.zero,
-        titleCentered: true,
-        formatButtonVisible: false,
-        leftChevronIcon: Icon(Icons.arrow_left),
-        rightChevronIcon: Icon(Icons.arrow_right),
-        titleTextStyle: TextStyle(fontSize: 17.0),
-      ),
-      rowHeight: 52 + 15,
-      calendarStyle: CalendarStyle(
-        todayDecoration: BoxDecoration(
-          color: Get.theme.disabledColor,
-          shape: BoxShape.circle,
+    return Column(
+      children: [
+        TableCalendar<Todo>(
+          availableGestures: AvailableGestures.horizontalSwipe,
+          focusedDay: _focusedDay,
+          firstDay: DateTime(2020, 01, 01),
+          lastDay: DateTime(2025, 12, 31),
+          locale: 'ko-KR',
+          sixWeekMonthsEnforced: true,
+          headerStyle: const HeaderStyle(
+            headerMargin: EdgeInsets.zero,
+            headerPadding: EdgeInsets.zero,
+            titleCentered: true,
+            formatButtonVisible: false,
+            leftChevronIcon: Icon(Icons.arrow_left),
+            rightChevronIcon: Icon(Icons.arrow_right),
+            titleTextStyle: TextStyle(fontSize: 17.0),
+          ),
+          rowHeight: 52 + 15,
+          calendarStyle: CalendarStyle(
+            todayDecoration: BoxDecoration(
+              color: Get.theme.disabledColor,
+              shape: BoxShape.circle,
+            ),
+            selectedDecoration: BoxDecoration(
+              color: Get.theme.primaryColor,
+              shape: BoxShape.circle,
+            ),
+            weekendTextStyle: const TextStyle(color: Colors.red),
+            tableBorder: TableBorder.all(
+              color: Colors.grey,
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+            cellMargin: const EdgeInsets.fromLTRB(0, 5, 0, 20),
+          ),
+          daysOfWeekHeight: 20,
+          daysOfWeekStyle:
+              DaysOfWeekStyle(weekendStyle: const TextStyle(color: Colors.red), decoration: BoxDecoration(color: Colors.grey.withOpacity(0.3))),
+          onHeaderTapped: (_) {
+            setState(() {
+              _selectedDay = DateTime.now();
+              _focusedDay = DateTime.now();
+            });
+          },
+          selectedDayPredicate: (day) {
+            return _isSameDay(_selectedDay, day);
+          },
+          onDaySelected: _onDaySelected,
+          eventLoader: (day) {
+            var eventList = <Todo>[];
+            for (var todo in widget.todoList) {
+              if (_isSameDay(todo.dueDate, day)) {
+                eventList.add(todo);
+              }
+            }
+            return eventList;
+          },
+          calendarBuilders: CalendarBuilders(
+            markerBuilder: (context, day, events) => _buildMarker(events),
+          ),
         ),
-        selectedDecoration: BoxDecoration(
-          color: Get.theme.primaryColor,
-          shape: BoxShape.circle,
-        ),
-        weekendTextStyle: const TextStyle(color: Colors.red),
-        tableBorder: TableBorder.all(
-          color: Colors.grey,
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        cellMargin: const EdgeInsets.fromLTRB(0, 5, 0, 20),
-      ),
-      daysOfWeekHeight: 20,
-      daysOfWeekStyle:
-          DaysOfWeekStyle(weekendStyle: const TextStyle(color: Colors.red), decoration: BoxDecoration(color: Colors.grey.withOpacity(0.3))),
-      onHeaderTapped: (_) {
-        setState(() {
-          _selectedDay = DateTime.now();
-          _focusedDay = DateTime.now();
-        });
-      },
-      selectedDayPredicate: (day) {
-        return _isSameDay(_selectedDay, day);
-      },
-      onDaySelected: _onDaySelected,
-      eventLoader: (day) {
-        var eventList = <Todo>[];
-        for (var todo in widget.todoList) {
-          if (_isSameDay(todo.dueDate, day)) {
-            eventList.add(todo);
-          }
-        }
-        return eventList;
-      },
-      calendarBuilders: CalendarBuilders(
-        markerBuilder: (context, day, events) => _buildMarker(events),
-      ),
+        _renderUndatedEvents(),
+      ],
     );
   }
 }

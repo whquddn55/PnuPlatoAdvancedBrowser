@@ -16,6 +16,9 @@ class EventTile extends StatelessWidget {
     if (course == null) return const SizedBox.shrink();
 
     final Color eventColor = event.getColor();
+    final String dateString = event.dueDate == null ? '' : DateFormat.Hms().format(event.dueDate!);
+    final Widget remainTextWidget =
+        event.dueDate == null ? const Text("진행 중", style: TextStyle(color: Colors.green)) : _RemainText(dueDate: event.dueDate!);
 
     return Opacity(
       opacity: event.status == TodoStatus.done ? 0.3 : 1.0,
@@ -32,10 +35,8 @@ class EventTile extends StatelessWidget {
               decoration: BoxDecoration(color: const Color(0xffdddddd), borderRadius: BorderRadius.circular(8.0)),
               child: Column(
                 children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text(course.title), Text(DateFormat.Hms().format(event.dueDate!))]),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(event.title), _RemainText(dueDate: event.dueDate!)]),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(course.title), Text(dateString)]),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(event.title), remainTextWidget]),
                 ],
               ),
             ),

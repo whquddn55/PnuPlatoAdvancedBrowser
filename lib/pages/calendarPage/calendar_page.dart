@@ -15,22 +15,24 @@ class CalendarPage extends StatelessWidget {
     return Scaffold(
       appBar: MainAppbar("캘린더"),
       drawer: const MainDrawer(),
-      body: LoginBuilderPage(() => RefreshIndicator(
-            onRefresh: () async => await TodoController.to.refreshTodoListAll(),
-            child: ListView(
-              children: [
-                const AcademicCalendar(),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GetBuilder<TodoController>(
-                    builder: (controller) {
-                      return MainCalendar(controller.todoList);
-                    },
-                  ),
+      body: LoginBuilderPage(
+        () => RefreshIndicator(
+          onRefresh: () async => await TodoController.to.refreshTodoListAll(),
+          child: ListView(
+            children: [
+              const AcademicCalendar(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GetBuilder<TodoController>(
+                  builder: (controller) {
+                    return MainCalendar(controller.todoList);
+                  },
                 ),
-              ],
-            ),
-          )),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
