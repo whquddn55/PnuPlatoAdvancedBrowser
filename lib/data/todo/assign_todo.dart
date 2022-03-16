@@ -1,14 +1,11 @@
 import 'dart:ui';
 
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 
-part 'assign_todo.g.dart';
-
-@HiveType(typeId: 0)
 class AssignTodo extends Todo {
   AssignTodo({
+    int? isarId,
     required int index,
     required String id,
     required String title,
@@ -18,6 +15,7 @@ class AssignTodo extends Todo {
     required String iconUrl,
     required TodoStatus status,
   }) : super(
+          isarId: isarId,
           index: index,
           id: id,
           title: title,
@@ -26,6 +24,7 @@ class AssignTodo extends Todo {
           availability: availability,
           iconUrl: iconUrl,
           status: status,
+          type: "assign",
         );
 
   @override

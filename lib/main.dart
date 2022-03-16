@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/download_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
@@ -16,7 +15,7 @@ import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.da
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await HiveController.initialize();
+  await StorageController.initialize();
   await AppSettingController.initilize();
   await NotificationController.initilize();
 
@@ -24,7 +23,6 @@ void main() async {
   await Firebase.initializeApp();
   Get.put(LoginController());
   Get.put(RouteController());
-  Get.put(DownloadController());
   Get.put(NoticeController());
   Get.put(TodoController());
   await TodoController.to.initialize();

@@ -1,6 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/article_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/assign_notification.dart';
@@ -12,37 +12,48 @@ import 'package:pnu_plato_advanced_browser/data/notification/vod_notification.da
 import 'package:pnu_plato_advanced_browser/data/notification/zoom_notification.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
 
-abstract class Notification {
-  @HiveField(0)
+part 'notification.g.dart';
+
+@Collection()
+class Notification {
+  @Id()
+  int? isarId;
+  final String? url;
   final String title;
-  @HiveField(1)
   final String body;
-  @HiveField(2)
-  final String url;
-  @HiveField(3)
   final DateTime time;
+  final String type;
 
-  Notification({required this.title, required this.body, required this.url, required this.time});
+  Notification({
+    this.isarId,
+    required this.title,
+    required this.body,
+    required this.url,
+    required this.time,
+    required this.type,
+  });
 
-  @factory
-  static Notification fromJson(Map<String, dynamic> json) {
-    switch (json["type"]) {
-      case "ubboard":
-        return ArticleNotification(title: json["title"], body: json["body"], url: json["url"], time: DateTime.parse(json["time"]));
+  Notification transType() {
+    switch (type) {
+      case "article":
+        return ArticleNotification(isarId: isarId, title: title, body: body, url: url, time: time);
       case "folder":
-        return FolderNotification(title: json["title"], body: json["body"], url: json["url"], time: DateTime.parse(json["time"]));
+        return FolderNotification(isarId: isarId, title: title, body: body, url: url, time: time);
       case "ubfile":
-        return FileNotification(title: json["title"], body: json["body"], url: json["url"], time: DateTime.parse(json["time"]));
+        return FileNotification(isarId: isarId, title: title, body: body, url: url, time: time);
       case "url":
-        return UrlNotification(title: json["title"], body: json["body"], url: json["url"], time: DateTime.parse(json["time"]));
+        return UrlNotification(isarId: isarId, title: title, body: body, url: url, time: time);
       case "vod":
-        return VodNotification(title: json["title"], body: json["body"], url: json["url"], time: DateTime.parse(json["time"]));
+        return VodNotification(isarId: isarId, title: title, body: body, url: url, time: time);
       case "zoom":
-        return ZoomNotification(title: json["title"], body: json["body"], url: json["url"], time: DateTime.parse(json["time"]));
+        return ZoomNotification(isarId: isarId, title: title, body: body, url: url, time: time);
       case "assign":
-        return AssignNotification(title: json["title"], body: json["body"], url: json["url"], time: DateTime.parse(json["time"]));
+        return AssignNotification(isarId: isarId, title: title, body: body, url: url, time: time);
+      case "removed":
+        return UnknownNotification(isarId: isarId, title: title, body: body, url: url, time: time);
+      default:
+        return UnknownNotification(isarId: isarId, title: title, body: body, url: url, time: time);
     }
-    return UnknownNotification(title: json["title"], body: json["body"], url: json["url"], time: DateTime.parse(json["time"]));
   }
 
   @override
@@ -50,7 +61,9 @@ abstract class Notification {
   @override
   bool operator ==(final Object other) => other.runtimeType == runtimeType && hashCode == other.hashCode;
 
-  Color getColor();
+  Color getColor() {
+    throw UnimplementedError("getcolor on notification");
+  }
 
   void open(final BuildContext context) {
     final course = CourseController.getCourseByTitle(title);
@@ -70,7 +83,7 @@ abstract class Notification {
       );
       return;
     }
-    Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: url.split('?id=')[1])));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: url!.split('?id=')[1])));
   }
 
   Future<void> show() async {
@@ -80,7 +93,7 @@ abstract class Notification {
         channelKey: 'ppab_noti_normal',
         title: title,
         body: body,
-        payload: {"url": url},
+        payload: {"url": url ?? ""},
         displayOnForeground: true,
         wakeUpScreen: true,
         displayOnBackground: true,

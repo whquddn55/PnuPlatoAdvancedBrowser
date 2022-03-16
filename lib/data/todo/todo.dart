@@ -1,40 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:isar/isar.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/unknown_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/vod_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
 
 part 'todo.g.dart';
 
-@HiveType(typeId: 5)
-enum TodoStatus {
-  @HiveField(0)
-  done,
-  @HiveField(1)
-  undone,
-  @HiveField(2)
-  doing
+enum TodoStatus { done, undone, doing }
+
+class TodoStatusConverter extends TypeConverter<TodoStatus, int> {
+  const TodoStatusConverter(); // Converters need to have an empty const constructor
+
+  @override
+  TodoStatus fromIsar(int object) {
+    return TodoStatus.values[object];
+  }
+
+  @override
+  int toIsar(TodoStatus object) {
+    return object.index;
+  }
 }
 
-abstract class Todo {
-  @HiveField(0)
+@Collection()
+class Todo {
+  @Id()
+  int? isarId;
+
   final int index;
-  @HiveField(1)
   final String id;
-  @HiveField(2)
   final String title;
-  @HiveField(3)
   final String courseId;
-  @HiveField(4)
   final DateTime? dueDate;
-  @HiveField(5)
   final bool availability;
-  @HiveField(6)
   final String iconUrl;
-  @HiveField(7)
+  final String type;
+  @TodoStatusConverter()
   TodoStatus status;
 
   Todo({
+    this.isarId,
     required this.index,
     required this.id,
     required this.title,
@@ -43,16 +53,77 @@ abstract class Todo {
     required this.availability,
     required this.iconUrl,
     required this.status,
+    required this.type,
   });
 
+  Todo transType() {
+    switch (type) {
+      case "assign":
+        return AssignTodo(
+            isarId: isarId,
+            availability: availability,
+            courseId: courseId,
+            dueDate: dueDate,
+            iconUrl: iconUrl,
+            id: id,
+            index: index,
+            status: status,
+            title: title);
+      case "quiz":
+        return QuizTodo(
+            isarId: isarId,
+            availability: availability,
+            courseId: courseId,
+            dueDate: dueDate,
+            iconUrl: iconUrl,
+            id: id,
+            index: index,
+            status: status,
+            title: title);
+      case "vod":
+        return VodTodo(
+            isarId: isarId,
+            availability: availability,
+            courseId: courseId,
+            dueDate: dueDate,
+            iconUrl: iconUrl,
+            id: id,
+            index: index,
+            status: status,
+            title: title);
+      case "zoom":
+        return ZoomTodo(
+            isarId: isarId,
+            availability: availability,
+            courseId: courseId,
+            dueDate: dueDate,
+            iconUrl: iconUrl,
+            id: id,
+            index: index,
+            status: status,
+            title: title);
+      default:
+        return UnknownTodo(
+            isarId: isarId,
+            availability: availability,
+            courseId: courseId,
+            dueDate: dueDate,
+            iconUrl: iconUrl,
+            id: id,
+            index: index,
+            status: status,
+            title: title);
+    }
+  }
+
   @override
-  int get hashCode => super.hashCode;
+  int get hashCode => (courseId + type + id).hashCode;
 
   @override
   bool operator ==(Object other) {
     if (other.runtimeType != runtimeType) return false;
     var otherTodo = other as Todo;
-    return otherTodo.id == id && otherTodo.courseId == courseId;
+    return otherTodo.hashCode == hashCode;
   }
 
   void open(final BuildContext context) {
@@ -64,5 +135,7 @@ abstract class Todo {
     Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: id)));
   }
 
-  Color getColor();
+  Color getColor() {
+    throw UnimplementedError("getcolor on todo");
+  }
 }

@@ -1,6 +1,6 @@
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
@@ -20,22 +20,28 @@ abstract class BackgroundTodoController {
       newTodoList.addAll(await _fetchZoom(courseId, index));
     }
 
-    var todoList = await HiveController.loadTodoList();
+    var todoList = await StorageController.loadTodoList();
 
     _updateTodoList(todoList, newTodoList, courseIdList);
     todoList.sort((a, b) {
       if (a.courseId == b.courseId) return a.index - b.index;
       return a.courseId.compareTo(b.courseId);
     });
-    printLog(todoList);
-    await HiveController.storeTodoList(todoList);
+    await StorageController.storeTodoList(todoList);
 
     return;
   }
 
   static void _updateTodoList(List<Todo> prvTodoList, List<Todo> newTodoList, final List<String> courseIdList) {
-    prvTodoList.removeWhere((todo) => courseIdList.contains(todo.courseId));
-    prvTodoList.addAll(newTodoList);
+    for (var newTodo in newTodoList) {
+      int prvIndex = prvTodoList.indexOf(newTodo);
+      if (prvIndex != -1) {
+        newTodo.isarId = prvTodoList[prvIndex].isarId;
+        prvTodoList[prvIndex] = newTodo;
+      } else {
+        prvTodoList.add(newTodo);
+      }
+    }
   }
 
   static Future<List<Todo>> _fetchVod(final String courseId, int index) async {

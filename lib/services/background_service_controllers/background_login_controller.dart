@@ -5,14 +5,14 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 
 abstract class BackgroundLoginController {
   static LoginInformation loginInformation = LoginInformation();
 
   static Future<bool> _checkLogin() async {
-    final LoginInformation? loginInformation = await HiveController.loadLoginInformation();
+    final LoginInformation? loginInformation = await StorageController.loadLoginInformation();
     if (loginInformation == null) return false;
 
     String body = '[{"index":0,"methodname":"core_fetch_notifications","args":{"contextid":2}}]';
@@ -32,18 +32,18 @@ abstract class BackgroundLoginController {
     if (autologin == true) {
       bool loginStatus = await _checkLogin();
       if (loginStatus == true) {
-        loginInformation = (await HiveController.loadLoginInformation())!;
-        loginInformation.loginMsg = "이미 로그인 되어있음!";
+        loginInformation = (await StorageController.loadLoginInformation())!;
         return;
       }
 
-      username = await HiveController.loadUsername();
-      password = await HiveController.loadPassword();
+      username = await StorageController.loadUsername();
+      password = await StorageController.loadPassword();
     }
 
     if (username == null || password == null) {
       loginInformation.loginStatus = false;
       loginInformation.loginMsg = "아이디, 비밀번호가 저장되어 있지 않습니다.";
+      await StorageController.storeLoginInformation(loginInformation);
       return;
     }
 
@@ -74,6 +74,7 @@ abstract class BackgroundLoginController {
       loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
       /* TODO: popup error report */
       loginInformation.loginStatus = false;
+      await StorageController.storeLoginInformation(loginInformation);
       return;
     } on dio.DioError catch (e, _) {
       /* successfully login */
@@ -85,6 +86,7 @@ abstract class BackgroundLoginController {
         loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
         /* TODO: popup error report */
         loginInformation.loginStatus = false;
+        await StorageController.storeLoginInformation(loginInformation);
         return;
       }
     }
@@ -93,6 +95,7 @@ abstract class BackgroundLoginController {
       loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
       /* TODO: popup error report */
       loginInformation.loginStatus = false;
+      await StorageController.storeLoginInformation(loginInformation);
       return;
     }
 
@@ -100,6 +103,7 @@ abstract class BackgroundLoginController {
     if (response.headers.map['location']![0] == CommonUrl.loginErrorUrl) {
       loginInformation.loginMsg = '잘못된 ID 또는 PW입니다. 다시 확인해주세요.';
       loginInformation.loginStatus = false;
+      await StorageController.storeLoginInformation(loginInformation);
       return;
     }
 
@@ -111,9 +115,9 @@ abstract class BackgroundLoginController {
     await _setCooKie(loginInformation);
     loginInformation.loginStatus = true;
 
-    await HiveController.storeUsername(username);
-    await HiveController.storePassword(password);
-    await HiveController.storeLoginInformation(loginInformation);
+    await StorageController.storeUsername(username);
+    await StorageController.storePassword(password);
+    await StorageController.storeLoginInformation(loginInformation);
 
     printLog("Sync With Plato : ${loginInformation.moodleSessionKey}");
 
@@ -121,7 +125,7 @@ abstract class BackgroundLoginController {
   }
 
   static Future<bool> logout() async {
-    final LoginInformation loginInformation = (await HiveController.loadLoginInformation())!;
+    final LoginInformation loginInformation = (await StorageController.loadLoginInformation())!;
 
     String? sessionKey = await _getSessionKey(loginInformation.moodleSessionKey);
     if (sessionKey == null) {
@@ -129,9 +133,7 @@ abstract class BackgroundLoginController {
     }
     await dio.Dio().get(CommonUrl.logoutUrl + sessionKey);
 
-    await HiveController.clearByKey("username");
-    await HiveController.clearByKey("password");
-    await HiveController.clearByKey("loginInformation");
+    await StorageController.clearUserData();
 
     return true;
   }

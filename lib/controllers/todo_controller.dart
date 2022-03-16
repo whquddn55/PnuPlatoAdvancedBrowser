@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
@@ -11,7 +11,7 @@ class TodoController extends GetxController {
   List<Todo> todoList = <Todo>[];
 
   Future<void> initialize() async {
-    todoList = await HiveController.loadTodoList();
+    todoList = await StorageController.loadTodoList();
   }
 
   Future<void> refreshTodoListAll() async {
@@ -29,8 +29,7 @@ class TodoController extends GetxController {
       BackgroundServiceAction.fetchTodoList,
       data: {"courseIdList": courseIdList},
     );
-    todoList = await HiveController.loadTodoList();
-    printLog(todoList);
+    todoList = await StorageController.loadTodoList();
     update();
 
     /* unlock */
@@ -53,7 +52,7 @@ class TodoController extends GetxController {
     }
 
     if (modified) {
-      await HiveController.storeTodoList(todoList);
+      await StorageController.storeTodoList(todoList);
       update();
     }
   }

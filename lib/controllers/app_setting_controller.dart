@@ -1,4 +1,4 @@
-import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 
 abstract class AppSettingController {
   static bool _isFirst = true;
@@ -6,10 +6,10 @@ abstract class AppSettingController {
   static bool get isFirst => _isFirst;
   static set isFirst(final bool isFirst) {
     _isFirst = isFirst;
-    HiveController.storeIsFirst(isFirst);
+    StorageController.storeIsFirst(isFirst);
   }
 
   static Future<void> initilize() async {
-    _isFirst = await HiveController.loadIsFirst();
+    _isFirst = await StorageController.loadIsFirst();
   }
 }

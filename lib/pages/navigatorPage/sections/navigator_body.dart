@@ -35,28 +35,12 @@ class NavigatorBody extends StatelessWidget {
                       ),
                     ),
                   ),
-                  tabs: [
-                    const Tab(child: Icon(Icons.home)),
-                    const Tab(child: Icon(Icons.calendar_today_outlined)),
-                    const Tab(child: Icon(Icons.email)),
-                    Tab(
-                      child: StreamBuilder<List<DownloadInformation>>(
-                        stream: Get.find<DownloadController>().stream,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.active) {
-                            List<DownloadInformation> list = snapshot.data!;
-                            return Badge(
-                              badgeContent: Text(list.length.toString()),
-                              child: const Icon(Icons.download_rounded),
-                              showBadge: list.isNotEmpty,
-                            );
-                          } else {
-                            return const Icon(Icons.download_rounded);
-                          }
-                        },
-                      ),
-                    ),
-                    const Tab(child: Icon(Icons.notifications)),
+                  tabs: const [
+                    Tab(child: Icon(Icons.home)),
+                    Tab(child: Icon(Icons.calendar_today_outlined)),
+                    Tab(child: Icon(Icons.email)),
+                    Tab(child: Icon(Icons.download_rounded)),
+                    Tab(child: Icon(Icons.notifications)),
                   ],
                 ),
               ),

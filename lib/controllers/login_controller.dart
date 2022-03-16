@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/hive_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
@@ -11,7 +11,7 @@ class LoginController extends GetxController {
   LoginInformation loginInformation = LoginInformation();
 
   static Future<bool> _checkLogin() async {
-    final LoginInformation? loginInformation = await HiveController.loadLoginInformation();
+    final LoginInformation? loginInformation = await StorageController.loadLoginInformation();
     if (loginInformation == null) return false;
 
     String body = '[{"index":0,"methodname":"core_fetch_notifications","args":{"contextid":2}}]';
@@ -26,15 +26,16 @@ class LoginController extends GetxController {
   }
 
   Future<void> login({required final bool autologin, String? username, String? password}) async {
-    bool before = loginInformation.loginStatus;
+    bool beforeLoginStatus = loginInformation.loginStatus;
+    String beforeLoginMsg = loginInformation.loginMsg;
     if (await _checkLogin() == false) {
       await BackgroundLoginController.login(autologin: autologin, username: username, password: password);
     }
 
-    final LoginInformation? _loginInformation = await HiveController.loadLoginInformation();
+    final LoginInformation? _loginInformation = await StorageController.loadLoginInformation();
     if (_loginInformation == null) return;
     loginInformation = _loginInformation;
-    if (before != loginInformation.loginStatus) update();
+    if (beforeLoginStatus != loginInformation.loginStatus || beforeLoginMsg != loginInformation.loginMsg) update();
   }
 
   Future<void> logout() async {

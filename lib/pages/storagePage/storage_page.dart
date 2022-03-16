@@ -29,22 +29,23 @@ class StoragePage extends StatelessWidget {
                 child: TabBar(
                   tabs: [
                     const Tab(icon: Icon(Icons.folder)),
-                    StreamBuilder<List<DownloadInformation>>(
-                        stream: Get.find<DownloadController>().stream,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.active) {
-                            List<DownloadInformation> list = snapshot.data!;
-                            return Tab(
-                              icon: Badge(
-                                badgeContent: Text(list.length.toString()),
-                                child: const Icon(Icons.download),
-                                showBadge: list.isNotEmpty,
-                              ),
-                            );
-                          } else {
-                            return const Tab(icon: Icon(Icons.download_rounded));
-                          }
-                        }),
+                    const Tab(icon: Icon(Icons.folder)),
+                    // StreamBuilder<List<DownloadInformation>>(
+                    //     stream: Get.find<DownloadController>().stream,
+                    //     builder: (context, snapshot) {
+                    //       if (snapshot.connectionState == ConnectionState.active) {
+                    //         List<DownloadInformation> list = snapshot.data!;
+                    //         return Tab(
+                    //           icon: Badge(
+                    //             badgeContent: Text(list.length.toString()),
+                    //             child: const Icon(Icons.download),
+                    //             showBadge: list.isNotEmpty,
+                    //           ),
+                    //         );
+                    //       } else {
+                    //         return const Tab(icon: Icon(Icons.download_rounded));
+                    //       }
+                    //     }),
                   ],
                 ),
               ),
@@ -61,7 +62,7 @@ class StoragePage extends StatelessWidget {
                             return const Center(child: CircularProgressIndicator());
                           }
                         }),
-                    const DownloadPage()
+                    const Center(child: Text("삭제")),
                   ],
                 ),
               ),
