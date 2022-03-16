@@ -107,7 +107,7 @@ abstract class BackgroundTodoController {
       if (tr.getElementsByClassName('cell c1').isNotEmpty) {
         String title = tr.getElementsByClassName('cell c1')[0].text.trim();
         String id = tr.getElementsByClassName('cell c1')[0].getElementsByTagName('a')[0].attributes['href']!.split('?id=')[1];
-        DateTime dueDate = DateTime.tryParse(tr.getElementsByClassName('cell c2')[0].text.trim()) ?? DateTime.now();
+        DateTime? dueDate = DateTime.tryParse(tr.getElementsByClassName('cell c2')[0].text.trim());
         bool done = tr.getElementsByClassName('cell c3')[0].text.trim().contains('완료');
 
         todoList.add(AssignTodo(
@@ -140,9 +140,10 @@ abstract class BackgroundTodoController {
       if (tr.getElementsByClassName('cell c1').isNotEmpty) {
         String title = tr.getElementsByClassName('cell c1')[0].text.trim();
         String id = tr.getElementsByClassName('cell c1')[0].getElementsByTagName('a')[0].attributes['href']!.split('?id=')[1];
-        DateTime dueDate = DateTime.tryParse(tr.getElementsByClassName('cell c2')[0].text.trim()) ?? DateTime.now();
+        DateTime? dueDate = DateTime.tryParse(tr.getElementsByClassName('cell c2')[0].text.trim());
         bool done = tr.getElementsByClassName('cell c3')[0].text.trim().contains('완료') ||
             (tr.getElementsByClassName('cell c3')[0].text.trim() != "-") ||
+            dueDate == null ||
             (dueDate.compareTo(DateTime.now()) <= 0);
 
         todoList.add(QuizTodo(
@@ -173,8 +174,8 @@ abstract class BackgroundTodoController {
       if (tr.getElementsByClassName('cell c1').isNotEmpty) {
         String title = tr.getElementsByClassName('cell c1')[0].text.trim();
         String id = tr.getElementsByClassName('cell c1')[0].getElementsByTagName('a')[0].attributes['href']!.split('?id=')[1];
-        DateTime dueDate = DateTime.parse(tr.getElementsByClassName('cell c2')[0].text.trim());
-        bool done = tr.parent!.parent!.classes.contains('mod_index') == false;
+        DateTime? dueDate = DateTime.tryParse(tr.getElementsByClassName('cell c2')[0].text.trim());
+        TodoStatus todoStatus = _getZoomTodoStatus(tr);
 
         todoList.add(ZoomTodo(
           index: index,
@@ -184,12 +185,22 @@ abstract class BackgroundTodoController {
           iconUrl: "https://plato.pusan.ac.kr/theme/image.php/coursemosv2/zoom/1641196863/icon",
           id: id,
           title: title,
-          status: done ? TodoStatus.done : TodoStatus.undone,
+          status: todoStatus,
         ));
       }
     }
 
     return todoList;
+  }
+
+  static TodoStatus _getZoomTodoStatus(final html.Element tr) {
+    if (tr.parent!.parent!.classes.contains('mod_index') == false) {
+      return TodoStatus.done;
+    }
+    if (tr.getElementsByClassName('cell c4')[0].getElementsByTagName('form').isNotEmpty) {
+      return TodoStatus.doing;
+    }
+    return TodoStatus.undone;
   }
 
   static Future<List<Map<String, dynamic>>> _fetchVodStatusList(final String courseId) async {

@@ -34,8 +34,8 @@ class EventTile extends StatelessWidget {
                 children: [
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text(course.title), Text(DateFormat.Hms().format(event.dueDate))]),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(event.title), _RemainText(dueDate: event.dueDate)]),
+                      children: [Text(course.title), Text(DateFormat.Hms().format(event.dueDate!))]),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(event.title), _RemainText(dueDate: event.dueDate!)]),
                 ],
               ),
             ),

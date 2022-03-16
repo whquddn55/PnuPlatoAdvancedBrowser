@@ -21,7 +21,7 @@ class AssignTodoAdapter extends TypeAdapter<AssignTodo> {
       id: fields[1] as String,
       title: fields[2] as String,
       courseId: fields[3] as String,
-      dueDate: fields[4] as DateTime,
+      dueDate: fields[4] as DateTime?,
       availability: fields[5] as bool,
       iconUrl: fields[6] as String,
       status: fields[7] as TodoStatus,

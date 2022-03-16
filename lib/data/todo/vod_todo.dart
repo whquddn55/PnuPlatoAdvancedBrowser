@@ -12,7 +12,7 @@ class VodTodo extends Todo {
       required String id,
       required String title,
       required String courseId,
-      required DateTime dueDate,
+      required DateTime? dueDate,
       required bool availability,
       required String iconUrl,
       required TodoStatus status})

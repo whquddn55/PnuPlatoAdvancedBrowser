@@ -13,98 +13,134 @@ class ZoomBottomSheet extends StatelessWidget {
   final ZoomCourseActivity activity;
   const ZoomBottomSheet({Key? key, required this.activity, required this.courseTitle, required this.courseId}) : super(key: key);
 
-  Widget _renderZoomInfo() {
-    return FutureBuilder<CourseZoom?>(
-      future: CourseZoomController.fetchCourseZoom(activity.id),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
-        }
+  Widget _renderZoomInfo(final AsyncSnapshot<CourseZoom?> snapshot) {
+    if (snapshot.connectionState != ConnectionState.done) {
+      return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
+    }
+    if (snapshot.data == null) {
+      return errorWidget();
+    }
 
-        if (snapshot.data == null) {
-          return errorWidget();
-        }
+    final CourseZoom courseZoom = snapshot.data!;
+    Color textColor = Colors.red;
+    switch (courseZoom.status) {
+      case "진행중":
+        textColor = Colors.green;
+        break;
+      case "종료":
+        textColor = Colors.black;
+        break;
+      default:
+        textColor = Colors.red;
+    }
 
-        CourseZoom courseZoom = snapshot.data!;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("시작시간 : ${DateFormat("yyyy-MM-dd HH:mm").format(courseZoom.startTime)} (${courseZoom.runningTime})"),
+        Row(
           children: [
-            Text("시작시간 : ${DateFormat("yyyy-MM-dd HH:mm").format(courseZoom.startTime)} (${courseZoom.runningTime})"),
-            Row(
-              children: [
-                const Text("상태 : "),
-                courseZoom.status ? const Icon(Icons.start, color: Colors.green) : const Icon(Icons.close, color: Colors.red)
-              ],
-            ),
+            const Text("상태 : "),
+            Text(courseZoom.status, style: TextStyle(color: textColor)),
           ],
-        );
-      },
+        ),
+      ],
     );
+  }
+
+  Widget _renderOpenButton(final BuildContext context, final AsyncSnapshot<CourseZoom?> snapshot) {
+    if (snapshot.connectionState != ConnectionState.done) {
+      return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
+    }
+    if (snapshot.data == null) {
+      return errorWidget();
+    }
+
+    final CourseZoom courseZoom = snapshot.data!;
+
+    switch (courseZoom.status) {
+      case "진행중":
+        return TextButton.icon(
+          icon: const Icon(Icons.open_in_new),
+          label: const Text("열기"),
+          style: TextButton.styleFrom(
+            alignment: Alignment.centerLeft,
+            primary: Get.textTheme.bodyText1!.color,
+          ),
+          onPressed: () async => await activity.open(context),
+        );
+      default:
+        return TextButton.icon(
+          icon: const Icon(Icons.open_in_new),
+          label: const Text("Zoom이 열려있지 않습니다."),
+          style: TextButton.styleFrom(
+            alignment: Alignment.centerLeft,
+            primary: Get.textTheme.bodyText1!.color,
+          ),
+          onPressed: null,
+        );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Wrap(
-        runSpacing: 20,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return FutureBuilder<CourseZoom?>(
+      future: CourseZoomController.fetchCourseZoom(activity.id),
+      builder: (context, snapshot) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Wrap(
+            runSpacing: 20,
             children: [
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: CachedNetworkImage(
-                      imageUrl: activity.iconUrl!,
-                      height: 20,
-                    ),
-                  ),
-                  Flexible(
-                    child: Text(
-                      activity.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: CachedNetworkImage(
+                          imageUrl: activity.iconUrl!,
+                          height: 20,
+                        ),
                       ),
-                    ),
+                      Flexible(
+                        child: Text(
+                          activity.title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                    ],
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(height: 8.0),
+                  _renderZoomInfo(snapshot),
                 ],
               ),
-              const SizedBox(height: 8.0),
-              _renderZoomInfo(),
-            ],
-          ),
-          const Divider(height: 0, thickness: 1.5),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextButton.icon(
-                icon: const Icon(Icons.open_in_new),
-                label: const Text("열기"),
-                style: TextButton.styleFrom(
-                  alignment: Alignment.centerLeft,
-                  primary: Get.textTheme.bodyText1!.color,
-                ),
-                onPressed: () async => await activity.open(context),
-              ),
-              TextButton.icon(
-                icon: const Icon(Icons.cancel_outlined),
-                label: const Text('취소'),
-                style: TextButton.styleFrom(
-                  alignment: Alignment.centerLeft,
-                  primary: Get.textTheme.bodyText1!.color,
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+              const Divider(height: 0, thickness: 1.5),
+              Column(
+                crossAxisAlignment: snapshot.connectionState == ConnectionState.done ? CrossAxisAlignment.stretch : CrossAxisAlignment.start,
+                children: [
+                  _renderOpenButton(context, snapshot),
+                  TextButton.icon(
+                    icon: const Icon(Icons.cancel_outlined),
+                    label: const Text('취소'),
+                    style: TextButton.styleFrom(
+                      alignment: Alignment.centerLeft,
+                      primary: Get.textTheme.bodyText1!.color,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

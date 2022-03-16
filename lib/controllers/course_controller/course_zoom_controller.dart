@@ -13,7 +13,7 @@ abstract class CourseZoomController {
     Document document = Document.html(response.data);
     late final DateTime startTime;
     late final String runningTime;
-    late final bool status;
+    late final String status;
     for (var tr in document.getElementsByClassName('ubzoom_view')[0].getElementsByTagName('tr')) {
       switch (tr.children[0].text) {
         case "시작 시간":
@@ -23,7 +23,7 @@ abstract class CourseZoomController {
           runningTime = tr.children[1].text;
           break;
         case "상태":
-          status = false;
+          status = tr.children[1].text.trim();
           break;
       }
     }

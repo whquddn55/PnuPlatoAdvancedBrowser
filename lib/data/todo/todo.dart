@@ -26,7 +26,7 @@ abstract class Todo {
   @HiveField(3)
   final String courseId;
   @HiveField(4)
-  final DateTime dueDate;
+  final DateTime? dueDate;
   @HiveField(5)
   final bool availability;
   @HiveField(6)
