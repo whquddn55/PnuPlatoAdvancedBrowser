@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -267,10 +268,6 @@ HtmlWidget renderHtml(String html) {
       }
       return true;
     },
-    onTapImage: (imageMetadata) {
-      Navigator.of(Get.context!, rootNavigator: true)
-          .push(MaterialPageRoute(builder: (context) => SafeArea(child: PhotoView(imageProvider: NetworkImage(imageMetadata.sources.first.url)))));
-    },
     customWidgetBuilder: (element) {
       if (element.classes.contains("badge")) {
         return Padding(
@@ -283,6 +280,37 @@ HtmlWidget renderHtml(String html) {
         );
       }
       switch (element.localName) {
+        case "video":
+          return InnerPlayer(
+            element.getElementsByTagName('source')[0].attributes["src"]!,
+            headers: {"Cookie": LoginController.to.loginInformation.moodleSessionKey},
+          );
+        case "img":
+          final String url = element.attributes["src"]!;
+          printLog(url);
+
+          return InkWell(
+            onTap: () => Navigator.of(Get.context!, rootNavigator: true).push(
+              MaterialPageRoute(
+                builder: (context) => SafeArea(
+                  child: PhotoView(
+                    imageProvider: NetworkImage(
+                      url,
+                      headers: {
+                        'Cookie': LoginController.to.loginInformation.moodleSessionKey,
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            child: Image.network(
+              url,
+              headers: {
+                'Cookie': LoginController.to.loginInformation.moodleSessionKey,
+              },
+            ),
+          );
         case "table":
           final _scrollController = ScrollController();
           var tbody = element.getElementsByTagName('tbody')[0];
@@ -329,11 +357,6 @@ HtmlWidget renderHtml(String html) {
                 ),
               ),
             ),
-          );
-        case "video":
-          return InnerPlayer(
-            element.getElementsByTagName('source')[0].attributes["src"]!,
-            headers: {"Cookie": LoginController.to.loginInformation.moodleSessionKey},
           );
       }
       return null;
