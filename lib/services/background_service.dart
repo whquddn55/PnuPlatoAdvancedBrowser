@@ -94,6 +94,7 @@ void _onStart() async {
     PathProviderIOS.registerWith();
   }
   await StorageController.initialize();
+  await BackgroundNotificationController.initilize();
 
   /* ensure login */
   await BackgroundLoginController.login(autologin: true, username: null, password: null);

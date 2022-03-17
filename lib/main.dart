@@ -5,7 +5,6 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
@@ -17,7 +16,6 @@ void main() async {
 
   await StorageController.initialize();
   await AppSettingController.initilize();
-  await NotificationController.initilize();
 
   await initializeDateFormatting();
   await Firebase.initializeApp();

@@ -51,8 +51,8 @@ class _CourseMainPageState extends State<CourseMainPage> {
     if (widget.targetActivityId != null) {
       if (targetActivityContext == null) return;
       Scrollable.ensureVisible(targetActivityContext, alignment: 0.5, duration: const Duration(milliseconds: 500));
-    } else {
-      Scrollable.ensureVisible(targetWeekContext!, duration: const Duration(milliseconds: 500));
+    } else if (targetWeekContext != null) {
+      Scrollable.ensureVisible(targetWeekContext, duration: const Duration(milliseconds: 500));
     }
   }
 
@@ -248,7 +248,8 @@ class _CourseMainPageState extends State<CourseMainPage> {
   }
 
   List<Widget> _renderWeekTileList(final GlobalKey targetActivityKey, final GlobalKey currentWeekKey) {
-    final int currentWeekIndex = widget.course.activityMap.keys.toList().indexOf(widget.course.currentWeek!);
+    final int currentWeekIndex =
+        widget.course.currentWeek == null ? 100 : widget.course.activityMap.keys.toList().indexOf(widget.course.currentWeek!);
     final List<Widget> weekTileWidgetList = [];
     final List<List<CourseActivity>> weekList = widget.course.activityMap.values.toList();
     for (int weekIndex = 0; weekIndex < weekList.length; ++weekIndex) {
@@ -320,12 +321,12 @@ class _CourseMainPageState extends State<CourseMainPage> {
                 widget.course.summaryMap[weekTitle] == ''
                     ? const SizedBox.shrink()
                     : Container(
-                        child: renderHtml(weekTitle),
+                        child: renderHtml(widget.course.summaryMap[weekTitle]!),
                         decoration: BoxDecoration(
                           border: Border.all(width: 1, color: Get.theme.hintColor),
                           borderRadius: BorderRadius.circular(3.0),
                         ),
-                        margin: const EdgeInsets.only(bottom: 20.0),
+                        margin: const EdgeInsets.all(12.0),
                       ),
                 Column(
                   children: activityButtonList,

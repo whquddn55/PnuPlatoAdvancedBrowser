@@ -33,7 +33,7 @@ abstract class CourseController {
   }
 
   static Future<bool> updateCurrentSemesterCourseList() async {
-    var res = await _fetchCourseList(year: 2022, semester: 10);
+    var res = await _fetchCourseList(year: 2021, semester: 20);
     if (res == null) {
       return false;
     }

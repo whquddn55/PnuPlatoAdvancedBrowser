@@ -4,28 +4,39 @@ import 'dart:typed_data';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dio/dio.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 
 abstract class BackgroundDownloadController {
+  static Map<int, CancelToken> tokenMap = {};
   static Future<void> download(final DownloadInformation downloadInformation) async {
     var res = true;
+    await Fluttertoast.cancel();
+    await Fluttertoast.showToast(msg: "다운로드를 시작합니다.");
     switch (downloadInformation.type) {
       case DownloadType.m3u8:
-        res &= await _M3u8Downloader.downloadM3u8(downloadInformation);
+        res &= await _downloadM3u8(downloadInformation);
         break;
       default:
         res &= await _downloadNormal(downloadInformation);
         break;
     }
-
     return;
+  }
+
+  static CancelToken _registerCancelToken(final int id) {
+    final CancelToken cancelToken = CancelToken();
+    tokenMap[id] = cancelToken;
+    return cancelToken;
   }
 
   static Future<bool> _downloadNormal(final DownloadInformation downloadInformation) async {
     final Options options = Options(headers: {"Cookie": BackgroundLoginController.loginInformation.moodleSessionKey});
+    final int id = downloadInformation.url.hashCode;
+
     try {
       await Directory(downloadInformation.saveDir).create(recursive: true);
 
@@ -34,47 +45,112 @@ abstract class BackgroundDownloadController {
         await file.delete();
       }
 
-      final CancelToken cancelToken = CancelToken();
+      final CancelToken cancelToken = _registerCancelToken(id);
+
+      await _showProgressNotification(id, downloadInformation.title);
       var res = await Dio().download(
         downloadInformation.url,
         '${downloadInformation.saveDir}/${downloadInformation.title}',
-        onReceiveProgress: (count, total) async {
-          await _showNotification(downloadInformation.hashCode, downloadInformation.title, cancelToken);
-        },
         options: options,
         cancelToken: cancelToken,
-        deleteOnError: true,
       );
+
+      await _showCompleteNotification(id, downloadInformation.title);
+
+      tokenMap.remove(id);
+
       return true;
-    } catch (e) {
-      /* TODO : 에러 */
-      printLog("[ERROR]$e");
+    } on DioError catch (e) {
+      switch (e.type) {
+        case DioErrorType.connectTimeout:
+        case DioErrorType.sendTimeout:
+        case DioErrorType.receiveTimeout:
+        case DioErrorType.response:
+        case DioErrorType.other:
+          await _showFailNotification(id, downloadInformation.title, body: e.message);
+          var file = File('${downloadInformation.saveDir}/${downloadInformation.title}');
+          if (await file.exists()) await file.delete();
+          break;
+        case DioErrorType.cancel:
+          break;
+      }
+
+      tokenMap.remove(id);
+      return false;
+    } on FileSystemException catch (e) {
+      await _showFailNotification(id, downloadInformation.title, body: e.message);
+      var file = File('${downloadInformation.saveDir}/${downloadInformation.title}');
+      if (await file.exists()) await file.delete();
+
+      tokenMap.remove(id);
       return false;
     }
   }
 
-  static Future<void> _showNotification(final int id, final String title, final CancelToken cancelToken) async {
-    /* TODO: Register cancelToken */
+  static Future<void> _showProgressNotification(final int id, final String title, {int? progress}) async {
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: id,
-        groupKey: 'ppab_noti_group',
-        channelKey: 'ppab_noti_download_status',
+        //groupKey: 'ppab_noti_download_progress',
+        channelKey: 'ppab_noti_download_progress',
         title: title,
         body: '다운로드중...',
         autoDismissible: false,
         displayOnForeground: true,
         displayOnBackground: true,
         locked: true,
+        showWhen: true,
+        progress: progress,
         notificationLayout: NotificationLayout.ProgressBar,
       ),
-      actionButtons: [NotificationActionButton(key: "cancel", label: "취소", buttonType: ActionButtonType.DisabledAction)],
+      actionButtons: [
+        NotificationActionButton(
+          key: "cancel",
+          label: "취소",
+          buttonType: ActionButtonType.KeepOnTop,
+        )
+      ],
     );
   }
-}
 
-abstract class _M3u8Downloader {
-  static Future<bool> downloadM3u8(final DownloadInformation downloadInformation) async {
+  static Future<void> _showCompleteNotification(final int id, final String title) async {
+    await AwesomeNotifications().dismiss(id);
+
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: id,
+        groupKey: 'ppab_noti_download_result',
+        channelKey: 'ppab_noti_download_result',
+        title: title,
+        body: '다운로드 완료!',
+        autoDismissible: true,
+        displayOnForeground: true,
+        displayOnBackground: true,
+        showWhen: true,
+      ),
+    );
+  }
+
+  static Future<void> _showFailNotification(final int id, final String title, {final String body = ""}) async {
+    await AwesomeNotifications().dismiss(id);
+
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: id,
+        groupKey: 'ppab_noti_normal',
+        channelKey: 'ppab_noti_normal',
+        title: title,
+        body: '다운로드 실패... ' + body,
+        autoDismissible: true,
+        displayOnForeground: true,
+        displayOnBackground: true,
+        showWhen: true,
+      ),
+    );
+  }
+
+  static Future<bool> _downloadM3u8(final DownloadInformation downloadInformation) async {
+    final int id = downloadInformation.url.hashCode;
     try {
       /* variable init */
       final String baseUrl = downloadInformation.url.substring(0, downloadInformation.url.lastIndexOf('/'));
@@ -86,7 +162,8 @@ abstract class _M3u8Downloader {
       m3u8Str = _reconstructM3u8Str(m3u8Str);
 
       /* download .ts, key, index file */
-      bool result = true;
+
+      bool res = true;
       if (tsUrlList.isNotEmpty) {
         /* delete exist folder */
         var dir = Directory(downloadInformation.saveDir);
@@ -97,27 +174,56 @@ abstract class _M3u8Downloader {
         await dir.create(recursive: true);
 
         /* downlaod .ts */
-        result &= await _downloadTs(tsUrlList, downloadInformation);
+        final CancelToken cancelToken = _registerCancelToken(id);
+        res &= await _downloadTs(tsUrlList, downloadInformation, cancelToken);
+
+        if (cancelToken.isCancelled) throw DioError(requestOptions: RequestOptions(path: ''), type: DioErrorType.cancel);
 
         /* download key */
         var keyFile = File('${downloadInformation.saveDir}/key');
-        keyFile.writeAsBytesSync(aesConf['key']);
-        result &= keyFile.lengthSync() == aesConf['key'].length;
+        await keyFile.writeAsBytes(aesConf['key']);
+        res &= (await keyFile.length()) == aesConf['key'].length;
 
         /* download index */
         var indexFile = File('${downloadInformation.saveDir}/index.m3u8');
-        indexFile.writeAsStringSync(m3u8Str);
-        result &= indexFile.lengthSync() == m3u8Str.length;
-      }
-      return result;
-    } catch (e) {
-      /* TODO : 에러 */
+        await indexFile.writeAsString(m3u8Str);
+        res &= await (indexFile.length()) == m3u8Str.length;
 
+        await _showCompleteNotification(id, downloadInformation.title);
+
+        tokenMap.remove(id);
+      }
+      return res;
+    } on DioError catch (e) {
+      switch (e.type) {
+        case DioErrorType.connectTimeout:
+        case DioErrorType.sendTimeout:
+        case DioErrorType.receiveTimeout:
+        case DioErrorType.response:
+        case DioErrorType.other:
+          await _showFailNotification(id, downloadInformation.title, body: e.message);
+          break;
+        case DioErrorType.cancel:
+          await AwesomeNotifications().dismiss(id);
+          break;
+      }
+      var dir = Directory(downloadInformation.saveDir);
+      if (await dir.exists()) await dir.delete(recursive: true);
+
+      tokenMap.remove(id);
+      return false;
+    } on Exception catch (e) {
+      await _showFailNotification(id, downloadInformation.title, body: e.toString());
+      var dir = Directory(downloadInformation.saveDir);
+      if (await dir.exists()) await dir.delete(recursive: true);
+
+      tokenMap.remove(id);
       return false;
     }
   }
 
-  static Future<bool> _downloadTs(final List<String> tsUrlList, final DownloadInformation downloadInformation) async {
+  static Future<bool> _downloadTs(final List<String> tsUrlList, final DownloadInformation downloadInformation, final CancelToken cancelToken) async {
+    final int id = downloadInformation.url.hashCode;
     const int junkSize = 10;
     bool res = true;
     for (int i = 0; i < tsUrlList.length; i += junkSize) {
@@ -126,32 +232,40 @@ abstract class _M3u8Downloader {
         try {
           List<Future> futureList = <Future>[];
           for (int j = i; j < min(tsUrlList.length, i + junkSize); ++j) {
-            futureList.add(_downloadOneTs(tsUrlList[j], j, downloadInformation.saveDir));
+            if (cancelToken.isCancelled) throw DioError(requestOptions: RequestOptions(path: ''), type: DioErrorType.cancel);
+            futureList.add(_downloadOneTs(tsUrlList[j], j, downloadInformation.saveDir, cancelToken));
           }
+
           var resultList = await Future.wait(futureList);
           for (var r in resultList) {
             res &= r;
           }
 
-          await _showNotification(downloadInformation.hashCode, downloadInformation.title);
+          final int progress = (((i + junkSize) / tsUrlList.length) * 100).toInt();
+          await _showProgressNotification(id, downloadInformation.title, progress: progress);
           break;
-        } catch (e) {
+        } on HttpException catch (e) {
           ++retry;
         }
       }
       if (retry == 5) {
-        throw "${downloadInformation.title}, ${downloadInformation.url}, $i ts download failed";
+        throw Exception("OverTried : 5times over");
       }
     }
 
     return res;
   }
 
-  static Future<bool> _downloadOneTs(final String url, final int index, final String saveDir) async {
-    var bytes = Uint8List.fromList((await http.get(Uri.parse(url))).body.codeUnits);
-    var tsFile = File('$saveDir/$index.ts');
-    tsFile.writeAsBytesSync(bytes);
-    return tsFile.lengthSync() == bytes.length;
+  static Future<bool> _downloadOneTs(final String url, final int index, final String saveDir, final CancelToken cancelToken) async {
+    try {
+      var bytes = Uint8List.fromList((await http.get(Uri.parse(url))).body.codeUnits);
+      if (cancelToken.isCancelled) throw DioError(requestOptions: RequestOptions(path: ''), type: DioErrorType.cancel);
+      var tsFile = File('$saveDir/$index.ts');
+      tsFile.writeAsBytesSync(bytes);
+      return tsFile.lengthSync() == bytes.length;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   static Future<Map<String, dynamic>> _getAesConfigure(final String m3u8Str, final String baseUrl) async {
@@ -193,23 +307,5 @@ abstract class _M3u8Downloader {
         return prv + '${index++}.ts' + '\n';
       }
     });
-  }
-
-  static Future<void> _showNotification(final int id, final String title) async {
-    /* TODO: 취소기능 추가 */
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: id,
-        channelKey: 'ppab_noti_download_status',
-        title: title,
-        body: '다운로드중...',
-        autoDismissible: false,
-        displayOnForeground: true,
-        displayOnBackground: true,
-        locked: true,
-        notificationLayout: NotificationLayout.ProgressBar,
-      ),
-      actionButtons: [NotificationActionButton(key: "cancel", label: "취소")],
-    );
   }
 }

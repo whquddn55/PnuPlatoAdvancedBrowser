@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
@@ -20,6 +21,9 @@ abstract class DownloadController {
     assert(type == DownloadType.m3u8 ? title != '' : true);
 
     if ((await _requestPermission()) == false) return;
+
+    await Fluttertoast.cancel();
+    await Fluttertoast.showToast(msg: "다운로드 초기화 작업을 시작 중입니다...");
 
     final String saveDir = await _getSaveDir(type, courseTitle, courseId, title);
     List<String>? tempList = await _getUrlAndTitle(type, url, title);
@@ -83,7 +87,7 @@ abstract class DownloadController {
         var responseTemp = await requestGet(url, options: options, isFront: true);
         if (responseTemp == null) return null;
         res[0] = responseTemp.headers.value('location')!.split('?')[0];
-        res[1] = Uri.decodeFull(url.split('/').last);
+        res[1] = Uri.decodeFull(res[0].split('/').last);
         break;
       case DownloadType.normal:
       case DownloadType.m3u8:
