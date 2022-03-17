@@ -48,7 +48,7 @@ class UnknownCourseActivity extends CourseActivity {
       builder: (context) {
         return AlertDialog(
           title: const Text("저 힘들어요..."),
-          content: const Text("아직 구현되지 않았어요! 버그리포트를 통해서 알려주세요!"),
+          content: const Text("아직 구현되지 않았어요. 버그리포트를 통해서 알려주세요.\n브라우저로 이동시켜드릴게요."),
           actions: [
             TextButton(
               child: const Text("확인"),

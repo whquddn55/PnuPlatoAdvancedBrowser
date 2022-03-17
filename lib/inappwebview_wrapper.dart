@@ -8,8 +8,16 @@ class InappwebviewWrapper extends StatelessWidget {
   final Function(InAppWebViewController, Uri?)? onLoadStop;
   final bool preventRedirect;
   final bool scaffolded;
-  const InappwebviewWrapper(this.title, this.url, this.onLoadStop, {Key? key, this.preventRedirect = false, this.scaffolded = false})
-      : super(key: key);
+  final bool alwaysPop;
+  const InappwebviewWrapper(
+    this.title,
+    this.url,
+    this.onLoadStop, {
+    Key? key,
+    this.preventRedirect = false,
+    this.scaffolded = false,
+    this.alwaysPop = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +25,13 @@ class InappwebviewWrapper extends StatelessWidget {
     final loaderKey = GlobalKey<__LoaderState>();
     final Widget body = WillPopScope(
       onWillPop: () async {
+        if (alwaysPop) {
+          return true;
+        }
         if (await _webViewController!.canGoBack()) {
           _webViewController!.goBack();
           return false;
         } else {
-          Navigator.pop(context);
           return true;
         }
       },

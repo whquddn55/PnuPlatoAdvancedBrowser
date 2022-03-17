@@ -23,6 +23,7 @@ class SmartAbsencePage extends StatelessWidget {
           document.body.style.padding = '0px';''',
         );
       },
+      alwaysPop: true,
     );
   }
 }

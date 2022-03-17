@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/components/emphasis_container.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
@@ -30,11 +31,6 @@ class _CourseMainPageState extends State<CourseMainPage> {
   final _weekTileControllerList = <ExpandedTileController>[];
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     _articleTileController.dispose();
     for (var controller in _weekTileControllerList) {
@@ -58,23 +54,57 @@ class _CourseMainPageState extends State<CourseMainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: CourseController.updateCourseSpecification(widget.course),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '강의 정보를 로딩 중입니다...'));
+    return RefreshIndicator(
+      onRefresh: () async => setState(() {}),
+      child: FutureBuilder(
+        future: CourseController.updateCourseSpecification(widget.course),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '강의 정보를 로딩 중입니다...'));
 
-        _refreshTodoList();
+          _refreshTodoList();
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('${widget.course.title} - ${widget.course.professor!.name}'),
-            centerTitle: true,
-            leading: const BackButton(),
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('${widget.course.title} - ${widget.course.professor!.name}'),
+              centerTitle: true,
+              leading: const BackButton(),
+            ),
+            endDrawer: _renderEndDrawer(context),
+            body: ListView(children: [_renderSmartAbsence(), ..._renderAcivityList()]),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _renderSmartAbsence() {
+    return FutureBuilder<bool>(
+      future: CourseController.checkAutoAbsence(widget.course.id),
+      builder: ((context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done || snapshot.data == false) return const SizedBox.shrink();
+        return InkWell(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => SmartAbsencePage(courseId: widget.course.id)));
+          },
+          child: Container(
+            height: 100,
+            decoration: BoxDecoration(border: Border.all(color: Colors.red, width: 2.5)),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.notification_important),
+                    Text("자동 출석체크가 진행중이예요!!"),
+                  ],
+                ),
+                const Positioned.fill(child: EmphasisContainer()),
+              ],
+            ),
           ),
-          endDrawer: _renderEndDrawer(context),
-          body: ListView(children: _renderAcivityList()),
         );
-      },
+      }),
     );
   }
 
@@ -278,7 +308,9 @@ class _CourseMainPageState extends State<CourseMainPage> {
         }
       }
 
-      _weekTileControllerList.add(ExpandedTileController());
+      if (_weekTileControllerList.length <= weekIndex) {
+        _weekTileControllerList.add(ExpandedTileController());
+      }
 
       if (widget.targetActivityId != null) {
         if (isTargetWeek && !_weekTileControllerList[weekIndex].isExpanded) {

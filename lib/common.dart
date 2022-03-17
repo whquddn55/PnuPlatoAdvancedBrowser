@@ -67,6 +67,7 @@ abstract class CommonUrl {
   static const String courseFolderViewUrl = 'https://plato.pusan.ac.kr/mod/folder/view.php?id=';
   static const String courseZoomViewUrl = 'https://plato.pusan.ac.kr/mod/zoom/view.php?id=';
   static const String courseZoomOpenUrl = 'https://plato.pusan.ac.kr/mod/zoom/loadmeeting.php?id=';
+  static const String courseAutoAbsenceUrl = 'https://plato.pusan.ac.kr/local/ubattendance/autoattendance.php?id=';
 
   static const String vodViewerUrl = 'https://plato.pusan.ac.kr/mod/vod/viewer.php?id=';
   static const String fileViewerUrl = 'https://plato.pusan.ac.kr/mod/ubfile/view.php?id=';

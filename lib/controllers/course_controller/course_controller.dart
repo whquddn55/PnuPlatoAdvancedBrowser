@@ -252,6 +252,17 @@ abstract class CourseController {
     return Uri.parse(document.getElementsByTagName('source')[0].attributes['src'] ?? '');
   }
 
+  static Future<bool> checkAutoAbsence(final String courseId) async {
+    var response = await requestGet(CommonUrl.courseAutoAbsenceUrl + courseId, isFront: true);
+    if (response == null) return false;
+
+    Document document = Document.html(response.data);
+    for (var a in document.getElementsByTagName('a')) {
+      if (a.attributes['href'] != null && a.attributes['href']!.contains(CommonUrl.courseSmartAbsenceUrl)) return false;
+    }
+    return true;
+  }
+
   static List<DateTime?> _getDueTime(Element activity) {
     var res = <DateTime?>[null, null, null];
     if (activity.getElementsByClassName('text-ubstrap').isEmpty) {
