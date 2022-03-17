@@ -9,8 +9,6 @@ abstract class BackgroundNotificationController {
   static Future<void> initilize() async {
     await AwesomeNotifications().initialize(null, [
       NotificationChannel(
-        groupKey: 'ppab_noti_download_progress',
-        channelGroupKey: 'ppab_noti_download_progress',
         channelKey: 'ppab_noti_download_progress',
         channelName: '플라토 브라우저 다운로드 진행 상태',
         channelDescription: '플라토 브라우저 다운로드 진행 상태를 보여줌',
@@ -22,6 +20,7 @@ abstract class BackgroundNotificationController {
         channelShowBadge: false,
       ),
       NotificationChannel(
+        groupKey: 'ppab_noti_download_result',
         channelGroupKey: 'ppab_noti_download_result',
         channelKey: 'ppab_noti_download_result',
         channelName: '플라토 브라우저 다운로드 결과',
@@ -46,7 +45,8 @@ abstract class BackgroundNotificationController {
         importance: NotificationImportance.Max,
       ),
     ], channelGroups: [
-      NotificationChannelGroup(channelGroupkey: 'ppab_noti_download_progress', channelGroupName: 'download progress'),
+      NotificationChannelGroup(channelGroupkey: 'ppab_noti_download_result', channelGroupName: 'ppab download result'),
+      NotificationChannelGroup(channelGroupkey: 'ppab_noti_normal', channelGroupName: 'ppab normal'),
     ]);
 
     AwesomeNotifications().actionStream.listen((ReceivedAction receivedAction) {

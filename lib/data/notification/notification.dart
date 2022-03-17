@@ -90,6 +90,7 @@ class Notification {
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: hashCode,
+        groupKey: 'ppab_noti_normal',
         channelKey: 'ppab_noti_normal',
         title: title,
         body: body,
