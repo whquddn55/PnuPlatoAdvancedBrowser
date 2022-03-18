@@ -1,12 +1,12 @@
-import 'package:isar/isar.dart';
+import 'package:objectbox/objectbox.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
+import 'package:pnu_plato_advanced_browser/objectbox.g.dart';
 
-part 'login_information.g.dart';
-
-@Collection()
+@Entity()
 class LoginInformation {
-  @Id()
-  final int isarId = 0;
+  @Id(assignable: true)
+  int dbId = StorageController.defaultUserDataId;
   bool loginStatus;
   String sessionKey;
   String moodleSessionKey;

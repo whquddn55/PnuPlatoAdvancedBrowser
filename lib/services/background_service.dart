@@ -93,7 +93,7 @@ void _onStart() async {
   if (Platform.isIOS) {
     PathProviderIOS.registerWith();
   }
-  await StorageController.initialize();
+  StorageController.initialize();
   await BackgroundNotificationController.initilize();
 
   /* ensure login */
@@ -133,7 +133,7 @@ void _onStart() async {
     printLog("send service: ${res["data"].toString()}");
   });
 
-  var lastFetchTodoTime = await StorageController.loadLastSyncTime();
+  var lastFetchTodoTime = StorageController.loadLastSyncTime();
   if (DateTime.now().difference(lastFetchTodoTime).inSeconds >= 300) {
     await timerBody();
   }
@@ -152,5 +152,5 @@ Future<void> timerBody() async {
   //         '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat("MM-dd_HH:mm").format(DateTime.now())}.txt')
   //     .writeAsString(res.data, mode: FileMode.append);
 
-  await StorageController.storeLastSyncTime(DateTime.now());
+  StorageController.storeLastSyncTime(DateTime.now());
 }

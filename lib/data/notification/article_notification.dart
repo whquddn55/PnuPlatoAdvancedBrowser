@@ -6,12 +6,11 @@ import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course
 
 class ArticleNotification extends noti.Notification {
   ArticleNotification({
-    int? isarId,
     required String title,
     required String body,
     required String? url,
     required DateTime time,
-  }) : super(isarId: isarId, title: title, body: body, url: url, time: time, type: "article");
+  }) : super(title: title, body: body, url: url, time: time, type: "article");
 
   @override
   void open(final BuildContext context) {

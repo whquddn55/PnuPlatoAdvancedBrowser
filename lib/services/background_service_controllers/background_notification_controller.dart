@@ -59,7 +59,7 @@ abstract class BackgroundNotificationController {
   static Future<void> updateNotificationList() async {
     int page = 1;
 
-    var notificationList = await StorageController.loadNotificationList();
+    var notificationList = StorageController.loadNotificationList();
 
     while (true) {
       final List<Notification>? newNotificationList = await _fetchNewNotificationList(page);
@@ -70,7 +70,7 @@ abstract class BackgroundNotificationController {
       ++page;
     }
 
-    await StorageController.storeNotificationList(notificationList);
+    StorageController.storeNotificationList(notificationList);
   }
 
   static Future<bool> _updateNotificationList(List<Notification> notificationList, final List<Notification> newNotificationList) async {
@@ -84,9 +84,6 @@ abstract class BackgroundNotificationController {
         notificationList.add(newNotification);
         await showNotification(newNotification);
         ++addedCnt;
-      } else {
-        newNotification.isarId = notificationList[prvNotificationIndex].isarId;
-        notificationList[prvNotificationIndex] = newNotification;
       }
     }
 
@@ -95,7 +92,9 @@ abstract class BackgroundNotificationController {
       if (DateTime.now().difference(notificationList[i].time).inDays < 30) break;
       splitIndex = i;
     }
-    notificationList = notificationList.sublist(splitIndex);
+    if (splitIndex != 0) {
+      notificationList = notificationList.sublist(splitIndex);
+    }
     return addedCnt == 15;
   }
 

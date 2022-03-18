@@ -1,0 +1,237 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:3284734248980943431",
+      "lastPropertyId": "11:7790827462074813127",
+      "name": "Todo",
+      "properties": [
+        {
+          "id": "1:5937245691610532397",
+          "name": "dbId",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:7180789667227499195",
+          "name": "index",
+          "type": 6
+        },
+        {
+          "id": "3:88563245766398739",
+          "name": "id",
+          "type": 9
+        },
+        {
+          "id": "4:6915353404330730178",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "5:7086502057598590637",
+          "name": "courseId",
+          "type": 9
+        },
+        {
+          "id": "6:3950634135583286619",
+          "name": "dueDate",
+          "type": 10
+        },
+        {
+          "id": "7:7243918767836596024",
+          "name": "availability",
+          "type": 1
+        },
+        {
+          "id": "8:7364091361633818541",
+          "name": "iconUrl",
+          "type": 9
+        },
+        {
+          "id": "9:4437214406351049793",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "10:7203101575986117035",
+          "name": "statusIndex",
+          "type": 6
+        },
+        {
+          "id": "11:7790827462074813127",
+          "name": "userDefined",
+          "type": 1
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:4420181251981158404",
+      "lastPropertyId": "6:4011268913774024298",
+      "name": "Notification",
+      "properties": [
+        {
+          "id": "1:5782222212685242326",
+          "name": "dbId",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:6359859855093440055",
+          "name": "url",
+          "type": 9
+        },
+        {
+          "id": "3:7170557344293606843",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "4:4668613904382870533",
+          "name": "body",
+          "type": 9
+        },
+        {
+          "id": "5:6861565402815390903",
+          "name": "time",
+          "type": 10
+        },
+        {
+          "id": "6:4011268913774024298",
+          "name": "type",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:7419517741216255617",
+      "lastPropertyId": "9:8022903993677831274",
+      "name": "LoginInformation",
+      "properties": [
+        {
+          "id": "1:634094398182009305",
+          "name": "dbId",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:3578730515291647593",
+          "name": "loginStatus",
+          "type": 1
+        },
+        {
+          "id": "3:1205553556073291920",
+          "name": "sessionKey",
+          "type": 9
+        },
+        {
+          "id": "4:7846494685238956114",
+          "name": "moodleSessionKey",
+          "type": 9
+        },
+        {
+          "id": "5:7324954176180697997",
+          "name": "loginMsg",
+          "type": 9
+        },
+        {
+          "id": "6:4484816848956330079",
+          "name": "studentId",
+          "type": 9
+        },
+        {
+          "id": "7:4926548132399196020",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "8:8485526282138067975",
+          "name": "department",
+          "type": 9
+        },
+        {
+          "id": "9:8022903993677831274",
+          "name": "imgUrl",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:5304213255211063717",
+      "lastPropertyId": "5:7212746729534182033",
+      "name": "UserData",
+      "properties": [
+        {
+          "id": "1:7946840175745358240",
+          "name": "dbId",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:7333475653602065520",
+          "name": "username",
+          "type": 9
+        },
+        {
+          "id": "3:1369289785613228728",
+          "name": "password",
+          "type": 9
+        },
+        {
+          "id": "4:82835774111024215",
+          "name": "isFirst",
+          "type": 1
+        },
+        {
+          "id": "5:7212746729534182033",
+          "name": "lastSyncTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "6:1760169772214913091",
+      "lastPropertyId": "2:8580495941994490358",
+      "name": "DBOrder",
+      "properties": [
+        {
+          "id": "1:214376942078346924",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:8580495941994490358",
+          "name": "idList",
+          "type": 30
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "6:1760169772214913091",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [
+    4816851749500283845
+  ],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    5044159418328435229,
+    8910649686947288288,
+    1440128632270886262,
+    4338693111533517871,
+    8600077381834846601,
+    2531200934916819732
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}

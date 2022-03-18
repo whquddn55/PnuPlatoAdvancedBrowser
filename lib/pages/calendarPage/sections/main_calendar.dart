@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
@@ -86,14 +88,19 @@ class _MainCalendarState extends State<MainCalendar> {
   }
 
   void _onDaySelected(final DateTime selectedDay, final DateTime focusedDay) {
-    var undoneEventList = widget.todoList.where((event) => _isSameDay(event.dueDate, selectedDay) && event.status != TodoStatus.done).toList();
-    var doneEventList = widget.todoList.where((event) => _isSameDay(event.dueDate, selectedDay) && event.status == TodoStatus.done).toList();
-    if (undoneEventList.isEmpty && doneEventList.isEmpty) return;
-
     setState(() {
       _selectedDay = selectedDay;
       _focusedDay = selectedDay;
     });
+
+    bool empty = true;
+    for (var todo in widget.todoList) {
+      if (_isSameDay(todo.dueDate, selectedDay)) {
+        empty = false;
+      }
+    }
+
+    if (empty) return;
 
     showModalBottomSheet(
       context: context,
@@ -101,26 +108,30 @@ class _MainCalendarState extends State<MainCalendar> {
       builder: (context) {
         return SizedBox(
           height: Get.height * 0.4,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: undoneEventList.length + doneEventList.length,
-            itemBuilder: (context, index) {
-              if (index < undoneEventList.length) {
-                return EventTile(event: undoneEventList[index], index: index);
-              } else {
-                return EventTile(event: doneEventList[index - undoneEventList.length], index: index);
-              }
-            },
-          ),
+          child: GetBuilder<TodoController>(builder: (controller) {
+            final undoneEventList =
+                controller.todoList.where((event) => _isSameDay(event.dueDate, selectedDay) && event.status != TodoStatus.done).toList();
+            final doneEventList =
+                controller.todoList.where((event) => _isSameDay(event.dueDate, selectedDay) && event.status == TodoStatus.done).toList();
+            return ListView.builder(
+              shrinkWrap: true,
+              itemCount: undoneEventList.length + doneEventList.length,
+              itemBuilder: (context, index) {
+                if (index < undoneEventList.length) {
+                  return EventTile(event: undoneEventList[index], index: index);
+                } else {
+                  return EventTile(event: doneEventList[index - undoneEventList.length], index: index);
+                }
+              },
+            );
+          }),
         );
       },
     );
   }
 
   Widget _renderUndatedEvents() {
-    final List<Todo> undateEventList = widget.todoList
-        .where((todo) => (todo.dueDate == null || todo.status == TodoStatus.doing) && (CourseController.getCourseById(todo.courseId) != null))
-        .toList();
+    final List<Todo> undateEventList = widget.todoList.where((todo) => (todo.dueDate == null || todo.status == TodoStatus.doing)).toList();
     final List<Widget> children = [];
     children.add(const Text("진행중이거나 마감기한이 없는 할 일"));
     for (int i = 0; i < undateEventList.length; ++i) {

@@ -20,14 +20,11 @@ abstract class BackgroundTodoController {
       newTodoList.addAll(await _fetchZoom(courseId, index));
     }
 
-    var todoList = await StorageController.loadTodoList();
+    var todoList = StorageController.loadTodoList();
+    // 어차피 load할 때 sorting 되니 상관없다.
 
     _updateTodoList(todoList, newTodoList, courseIdList);
-    todoList.sort((a, b) {
-      if (a.courseId == b.courseId) return a.index - b.index;
-      return a.courseId.compareTo(b.courseId);
-    });
-    await StorageController.storeTodoList(todoList);
+    StorageController.storeTodoList(todoList);
 
     return;
   }
@@ -36,7 +33,6 @@ abstract class BackgroundTodoController {
     for (var newTodo in newTodoList) {
       int prvIndex = prvTodoList.indexOf(newTodo);
       if (prvIndex != -1) {
-        newTodo.isarId = prvTodoList[prvIndex].isarId;
         prvTodoList[prvIndex] = newTodo;
       } else {
         prvTodoList.add(newTodo);
@@ -93,6 +89,7 @@ abstract class BackgroundTodoController {
         id: id,
         title: title,
         status: done ? TodoStatus.done : TodoStatus.undone,
+        userDefined: false,
       ));
     }
     return todoList;
@@ -125,6 +122,7 @@ abstract class BackgroundTodoController {
           id: id,
           title: title,
           status: done ? TodoStatus.done : TodoStatus.undone,
+          userDefined: false,
         ));
       }
     }
@@ -161,6 +159,7 @@ abstract class BackgroundTodoController {
           id: id,
           title: title,
           status: done ? TodoStatus.done : TodoStatus.undone,
+          userDefined: false,
         ));
       }
     }
@@ -192,6 +191,7 @@ abstract class BackgroundTodoController {
           id: id,
           title: title,
           status: todoStatus,
+          userDefined: false,
         ));
       }
     }

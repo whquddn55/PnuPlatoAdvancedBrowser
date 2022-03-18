@@ -10,6 +10,6 @@ abstract class AppSettingController {
   }
 
   static Future<void> initilize() async {
-    _isFirst = await StorageController.loadIsFirst();
+    _isFirst = StorageController.loadIsFirst();
   }
 }

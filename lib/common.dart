@@ -10,7 +10,6 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:html/parser.dart';
 import 'package:get/get.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:logger/logger.dart';
 import 'package:marquee/marquee.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
@@ -26,10 +25,7 @@ Color folderColor = Colors.orange.withOpacity(0.7);
 Color articleColor = Colors.purple.withOpacity(0.7);
 Color unknownColor = Colors.grey.withOpacity(0.7);
 
-final logger = Logger();
-
 void printLog(final dynamic msg) {
-  //logger.d(msg);
   print("[DEBUG] ${msg.toString()}");
 }
 

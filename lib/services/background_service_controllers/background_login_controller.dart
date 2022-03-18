@@ -12,7 +12,7 @@ abstract class BackgroundLoginController {
   static LoginInformation loginInformation = LoginInformation();
 
   static Future<bool> _checkLogin() async {
-    final LoginInformation? loginInformation = await StorageController.loadLoginInformation();
+    final LoginInformation? loginInformation = StorageController.loadLoginInformation();
     if (loginInformation == null) return false;
 
     String body = '[{"index":0,"methodname":"core_fetch_notifications","args":{"contextid":2}}]';
@@ -32,18 +32,18 @@ abstract class BackgroundLoginController {
     if (autologin == true) {
       bool loginStatus = await _checkLogin();
       if (loginStatus == true) {
-        loginInformation = (await StorageController.loadLoginInformation())!;
+        loginInformation = (StorageController.loadLoginInformation())!;
         return;
       }
 
-      username = await StorageController.loadUsername();
-      password = await StorageController.loadPassword();
+      username = StorageController.loadUsername();
+      password = StorageController.loadPassword();
     }
 
     if (username == null || password == null) {
       loginInformation.loginStatus = false;
       loginInformation.loginMsg = "아이디, 비밀번호가 저장되어 있지 않습니다.";
-      await StorageController.storeLoginInformation(loginInformation);
+      StorageController.storeLoginInformation(loginInformation);
       return;
     }
 
@@ -74,7 +74,7 @@ abstract class BackgroundLoginController {
       loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
       /* TODO: popup error report */
       loginInformation.loginStatus = false;
-      await StorageController.storeLoginInformation(loginInformation);
+      StorageController.storeLoginInformation(loginInformation);
       return;
     } on dio.DioError catch (e, _) {
       /* successfully login */
@@ -86,7 +86,7 @@ abstract class BackgroundLoginController {
         loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
         /* TODO: popup error report */
         loginInformation.loginStatus = false;
-        await StorageController.storeLoginInformation(loginInformation);
+        StorageController.storeLoginInformation(loginInformation);
         return;
       }
     }
@@ -95,7 +95,7 @@ abstract class BackgroundLoginController {
       loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
       /* TODO: popup error report */
       loginInformation.loginStatus = false;
-      await StorageController.storeLoginInformation(loginInformation);
+      StorageController.storeLoginInformation(loginInformation);
       return;
     }
 
@@ -103,7 +103,7 @@ abstract class BackgroundLoginController {
     if (response.headers.map['location']![0] == CommonUrl.loginErrorUrl) {
       loginInformation.loginMsg = '잘못된 ID 또는 PW입니다. 다시 확인해주세요.';
       loginInformation.loginStatus = false;
-      await StorageController.storeLoginInformation(loginInformation);
+      StorageController.storeLoginInformation(loginInformation);
       return;
     }
 
@@ -115,9 +115,9 @@ abstract class BackgroundLoginController {
     await _setCooKie(loginInformation);
     loginInformation.loginStatus = true;
 
-    await StorageController.storeUsername(username);
-    await StorageController.storePassword(password);
-    await StorageController.storeLoginInformation(loginInformation);
+    StorageController.storeUsername(username);
+    StorageController.storePassword(password);
+    StorageController.storeLoginInformation(loginInformation);
 
     printLog("Sync With Plato : ${loginInformation.moodleSessionKey}");
 
@@ -125,7 +125,7 @@ abstract class BackgroundLoginController {
   }
 
   static Future<bool> logout() async {
-    final LoginInformation loginInformation = (await StorageController.loadLoginInformation())!;
+    final LoginInformation loginInformation = (StorageController.loadLoginInformation())!;
 
     String? sessionKey = await _getSessionKey(loginInformation.moodleSessionKey);
     if (sessionKey == null) {
@@ -133,7 +133,7 @@ abstract class BackgroundLoginController {
     }
     await dio.Dio().get(CommonUrl.logoutUrl + sessionKey);
 
-    await StorageController.clearUserData();
+    StorageController.clearUserData();
 
     return true;
   }

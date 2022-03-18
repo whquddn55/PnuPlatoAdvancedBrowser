@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
@@ -10,10 +11,20 @@ import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 class TodoController extends GetxController {
   static TodoController get to => Get.find<TodoController>();
   static final Set<String> _refreshLock = {};
-  List<Todo> todoList = <Todo>[];
+  List<Todo> _todoList = <Todo>[];
+
+  List<Todo> get todoList {
+    final userDefinedList = _todoList.where((todo) => todo.userDefined == true);
+    var res = _todoList
+        .where((todo) =>
+            todo.userDefined == true ||
+            userDefinedList.any((element) => (element.courseId + element.type + element.id + "false").hashCode == todo.dbId) == false)
+        .toList();
+    return res;
+  }
 
   Future<void> initialize() async {
-    todoList = await StorageController.loadTodoList();
+    _todoList = StorageController.loadTodoList();
   }
 
   Future<void> refreshTodoListAll() async {
@@ -31,7 +42,7 @@ class TodoController extends GetxController {
       BackgroundServiceAction.fetchTodoList,
       data: {"courseIdList": courseIdList},
     );
-    todoList = await StorageController.loadTodoList();
+    _todoList = StorageController.loadTodoList();
     update();
 
     /* unlock */
@@ -40,10 +51,10 @@ class TodoController extends GetxController {
 
   Future<void> updateVodTodoStatus(final String courseId, final Map<int, List<Map<String, dynamic>>> vodStatusMap) async {
     bool modified = false;
-    for (var todo in todoList) {
+    for (var todo in _todoList) {
       for (var vodStatusList in vodStatusMap.values) {
         for (var vodStatus in vodStatusList) {
-          if (todo.runtimeType == (VodTodo) && todo.courseId == courseId && todo.title == vodStatus["title"]) {
+          if (todo.runtimeType == (VodTodo) && todo.userDefined == false && todo.courseId == courseId && todo.title == vodStatus["title"]) {
             if (todo.status != vodStatus["status"]) {
               modified = true;
               todo.status = vodStatus["status"] == true ? TodoStatus.done : TodoStatus.undone;
@@ -54,15 +65,15 @@ class TodoController extends GetxController {
     }
 
     if (modified) {
-      await StorageController.storeTodoList(todoList);
+      StorageController.storeTodoList(_todoList);
       update();
     }
   }
 
   Future<void> updateZoomTodoStatus(final String id, final TodoStatus status) async {
     bool modified = false;
-    for (var todo in todoList) {
-      if (todo.runtimeType == (ZoomTodo) && todo.id == id) {
+    for (var todo in _todoList) {
+      if (todo.runtimeType == (ZoomTodo) && todo.userDefined == false && todo.id == id) {
         if (todo.status != status) {
           modified = true;
           todo.status = status;
@@ -71,15 +82,15 @@ class TodoController extends GetxController {
     }
 
     if (modified) {
-      await StorageController.storeTodoList(todoList);
+      StorageController.storeTodoList(_todoList);
       update();
     }
   }
 
   Future<void> updateAssignTodoStatus(final String id, final TodoStatus status) async {
     bool modified = false;
-    for (var todo in todoList) {
-      if (todo.runtimeType == (AssignTodo) && todo.id == id) {
+    for (var todo in _todoList) {
+      if (todo.runtimeType == (AssignTodo) && todo.userDefined == false && todo.id == id) {
         if (todo.status == status) {
           modified = true;
           todo.status = status;
@@ -88,7 +99,48 @@ class TodoController extends GetxController {
     }
 
     if (modified) {
-      await StorageController.storeTodoList(todoList);
+      StorageController.storeTodoList(_todoList);
+      update();
+    }
+  }
+
+  Future<void> changeTodoStatus(final BuildContext context, final Todo target) async {
+    var res = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: target.userDefined == true ? const Text("상태를 복구합니다.") : const Text("상태를 변경합니다."),
+        actions: [
+          TextButton(
+            child: const Text("취소"),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          TextButton(
+            child: const Text("확인"),
+            onPressed: () => Navigator.pop(context, true),
+          )
+        ],
+      ),
+    );
+
+    if (res == true) {
+      if (target.userDefined == false) {
+        final newTodo = Todo(
+          availability: target.availability,
+          courseId: target.courseId,
+          dueDate: target.dueDate ?? DateTime.now(),
+          iconUrl: target.iconUrl,
+          id: target.id,
+          index: target.index,
+          statusIndex: target.status == TodoStatus.done ? TodoStatus.undone.index : TodoStatus.done.index,
+          title: target.title,
+          type: target.type,
+          userDefined: true,
+        ).transType();
+        _todoList.insert(_todoList.indexOf(target), newTodo);
+      } else {
+        _todoList.remove(target);
+      }
+      StorageController.storeTodoList(_todoList);
       update();
     }
   }

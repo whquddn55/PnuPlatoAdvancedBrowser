@@ -1,142 +1,118 @@
-import 'package:isar/isar.dart';
+import 'package:objectbox/objectbox.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pnu_plato_advanced_browser/data/db_order.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 import 'package:pnu_plato_advanced_browser/data/user_data.dart';
+import 'package:pnu_plato_advanced_browser/objectbox.g.dart';
 
 abstract class StorageController {
-  static late final Isar isar;
+  static const int defaultUserDataId = 1234;
+  // static const int _defaultTodoListId = 1235;
+  static const int _defaultNotificationId = 1236;
+
+  static late final Store store;
   static Future<void> initialize() async {
-    final dir = await getApplicationSupportDirectory();
-    print(dir);
-    print(await getApplicationDocumentsDirectory());
-    /* register HiveAdapters */
-    isar = await Isar.open(
-      directory: dir.path,
-      schemas: [
-        LoginInformationSchema,
-        NotificationSchema,
-        TodoSchema,
-        UserDataSchema,
-      ],
-      inspector: true,
-    );
-    await isar.writeTxn((isar) async {
-      if ((await isar.userDatas.get(0)) == null) {
-        await isar.userDatas.put(UserData());
+    final String path = (await getApplicationDocumentsDirectory()).path + '/db';
+    try {
+      store = await openStore(directory: path);
+    } catch (e) {
+      store = Store.attach(getObjectBoxModel(), path);
+    }
+    if (store.box<UserData>().get(defaultUserDataId) == null) {
+      store.box<UserData>().put(UserData());
+    }
+    if (store.box<DBOrder>().get(_defaultNotificationId) == null) {
+      store.box<DBOrder>().put(DBOrder(id: _defaultNotificationId, idList: []));
+    }
+  }
+
+  static List<Todo> loadTodoList() {
+    final res = store.box<Todo>().getAll().map((todo) => todo.transType()).toList();
+    res.sort((a, b) {
+      if (a.dueDate == b.dueDate) {
+        if (a.courseId == b.courseId) {
+          if (a.index == b.index) {
+            return (a.userDefined ? 1 : 0) - (b.userDefined ? 1 : 0);
+          }
+          return a.index - b.index;
+        }
+        return int.parse(a.courseId) - int.parse(b.courseId);
       }
+      return (a.dueDate ?? DateTime(0)).compareTo(b.dueDate ?? DateTime(0));
     });
+    return res;
   }
 
-  static Future<List<Todo>> loadTodoList() async {
-    var todoList = await isar.txn<List<Todo>>((isar) async {
-      return await isar.todos.filter().indexGreaterThan(-1).findAll();
-    });
-    return todoList.map((todo) => todo.transType()).toList();
+  static void storeTodoList(final List<Todo> todoList) {
+    store.box<Todo>().putMany(todoList);
   }
 
-  static Future<void> storeTodoList(final List<Todo> todoList) async {
-    final List<int> idList = await isar.writeTxn<List<int>>((isar) async {
-      return await isar.todos.putAll(todoList);
-    });
-
-    for (int i = 0; i < todoList.length; ++i) {
-      todoList[i].isarId = idList[i];
-    }
+  static List<Notification> loadNotificationList() {
+    final res = store.box<Notification>().getAll().map((notification) => notification.transType()).toList();
+    final notificationOrder = store.box<DBOrder>().get(_defaultNotificationId)!.idList;
+    res.sort((a, b) =>
+        notificationOrder.indexWhere((bdId) => int.parse(bdId) == a.dbId) - notificationOrder.indexWhere((bdId) => int.parse(bdId) == b.dbId));
+    return res;
   }
 
-  static Future<List<Notification>> loadNotificationList() async {
-    var notificationList = await isar.txn<List<Notification>>((isar) async {
-      return await isar.notifications.filter().timeGreaterThan(DateTime(0)).findAll();
-    });
-    return notificationList.map((notification) => notification.transType()).toList();
+  static void storeNotificationList(final List<Notification> notificationList) {
+    store.box<Notification>().putMany(notificationList);
+    final todoOrder = DBOrder(id: _defaultNotificationId, idList: notificationList.map((notification) => notification.dbId.toString()).toList());
+    store.box<DBOrder>().put(todoOrder);
   }
 
-  static Future<void> storeNotificationList(final List<Notification> notificationList) async {
-    final List<int> idList = await isar.writeTxn<List<int>>((isar) async {
-      return await isar.notifications.putAll(notificationList);
-    });
-
-    for (int i = 0; i < notificationList.length; ++i) {
-      notificationList[i].isarId = idList[i];
-    }
+  static LoginInformation? loadLoginInformation() {
+    return store.box<LoginInformation>().get(defaultUserDataId);
   }
 
-  static Future<LoginInformation?> loadLoginInformation() async {
-    return await isar.txn<LoginInformation?>((isar) async {
-      LoginInformation? res = await isar.loginInformations.get(0);
-      return res;
-    });
+  static void storeLoginInformation(final LoginInformation loginInformation) {
+    store.box<LoginInformation>().put(loginInformation);
   }
 
-  static Future<void> storeLoginInformation(final LoginInformation loginInformation) async {
-    await isar.writeTxn<int>((isar) async {
-      return await isar.loginInformations.put(loginInformation);
-    });
+  static String loadUsername() {
+    return store.box<UserData>().get(defaultUserDataId)!.username;
   }
 
-  static Future<String> loadUsername() async {
-    return await isar.txn<String>((isar) async {
-      return (await isar.userDatas.get(0))!.username;
-    });
+  static void storeUsername(final String username) {
+    var userData = store.box<UserData>().get(defaultUserDataId)!;
+    userData.username = username;
+    store.box<UserData>().put(userData);
   }
 
-  static Future<void> storeUsername(final String username) async {
-    await isar.writeTxn((isar) async {
-      UserData userdata = (await isar.userDatas.get(0))!;
-      userdata.username = username;
-      await isar.userDatas.put(userdata);
-    });
+  static String loadPassword() {
+    return store.box<UserData>().get(defaultUserDataId)!.password;
   }
 
-  static Future<String> loadPassword() async {
-    return await isar.txn<String>((isar) async {
-      return (await isar.userDatas.get(0))!.password;
-    });
+  static void storePassword(final String password) {
+    var userData = store.box<UserData>().get(defaultUserDataId)!;
+    userData.password = password;
+    store.box<UserData>().put(userData);
   }
 
-  static Future<void> storePassword(final String password) async {
-    await isar.writeTxn((isar) async {
-      UserData userdata = (await isar.userDatas.get(0))!;
-      userdata.password = password;
-      await isar.userDatas.put(userdata);
-    });
+  static DateTime loadLastSyncTime() {
+    return store.box<UserData>().get(defaultUserDataId)!.lastSyncTime;
   }
 
-  static Future<DateTime> loadLastSyncTime() async {
-    return await isar.txn<DateTime>((isar) async {
-      return (await isar.userDatas.get(0))!.lastSyncTime;
-    });
+  static void storeLastSyncTime(final DateTime lastSyncTime) {
+    var userData = store.box<UserData>().get(defaultUserDataId)!;
+    userData.lastSyncTime = lastSyncTime;
+    store.box<UserData>().put(userData);
   }
 
-  static Future<void> storeLastSyncTime(final DateTime lastSyncTime) async {
-    await isar.writeTxn((isar) async {
-      UserData userdata = (await isar.userDatas.get(0))!;
-      userdata.lastSyncTime = lastSyncTime;
-      await isar.userDatas.put(userdata);
-    });
+  static bool loadIsFirst() {
+    return store.box<UserData>().get(defaultUserDataId)!.isFirst;
   }
 
-  static Future<bool> loadIsFirst() async {
-    return await isar.txn<bool>((isar) async {
-      return (await isar.userDatas.get(0))!.isFirst;
-    });
+  static void storeIsFirst(final bool isFirst) {
+    var userData = store.box<UserData>().get(defaultUserDataId)!;
+    userData.isFirst = isFirst;
+    store.box<UserData>().put(userData);
   }
 
-  static Future<void> storeIsFirst(final bool isFirst) async {
-    await isar.writeTxn((isar) async {
-      UserData userdata = (await isar.userDatas.get(0))!;
-      userdata.isFirst = isFirst;
-      await isar.userDatas.put(userdata);
-    });
-  }
-
-  static Future<void> clearUserData() async {
-    await isar.writeTxn((isar) async {
-      var userData = UserData();
-      userData.isFirst = false;
-      await isar.userDatas.put(userData);
-    });
+  static void clearUserData() {
+    var newUserData = UserData();
+    store.box<UserData>().put(newUserData);
   }
 }

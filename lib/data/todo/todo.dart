@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
+import 'package:objectbox/objectbox.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
@@ -9,28 +9,14 @@ import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
 
-part 'todo.g.dart';
+import '../../objectbox.g.dart';
 
 enum TodoStatus { done, undone, doing }
 
-class TodoStatusConverter extends TypeConverter<TodoStatus, int> {
-  const TodoStatusConverter(); // Converters need to have an empty const constructor
-
-  @override
-  TodoStatus fromIsar(int object) {
-    return TodoStatus.values[object];
-  }
-
-  @override
-  int toIsar(TodoStatus object) {
-    return object.index;
-  }
-}
-
-@Collection()
+@Entity()
 class Todo {
-  @Id()
-  int? isarId;
+  @Id(assignable: true)
+  int dbId;
 
   final int index;
   final String id;
@@ -40,11 +26,11 @@ class Todo {
   final bool availability;
   final String iconUrl;
   final String type;
-  @TodoStatusConverter()
-  TodoStatus status;
+  int statusIndex;
+  TodoStatus _status;
+  final bool userDefined;
 
   Todo({
-    this.isarId,
     required this.index,
     required this.id,
     required this.title,
@@ -52,15 +38,17 @@ class Todo {
     required this.dueDate,
     required this.availability,
     required this.iconUrl,
-    required this.status,
     required this.type,
-  });
+    required this.statusIndex,
+    required this.userDefined,
+  })  : dbId = (courseId + type + id + userDefined.toString()).hashCode,
+        _status = TodoStatus.values[statusIndex];
 
   Todo transType() {
+    TodoStatus status = TodoStatus.values[statusIndex];
     switch (type) {
       case "assign":
         return AssignTodo(
-            isarId: isarId,
             availability: availability,
             courseId: courseId,
             dueDate: dueDate,
@@ -68,10 +56,10 @@ class Todo {
             id: id,
             index: index,
             status: status,
-            title: title);
+            title: title,
+            userDefined: userDefined);
       case "quiz":
         return QuizTodo(
-            isarId: isarId,
             availability: availability,
             courseId: courseId,
             dueDate: dueDate,
@@ -79,10 +67,10 @@ class Todo {
             id: id,
             index: index,
             status: status,
-            title: title);
+            title: title,
+            userDefined: userDefined);
       case "vod":
         return VodTodo(
-            isarId: isarId,
             availability: availability,
             courseId: courseId,
             dueDate: dueDate,
@@ -90,10 +78,10 @@ class Todo {
             id: id,
             index: index,
             status: status,
-            title: title);
+            title: title,
+            userDefined: userDefined);
       case "zoom":
         return ZoomTodo(
-            isarId: isarId,
             availability: availability,
             courseId: courseId,
             dueDate: dueDate,
@@ -101,10 +89,10 @@ class Todo {
             id: id,
             index: index,
             status: status,
-            title: title);
+            title: title,
+            userDefined: userDefined);
       default:
         return UnknownTodo(
-            isarId: isarId,
             availability: availability,
             courseId: courseId,
             dueDate: dueDate,
@@ -112,24 +100,30 @@ class Todo {
             id: id,
             index: index,
             status: status,
-            title: title);
+            title: title,
+            userDefined: userDefined);
     }
   }
 
+  TodoStatus get status => _status;
+  set status(TodoStatus status) {
+    _status = status;
+    statusIndex = TodoStatus.values.indexOf(status);
+  }
+
   @override
-  int get hashCode => (courseId + type + id).hashCode;
+  int get hashCode => dbId;
 
   @override
   bool operator ==(Object other) {
     if (other.runtimeType != runtimeType) return false;
-    var otherTodo = other as Todo;
-    return otherTodo.hashCode == hashCode;
+    return other.hashCode == hashCode;
   }
 
   void open(final BuildContext context) {
     var course = CourseController.getCourseById(courseId);
     if (course == null) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const ErrorPage(msg: "없는... 강의인데요??")));
+      Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => const ErrorPage(msg: "없는... 강의인데요??")));
       return;
     }
     Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: id)));

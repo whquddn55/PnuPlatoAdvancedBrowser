@@ -11,7 +11,7 @@ class LoginController extends GetxController {
   LoginInformation loginInformation = LoginInformation();
 
   static Future<bool> _checkLogin() async {
-    final LoginInformation? loginInformation = await StorageController.loadLoginInformation();
+    final LoginInformation? loginInformation = StorageController.loadLoginInformation();
     if (loginInformation == null) return false;
 
     String body = '[{"index":0,"methodname":"core_fetch_notifications","args":{"contextid":2}}]';
@@ -32,7 +32,7 @@ class LoginController extends GetxController {
       await BackgroundLoginController.login(autologin: autologin, username: username, password: password);
     }
 
-    final LoginInformation? _loginInformation = await StorageController.loadLoginInformation();
+    final LoginInformation? _loginInformation = StorageController.loadLoginInformation();
     if (_loginInformation == null) return;
     loginInformation = _loginInformation;
     if (beforeLoginStatus != loginInformation.loginStatus || beforeLoginMsg != loginInformation.loginMsg) update();

@@ -5,7 +5,6 @@ import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 
 class UnknownTodo extends Todo {
   UnknownTodo({
-    int? isarId,
     required int index,
     required String id,
     required String title,
@@ -14,8 +13,8 @@ class UnknownTodo extends Todo {
     required bool availability,
     required String iconUrl,
     required TodoStatus status,
+    required bool userDefined,
   }) : super(
-          isarId: isarId,
           index: index,
           id: id,
           title: title,
@@ -23,8 +22,9 @@ class UnknownTodo extends Todo {
           dueDate: dueDate,
           availability: availability,
           iconUrl: iconUrl,
-          status: status,
+          statusIndex: status.index,
           type: "unknown",
+          userDefined: userDefined,
         );
 
   @override

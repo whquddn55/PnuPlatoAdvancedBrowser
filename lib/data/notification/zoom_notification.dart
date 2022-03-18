@@ -5,12 +5,11 @@ import 'package:pnu_plato_advanced_browser/data/notification/notification.dart' 
 
 class ZoomNotification extends noti.Notification {
   ZoomNotification({
-    int? isarId,
     required String title,
     required String body,
     required String? url,
     required DateTime time,
-  }) : super(isarId: isarId, title: title, body: body, url: url, time: time, type: "zoom");
+  }) : super(title: title, body: body, url: url, time: time, type: "zoom");
 
   @override
   Color getColor() => zoomColor;

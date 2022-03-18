@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 
 class EventTile extends StatelessWidget {
@@ -13,7 +14,6 @@ class EventTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var course = CourseController.getCourseById(event.courseId);
-    if (course == null) return const SizedBox.shrink();
 
     final Color eventColor = event.getColor();
     final String dateString = event.dueDate == null ? '' : DateFormat.Hms().format(event.dueDate!);
@@ -26,6 +26,7 @@ class EventTile extends StatelessWidget {
         alignment: Alignment.centerLeft,
         children: [
           InkWell(
+            onLongPress: () async => await TodoController.to.changeTodoStatus(context, event),
             onTap: () => event.open(context),
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
@@ -35,7 +36,7 @@ class EventTile extends StatelessWidget {
               decoration: BoxDecoration(color: const Color(0xffdddddd), borderRadius: BorderRadius.circular(8.0)),
               child: Column(
                 children: [
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(course.title), Text(dateString)]),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(course?.title ?? '알 수 없음'), Text(dateString)]),
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(event.title), remainTextWidget]),
                 ],
               ),

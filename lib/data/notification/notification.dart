@@ -1,6 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/article_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/assign_notification.dart';
@@ -11,13 +10,14 @@ import 'package:pnu_plato_advanced_browser/data/notification/url_notification.da
 import 'package:pnu_plato_advanced_browser/data/notification/vod_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/zoom_notification.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
+import 'package:objectbox/objectbox.dart';
 
-part 'notification.g.dart';
+import '../../objectbox.g.dart';
 
-@Collection()
+@Entity()
 class Notification {
-  @Id()
-  int? isarId;
+  @Id(assignable: true)
+  int dbId;
   final String? url;
   final String title;
   final String body;
@@ -25,39 +25,38 @@ class Notification {
   final String type;
 
   Notification({
-    this.isarId,
     required this.title,
     required this.body,
     required this.url,
     required this.time,
     required this.type,
-  });
+  }) : dbId = (url ?? '' + title + time.toString()).hashCode;
 
   Notification transType() {
     switch (type) {
       case "article":
-        return ArticleNotification(isarId: isarId, title: title, body: body, url: url, time: time);
+        return ArticleNotification(title: title, body: body, url: url, time: time);
       case "folder":
-        return FolderNotification(isarId: isarId, title: title, body: body, url: url, time: time);
+        return FolderNotification(title: title, body: body, url: url, time: time);
       case "ubfile":
-        return FileNotification(isarId: isarId, title: title, body: body, url: url, time: time);
+        return FileNotification(title: title, body: body, url: url, time: time);
       case "url":
-        return UrlNotification(isarId: isarId, title: title, body: body, url: url, time: time);
+        return UrlNotification(title: title, body: body, url: url, time: time);
       case "vod":
-        return VodNotification(isarId: isarId, title: title, body: body, url: url, time: time);
+        return VodNotification(title: title, body: body, url: url, time: time);
       case "zoom":
-        return ZoomNotification(isarId: isarId, title: title, body: body, url: url, time: time);
+        return ZoomNotification(title: title, body: body, url: url, time: time);
       case "assign":
-        return AssignNotification(isarId: isarId, title: title, body: body, url: url, time: time);
+        return AssignNotification(title: title, body: body, url: url, time: time);
       case "removed":
-        return UnknownNotification(isarId: isarId, title: title, body: body, url: url, time: time);
+        return UnknownNotification(title: title, body: body, url: url, time: time);
       default:
-        return UnknownNotification(isarId: isarId, title: title, body: body, url: url, time: time);
+        return UnknownNotification(title: title, body: body, url: url, time: time);
     }
   }
 
   @override
-  int get hashCode => url.hashCode;
+  int get hashCode => dbId;
   @override
   bool operator ==(final Object other) => other.runtimeType == runtimeType && hashCode == other.hashCode;
 
