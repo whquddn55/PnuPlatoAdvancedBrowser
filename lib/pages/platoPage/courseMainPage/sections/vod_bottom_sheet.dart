@@ -17,17 +17,6 @@ class VodBottomSheet extends StatefulWidget {
 }
 
 class _VodBottomSheetState extends State<VodBottomSheet> {
-  late final Future _future;
-
-  @override
-  initState() {
-    super.initState();
-    _future = CourseController.getVodStatus(widget.courseId, true).then((value) async {
-      await TodoController.to.updateTodoStatus(value);
-      return value;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -82,7 +71,10 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
                   ),
               const SizedBox(height: 8.0),
               FutureBuilder(
-                future: _future,
+                future: CourseController.getVodStatus(widget.courseId, true).then((value) async {
+                  await TodoController.to.updateVodTodoStatus(widget.courseId, value);
+                  return value;
+                }),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
                     return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
@@ -132,7 +124,10 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
                   alignment: Alignment.centerLeft,
                   primary: Get.textTheme.bodyText1!.color,
                 ),
-                onPressed: () async => await widget.activity.download(),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await widget.activity.download();
+                },
               ),
               TextButton.icon(
                 icon: const Icon(Icons.open_in_new),
@@ -141,7 +136,10 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
                   alignment: Alignment.centerLeft,
                   primary: Get.textTheme.bodyText1!.color,
                 ),
-                onPressed: () async => await widget.activity.open(context),
+                onPressed: () async {
+                  await widget.activity.open(context);
+                  setState(() {});
+                },
               ),
               TextButton.icon(
                 icon: const Icon(Icons.cancel_outlined),

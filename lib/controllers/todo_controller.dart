@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/vod_todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
 class TodoController extends GetxController {
@@ -36,17 +38,51 @@ class TodoController extends GetxController {
     _unlockCourseId();
   }
 
-  Future<void> updateTodoStatus(final Map<int, List<Map<String, dynamic>>> vodStatusMap) async {
+  Future<void> updateVodTodoStatus(final String courseId, final Map<int, List<Map<String, dynamic>>> vodStatusMap) async {
     bool modified = false;
     for (var todo in todoList) {
       for (var vodStatusList in vodStatusMap.values) {
         for (var vodStatus in vodStatusList) {
-          if (todo.title == vodStatus["title"]) {
+          if (todo.runtimeType == (VodTodo) && todo.courseId == courseId && todo.title == vodStatus["title"]) {
             if (todo.status != vodStatus["status"]) {
               modified = true;
               todo.status = vodStatus["status"] == true ? TodoStatus.done : TodoStatus.undone;
             }
           }
+        }
+      }
+    }
+
+    if (modified) {
+      await StorageController.storeTodoList(todoList);
+      update();
+    }
+  }
+
+  Future<void> updateZoomTodoStatus(final String id, final TodoStatus status) async {
+    bool modified = false;
+    for (var todo in todoList) {
+      if (todo.runtimeType == (ZoomTodo) && todo.id == id) {
+        if (todo.status != status) {
+          modified = true;
+          todo.status = status;
+        }
+      }
+    }
+
+    if (modified) {
+      await StorageController.storeTodoList(todoList);
+      update();
+    }
+  }
+
+  Future<void> updateAssignTodoStatus(final String id, final TodoStatus status) async {
+    bool modified = false;
+    for (var todo in todoList) {
+      if (todo.runtimeType == (AssignTodo) && todo.id == id) {
+        if (todo.status == status) {
+          modified = true;
+          todo.status = status;
         }
       }
     }

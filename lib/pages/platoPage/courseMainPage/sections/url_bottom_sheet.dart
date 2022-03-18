@@ -62,7 +62,10 @@ class UrlBottomSheet extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   primary: Get.textTheme.bodyText1!.color,
                 ),
-                onPressed: () async => await activity.open(context),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await activity.open(context);
+                },
               ),
               TextButton.icon(
                 icon: const Icon(Icons.cancel_outlined),

@@ -3,35 +3,43 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_zoom_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/zoom_course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course_zoom.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 
-class ZoomBottomSheet extends StatelessWidget {
+class ZoomBottomSheet extends StatefulWidget {
   final String courseTitle;
   final String courseId;
   final ZoomCourseActivity activity;
   const ZoomBottomSheet({Key? key, required this.activity, required this.courseTitle, required this.courseId}) : super(key: key);
 
+  @override
+  State<ZoomBottomSheet> createState() => _ZoomBottomSheetState();
+}
+
+class _ZoomBottomSheetState extends State<ZoomBottomSheet> {
   Widget _renderZoomInfo(final AsyncSnapshot<CourseZoom?> snapshot) {
-    if (snapshot.connectionState != ConnectionState.done) {
-      return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
-    }
-    if (snapshot.data == null) {
-      return errorWidget();
-    }
+    if (snapshot.connectionState != ConnectionState.done) return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
+    if (snapshot.data == null) return errorWidget();
 
     final CourseZoom courseZoom = snapshot.data!;
     Color textColor = Colors.red;
+    String statusString = '';
     switch (courseZoom.status) {
-      case "진행중":
+      case TodoStatus.doing:
         textColor = Colors.green;
+        statusString = '진행중';
         break;
-      case "종료":
+      case TodoStatus.done:
         textColor = Colors.black;
+        statusString = '종료';
         break;
-      default:
+      case TodoStatus.undone:
         textColor = Colors.red;
+        statusString = '참가전';
+        break;
     }
 
     return Column(
@@ -41,7 +49,7 @@ class ZoomBottomSheet extends StatelessWidget {
         Row(
           children: [
             const Text("상태 : "),
-            Text(courseZoom.status, style: TextStyle(color: textColor)),
+            Text(statusString, style: TextStyle(color: textColor)),
           ],
         ),
       ],
@@ -49,17 +57,13 @@ class ZoomBottomSheet extends StatelessWidget {
   }
 
   Widget _renderOpenButton(final BuildContext context, final AsyncSnapshot<CourseZoom?> snapshot) {
-    if (snapshot.connectionState != ConnectionState.done) {
-      return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
-    }
-    if (snapshot.data == null) {
-      return errorWidget();
-    }
+    if (snapshot.connectionState != ConnectionState.done) return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
+    if (snapshot.data == null) return errorWidget();
 
     final CourseZoom courseZoom = snapshot.data!;
 
     switch (courseZoom.status) {
-      case "진행중":
+      case TodoStatus.doing:
         return TextButton.icon(
           icon: const Icon(Icons.open_in_new),
           label: const Text("열기"),
@@ -67,7 +71,10 @@ class ZoomBottomSheet extends StatelessWidget {
             alignment: Alignment.centerLeft,
             primary: Get.textTheme.bodyText1!.color,
           ),
-          onPressed: () async => await activity.open(context),
+          onPressed: () async {
+            await widget.activity.open(context);
+            setState(() {});
+          },
         );
       default:
         return TextButton.icon(
@@ -85,7 +92,10 @@ class ZoomBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<CourseZoom?>(
-      future: CourseZoomController.fetchCourseZoom(activity.id),
+      future: CourseZoomController.fetchCourseZoom(widget.activity.id).then((value) async {
+        TodoController.to.updateZoomTodoStatus(widget.activity.id, value!.status);
+        return value;
+      }),
       builder: (context, snapshot) {
         return Padding(
           padding: const EdgeInsets.all(20.0),
@@ -100,13 +110,13 @@ class ZoomBottomSheet extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         child: CachedNetworkImage(
-                          imageUrl: activity.iconUrl!,
+                          imageUrl: widget.activity.iconUrl!,
                           height: 20,
                         ),
                       ),
                       Flexible(
                         child: Text(
-                          activity.title,
+                          widget.activity.title,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),

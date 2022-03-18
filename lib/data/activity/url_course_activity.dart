@@ -46,6 +46,7 @@ class UrlCourseActivity extends CourseActivity {
 
   @override
   Future<void> open(final BuildContext context) async {
+    final progressContext = await showProgressDialog(context, "로딩중입니다...");
     var response = await requestGet(CommonUrl.courseUrlViewUrl + id + '&redirect=1',
         isFront: true, options: Options(followRedirects: false, validateStatus: (status) => status == 303));
 
@@ -58,5 +59,6 @@ class UrlCourseActivity extends CourseActivity {
         url: Uri.parse(response.headers.value("location")!),
         options: ChromeSafariBrowserClassOptions(
             android: AndroidChromeCustomTabsOptions(showTitle: false, toolbarBackgroundColor: Colors.white), ios: IOSSafariOptions()));
+    closeProgressDialog(progressContext);
   }
 }

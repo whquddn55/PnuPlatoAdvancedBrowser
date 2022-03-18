@@ -18,6 +18,7 @@ class FileBottomSheet extends StatelessWidget {
   const FileBottomSheet({Key? key, required this.file, required this.fileType, required this.courseTitle, required this.courseId}) : super(key: key);
 
   Future<void> _viewHanlder(BuildContext context) async {
+    Navigator.pop(context);
     final BuildContext dialogContext = await showProgressDialog(context, "파일을 다운로드 중입니다...");
     var cachedFile = await DefaultCacheManager().getSingleFile(
       file.url,
@@ -33,6 +34,7 @@ class FileBottomSheet extends StatelessWidget {
   }
 
   Future<void> _downloadHandler(BuildContext context) async {
+    Navigator.pop(context);
     var downloadResult = await DownloadController.enQueue(
       title: file.title,
       url: file.url,
