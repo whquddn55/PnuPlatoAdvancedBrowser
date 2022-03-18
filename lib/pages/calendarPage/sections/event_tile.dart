@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
@@ -17,8 +18,7 @@ class EventTile extends StatelessWidget {
 
     final Color eventColor = event.getColor();
     final String dateString = event.dueDate == null ? '' : DateFormat.Hms().format(event.dueDate!);
-    final Widget remainTextWidget =
-        event.dueDate == null ? const Text("진행 중", style: TextStyle(color: Colors.green)) : _RemainText(dueDate: event.dueDate!);
+    final Widget remainTextWidget = _RemainText(dueDate: event.dueDate);
 
     return Opacity(
       opacity: event.status == TodoStatus.done ? 0.3 : 1.0,
@@ -36,8 +36,14 @@ class EventTile extends StatelessWidget {
               decoration: BoxDecoration(color: const Color(0xffdddddd), borderRadius: BorderRadius.circular(8.0)),
               child: Column(
                 children: [
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(course?.title ?? '알 수 없음'), Text(dateString)]),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(event.title), remainTextWidget]),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    Flexible(flex: 8, child: Text(course?.title ?? '알 수 없음')),
+                    Wrap(children: [Text(dateString)]),
+                  ]),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    Flexible(flex: 8, child: NFMarquee(text: event.title, fontWeight: FontWeight.normal)),
+                    Wrap(children: [remainTextWidget])
+                  ]),
                 ],
               ),
             ),
@@ -63,7 +69,7 @@ class EventTile extends StatelessWidget {
 }
 
 class _RemainText extends StatefulWidget {
-  final DateTime dueDate;
+  final DateTime? dueDate;
   const _RemainText({Key? key, required this.dueDate}) : super(key: key);
 
   @override
@@ -80,7 +86,8 @@ class __RemainTextState extends State<_RemainText> {
 
   @override
   Widget build(BuildContext context) {
-    Duration remainTime = widget.dueDate.difference(DateTime.now());
+    if (widget.dueDate == null) return const SizedBox.shrink();
+    Duration remainTime = widget.dueDate!.difference(DateTime.now());
     if (remainTime.isNegative) return const SizedBox.shrink();
 
     String days = remainTime.inDays.toString().padLeft(2, '0');
