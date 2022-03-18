@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
@@ -117,7 +118,9 @@ class _MainCalendarState extends State<MainCalendar> {
   }
 
   Widget _renderUndatedEvents() {
-    final List<Todo> undateEventList = widget.todoList.where((todo) => todo.dueDate == null).toList();
+    final List<Todo> undateEventList = widget.todoList
+        .where((todo) => (todo.dueDate == null || todo.status == TodoStatus.doing) && (CourseController.getCourseById(todo.courseId) != null))
+        .toList();
     final List<Widget> children = [];
     children.add(const Text("진행중이거나 마감기한이 없는 할 일"));
     for (int i = 0; i < undateEventList.length; ++i) {
