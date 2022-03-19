@@ -149,7 +149,7 @@ Future<void> timerBody() async {
   //var document = await getApplicationSupportDirectory();
 
   // await File(
-  //         '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat("MM-dd_HH:mm").format(DateTime.now())}.txt')
+  //         '/storage/emulated/0/Android/data/com.thuthi.pnu_plato_advanced_browser/files/${DateFormat("MM-dd_HH:mm").format(DateTime.now())}.txt')
   //     .writeAsString(res.data, mode: FileMode.append);
 
   StorageController.storeLastSyncTime(DateTime.now());
