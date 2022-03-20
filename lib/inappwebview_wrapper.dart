@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 
-class InappwebviewWrapper extends StatelessWidget {
+class InappwebviewWrapper extends StatefulWidget {
   final String title;
   final String url;
   final Function(InAppWebViewController, Uri?)? onLoadStop;
@@ -20,16 +20,32 @@ class InappwebviewWrapper extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<InappwebviewWrapper> createState() => _InappwebviewWrapperState();
+}
+
+class _InappwebviewWrapperState extends State<InappwebviewWrapper> {
+  late final InAppWebViewController _webViewController;
+  late final PullToRefreshController _pullToRefreshController;
+
+  @override
+  void initState() {
+    _pullToRefreshController = PullToRefreshController(onRefresh: () async {
+      await _webViewController.reload();
+      await _pullToRefreshController.endRefreshing();
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    InAppWebViewController? _webViewController;
     final loaderKey = GlobalKey<__LoaderState>();
     final Widget body = WillPopScope(
       onWillPop: () async {
-        if (alwaysPop) {
+        if (widget.alwaysPop) {
           return true;
         }
-        if (await _webViewController!.canGoBack()) {
-          _webViewController!.goBack();
+        if (await _webViewController.canGoBack()) {
+          _webViewController.goBack();
           return false;
         } else {
           return true;
@@ -38,7 +54,8 @@ class InappwebviewWrapper extends StatelessWidget {
       child: Stack(
         children: [
           InAppWebView(
-            initialUrlRequest: URLRequest(url: Uri.parse(url)),
+            pullToRefreshController: _pullToRefreshController,
+            initialUrlRequest: URLRequest(url: Uri.parse(widget.url)),
             initialOptions: InAppWebViewGroupOptions(
                 android: AndroidInAppWebViewOptions(
               useHybridComposition: true,
@@ -47,14 +64,16 @@ class InappwebviewWrapper extends StatelessWidget {
               _webViewController = controller;
             },
             onLoadStart: (controller, uri) async {
-              if (preventRedirect && (uri.toString() != url)) Navigator.pop(context);
+              if (widget.preventRedirect && (uri.toString() != widget.url)) Navigator.pop(context);
 
               loaderKey.currentState!.setLoading();
             },
             onLoadStop: (controller, uri) async {
-              if (onLoadStop != null) {
-                await onLoadStop!(controller, uri);
+              if (widget.onLoadStop != null) {
+                await widget.onLoadStop!(controller, uri);
               }
+              await controller.scrollTo(x: 0, y: 0);
+
               loaderKey.currentState!.setLoaded();
             },
             onConsoleMessage: (controller, msg) {
@@ -167,12 +186,12 @@ class InappwebviewWrapper extends StatelessWidget {
       ),
     );
 
-    if (scaffolded) {
+    if (widget.scaffolded) {
       return body;
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(widget.title),
         centerTitle: true,
         leading: BackButton(onPressed: () => Navigator.pop(context)),
       ),
