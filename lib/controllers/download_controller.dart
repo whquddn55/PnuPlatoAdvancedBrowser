@@ -4,9 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/permission_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
@@ -62,7 +62,7 @@ abstract class DownloadController {
   }
 
   static Future<String> _getSaveDir(final DownloadType type, final String courseTitle, final String courseId, final String title) async {
-    final String externalDir = (await getExternalStorageDirectory())!.path;
+    final String externalDir = await StorageController.getDownloadDirectory();
     late final String saveDir;
     switch (type) {
       case DownloadType.activity:

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -9,8 +8,6 @@ import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_todo_controller.dart';
-import 'package:path_provider_android/path_provider_android.dart';
-import 'package:path_provider_ios/path_provider_ios.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/bakcground_download_controller.dart';
 
 enum BackgroundServiceAction { logout, fetchTodoList, fetchNotificationList, download }
@@ -87,13 +84,7 @@ void _onIosBackground() {
 void _onStart() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (Platform.isAndroid) {
-    PathProviderAndroid.registerWith();
-  }
-  if (Platform.isIOS) {
-    PathProviderIOS.registerWith();
-  }
-  StorageController.initialize();
+  await StorageController.initialize();
   await BackgroundNotificationController.initilize();
 
   /* ensure login */

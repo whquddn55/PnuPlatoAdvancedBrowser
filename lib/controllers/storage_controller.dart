@@ -1,4 +1,5 @@
-import 'package:objectbox/objectbox.dart';
+import 'dart:io';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:pnu_plato_advanced_browser/data/db_order.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
@@ -7,6 +8,9 @@ import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 import 'package:pnu_plato_advanced_browser/data/user_data.dart';
 import 'package:pnu_plato_advanced_browser/objectbox.g.dart';
 
+import 'package:path_provider_android/path_provider_android.dart';
+import 'package:path_provider_ios/path_provider_ios.dart';
+
 abstract class StorageController {
   static const int defaultUserDataId = 1234;
   // static const int _defaultTodoListId = 1235;
@@ -14,6 +18,19 @@ abstract class StorageController {
 
   static late final Store store;
   static Future<void> initialize() async {
+    if (Platform.isAndroid) {
+      PathProviderAndroid.registerWith();
+    }
+    if (Platform.isIOS) {
+      PathProviderIOS.registerWith();
+    }
+
+    final downloadDirectory = Directory(await getDownloadDirectory());
+
+    if (!(await downloadDirectory.exists())) {
+      await downloadDirectory.create(recursive: true);
+    }
+
     final String path = (await getApplicationDocumentsDirectory()).path + '/db';
     try {
       store = await openStore(directory: path);
@@ -26,6 +43,10 @@ abstract class StorageController {
     if (store.box<DBOrder>().get(_defaultNotificationId) == null) {
       store.box<DBOrder>().put(DBOrder(id: _defaultNotificationId, idList: []));
     }
+  }
+
+  static Future<String> getDownloadDirectory() async {
+    return (await getApplicationDocumentsDirectory()).path + '/downloads';
   }
 
   static List<Todo> loadTodoList() {

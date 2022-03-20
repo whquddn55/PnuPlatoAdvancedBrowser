@@ -3,12 +3,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/permission_controller.dart';
 import 'dart:io';
 
 import 'package:pnu_plato_advanced_browser/components/immersive_player/immersive_player.dart';
+import 'package:watcher/watcher.dart';
 
 class DirectoryPage extends StatefulWidget {
   final Directory rootDirectory;
@@ -20,7 +19,6 @@ class DirectoryPage extends StatefulWidget {
 
 class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveClientMixin {
   Directory currentDirectory = Directory.systemTemp;
-  List<FileSystemEntity> fileList = [];
 
   @override
   void initState() {
@@ -165,12 +163,6 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
   Widget build(BuildContext context) {
     super.build(context);
 
-    fileList.sort((a, b) {
-      if (a is Directory && basename(a.path).contains('\$')) return -1;
-      if (b is Directory && basename(b.path).contains('\$')) return 1;
-      return a.statSync().changed.compareTo(b.statSync().changed);
-    });
-
     Widget backButton = const SizedBox.shrink();
     if (widget.rootDirectory.path != currentDirectory.path) {
       backButton = ElevatedButton.icon(
@@ -185,57 +177,58 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
 
     String dirText = currentDirectory.path.replaceAll(widget.rootDirectory.path, '').split('\$')[0];
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return StreamBuilder<WatchEvent>(
+      stream: Watcher(currentDirectory.path).events,
+      builder: (context, snapshot) {
+        List<FileSystemEntity> fileList = currentDirectory.listSync();
+
+        fileList.sort((a, b) {
+          if (a is Directory && basename(a.path).contains('\$')) return -1;
+          if (b is Directory && basename(b.path).contains('\$')) return 1;
+          return a.statSync().changed.compareTo(b.statSync().changed);
+        });
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(dirText == '' ? '/' : dirText),
-              Text('총 ${formatBytes(_dirStatSync(widget.rootDirectory), 2)} 사용중'),
-            ],
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async => await _refreshFileList(),
-              child: ListView(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  backButton,
-                  ...fileList.map((FileSystemEntity e) {
-                    if (e is Directory) {
-                      if (basename(e.path).contains('\$')) {
-                        return _renderFolder(context, e);
-                      } else {
-                        return _renderM3u8(context, e);
-                      }
-                    } else {
-                      return _renderNormal(context, e);
-                    }
-                  }).toList()
+                  Text(dirText == '' ? '/' : dirText),
+                  Text('총 ${formatBytes(_dirStatSync(widget.rootDirectory), 2)} 사용중'),
                 ],
               ),
-            ),
+              Expanded(
+                child: ListView(
+                  children: [
+                    backButton,
+                    ...fileList.map((FileSystemEntity e) {
+                      if (e is Directory) {
+                        if (basename(e.path).contains('\$')) {
+                          return _renderFolder(context, e);
+                        } else {
+                          return _renderM3u8(context, e);
+                        }
+                      } else {
+                        return _renderNormal(context, e);
+                      }
+                    }).toList()
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Future<void> _updateCurrentDirectory(Directory directory) async {
     setState(() {
       currentDirectory = directory;
-      fileList = directory.listSync();
     });
-  }
-
-  Future<void> _refreshFileList() async {
-    fileList.clear();
-    await for (var i in currentDirectory.list()) {
-      fileList.add(i);
-    }
-    setState(() {});
   }
 
   int _dirStatSync(Directory dir) {
@@ -275,6 +268,5 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
     }
 
     Navigator.pop(context);
-    await _refreshFileList();
   }
 }
