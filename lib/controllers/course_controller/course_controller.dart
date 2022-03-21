@@ -152,16 +152,21 @@ abstract class CourseController {
           week = int.parse(tr.children[0].text);
         }
         if (tr.getElementsByClassName('text-left').isNotEmpty) {
-          final String title = tr.getElementsByClassName('text-left')[0].text.trim();
+          String title = tr.getElementsByClassName('text-left')[0].text.trim();
           bool status = false;
           for (var e in tr.getElementsByClassName('text-center')) {
-            if (e.text == 'O') {
+            if (e.text.contains('O')) {
               status = true;
             }
           }
 
           if (res[week] == null) {
             res[week] = [];
+          }
+          for (var vodStatus in res[week]!) {
+            if (vodStatus["title"] == title) {
+              title += "_";
+            }
           }
           res[week]!.add({"title": title, "status": status});
         }
@@ -173,16 +178,21 @@ abstract class CourseController {
           if (tr.children[0].attributes["rowspan"] != null) {
             week = int.parse(tr.children[0].text);
           }
-          final String title = tr.getElementsByClassName('text-left')[0].text.trim();
+          String title = tr.getElementsByClassName('text-left')[0].text.trim();
           bool status = false;
           for (var e in tr.getElementsByClassName('text-center')) {
-            if (e.text == '100%') {
+            if (e.text.contains('100%')) {
               status = true;
             }
           }
 
           if (res[week] == null) {
             res[week] = [];
+          }
+          for (var vodStatus in res[week]!) {
+            if (vodStatus["title"] == title) {
+              title += "_";
+            }
           }
           res[week]!.add({"title": title, "status": status});
         }

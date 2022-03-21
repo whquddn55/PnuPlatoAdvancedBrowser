@@ -60,7 +60,12 @@ abstract class BackgroundTodoController {
         continue;
       }
 
-      final String title = _getTitle(activity);
+      String title = _getTitle(activity);
+      for (var todo in todoList) {
+        if (todo.title == title) {
+          title += '_';
+        }
+      }
       bool? done;
       for (var vod in vodStatusList) {
         if (vod["title"] == title) {
