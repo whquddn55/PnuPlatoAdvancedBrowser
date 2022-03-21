@@ -18,7 +18,7 @@ import '../../objectbox.g.dart';
 class Notification {
   @Id(assignable: true)
   int dbId;
-  final String? url;
+  final String url;
   final String title;
   final String body;
   final DateTime time;
@@ -30,7 +30,7 @@ class Notification {
     required this.url,
     required this.time,
     required this.type,
-  }) : dbId = (url ?? '' + title + time.toString()).hashCode;
+  }) : dbId = url.hashCode;
 
   Notification transType() {
     switch (type) {
@@ -82,7 +82,7 @@ class Notification {
       );
       return;
     }
-    Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: url!.split('?id=')[1])));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: url.split('?id=')[1])));
   }
 
   Future<void> show() async {
@@ -93,7 +93,7 @@ class Notification {
         channelKey: 'ppab_noti_normal',
         title: title,
         body: body,
-        payload: {"url": url ?? ""},
+        payload: {"url": url},
         displayOnForeground: true,
         wakeUpScreen: true,
         displayOnBackground: true,

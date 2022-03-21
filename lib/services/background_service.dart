@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -9,6 +10,8 @@ import 'package:pnu_plato_advanced_browser/services/background_service_controlle
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/bakcground_download_controller.dart';
+import 'package:flutter_background_service_android/flutter_background_service_android.dart';
+import 'package:flutter_background_service_ios/flutter_background_service_ios.dart';
 
 enum BackgroundServiceAction { logout, fetchTodoList, fetchNotificationList, download }
 
@@ -84,6 +87,9 @@ void _onIosBackground() {
 void _onStart() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  if (Platform.isIOS) FlutterBackgroundServiceIOS.registerWith();
+  if (Platform.isAndroid) FlutterBackgroundServiceAndroid.registerWith();
+
   await StorageController.initialize();
   await BackgroundNotificationController.initilize();
 
@@ -140,7 +146,7 @@ Future<void> timerBody() async {
   //var document = await getApplicationSupportDirectory();
 
   // await File(
-  //         '/storage/emulated/0/Android/data/com.thuthi.pnu_plato_advanced_browser/files/${DateFormat("MM-dd_HH:mm").format(DateTime.now())}.txt')
+  //         '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat("MM-dd_HH:mm").format(DateTime.now())}.txt')
   //     .writeAsString(res.data, mode: FileMode.append);
 
   StorageController.storeLastSyncTime(DateTime.now());

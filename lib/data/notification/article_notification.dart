@@ -8,7 +8,7 @@ class ArticleNotification extends noti.Notification {
   ArticleNotification({
     required String title,
     required String body,
-    required String? url,
+    required String url,
     required DateTime time,
   }) : super(title: title, body: body, url: url, time: time, type: "article");
 
@@ -31,7 +31,7 @@ class ArticleNotification extends noti.Notification {
       );
       return;
     }
-    Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: url!.split('bwid=')[1])));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: url.split('bwid=')[1])));
   }
 
   @override

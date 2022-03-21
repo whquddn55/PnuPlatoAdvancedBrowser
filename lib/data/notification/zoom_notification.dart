@@ -7,7 +7,7 @@ class ZoomNotification extends noti.Notification {
   ZoomNotification({
     required String title,
     required String body,
-    required String? url,
+    required String url,
     required DateTime time,
   }) : super(title: title, body: body, url: url, time: time, type: "zoom");
 

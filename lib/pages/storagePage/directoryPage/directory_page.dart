@@ -7,6 +7,7 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'dart:io';
 
 import 'package:pnu_plato_advanced_browser/components/immersive_player/immersive_player.dart';
+import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:watcher/watcher.dart';
 
 class DirectoryPage extends StatefulWidget {
@@ -17,7 +18,7 @@ class DirectoryPage extends StatefulWidget {
   _DirectoryPageState createState() => _DirectoryPageState();
 }
 
-class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveClientMixin {
+class _DirectoryPageState extends State<DirectoryPage> {
   Directory currentDirectory = Directory.systemTemp;
 
   @override
@@ -26,9 +27,6 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
 
     _updateCurrentDirectory(widget.rootDirectory);
   }
-
-  @override
-  bool get wantKeepAlive => true;
 
   Widget _renderFolder(final BuildContext context, final Directory directory) {
     return ElevatedButton.icon(
@@ -63,6 +61,7 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
   }
 
   Widget _renderM3u8(final BuildContext context, final Directory directory) {
+    printLog(directory.path);
     /* m3u8파일 */
     bool show = false;
     int fileSize = 0;
@@ -70,6 +69,7 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
       if (basename(file.path).contains('index')) {
         show = true;
       }
+      printLog(file.path);
       fileSize += (file as File).lengthSync();
     }
     if (show) {
@@ -161,68 +161,72 @@ class _DirectoryPageState extends State<DirectoryPage> with AutomaticKeepAliveCl
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
+    return GetBuilder<RouteController>(builder: (controller) {
+      printLog(controller.currentIndex);
+      if (controller.currentIndex != 3) return const SizedBox.shrink();
 
-    Widget backButton = const SizedBox.shrink();
-    if (widget.rootDirectory.path != currentDirectory.path) {
-      backButton = ElevatedButton.icon(
-        label: const Text("뒤로가기"),
-        icon: const Icon(Icons.arrow_back),
-        style: ElevatedButton.styleFrom(
-          primary: Get.theme.backgroundColor,
-        ),
-        onPressed: () => _updateCurrentDirectory(currentDirectory.parent),
-      );
-    }
+      Widget backButton = const SizedBox.shrink();
+      if (widget.rootDirectory.path != currentDirectory.path) {
+        backButton = ElevatedButton.icon(
+          label: const Text("뒤로가기"),
+          icon: const Icon(Icons.arrow_back),
+          style: ElevatedButton.styleFrom(
+            primary: Get.theme.backgroundColor,
+          ),
+          onPressed: () => _updateCurrentDirectory(currentDirectory.parent),
+        );
+      }
 
-    String dirText = currentDirectory.path.replaceAll(widget.rootDirectory.path, '').split('\$')[0];
+      final String dirText = currentDirectory.path.replaceAll(widget.rootDirectory.path, '').split('\$')[0];
 
-    return StreamBuilder<WatchEvent>(
-      stream: Watcher(currentDirectory.path).events,
-      builder: (context, snapshot) {
-        List<FileSystemEntity> fileList = currentDirectory.listSync();
+      return StreamBuilder<WatchEvent>(
+        stream: Watcher(currentDirectory.path).events,
+        builder: (context, snapshot) {
+          final List<FileSystemEntity> fileList = currentDirectory.listSync();
+          fileList.sort((a, b) {
+            if (a is Directory && basename(a.path).contains('\$')) return -1;
+            if (b is Directory && basename(b.path).contains('\$')) return 1;
+            return a.statSync().changed.compareTo(b.statSync().changed);
+          });
 
-        fileList.sort((a, b) {
-          if (a is Directory && basename(a.path).contains('\$')) return -1;
-          if (b is Directory && basename(b.path).contains('\$')) return 1;
-          return a.statSync().changed.compareTo(b.statSync().changed);
-        });
+          final String totalStorageSize = formatBytes(_dirStatSync(widget.rootDirectory), 2);
 
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(dirText == '' ? '/' : dirText),
-                  Text('총 ${formatBytes(_dirStatSync(widget.rootDirectory), 2)} 사용중'),
-                ],
-              ),
-              Expanded(
-                child: ListView(
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    backButton,
-                    ...fileList.map((FileSystemEntity e) {
-                      if (e is Directory) {
-                        if (basename(e.path).contains('\$')) {
-                          return _renderFolder(context, e);
-                        } else {
-                          return _renderM3u8(context, e);
-                        }
-                      } else {
-                        return _renderNormal(context, e);
-                      }
-                    }).toList()
+                    Text(dirText == '' ? '/' : dirText),
+                    Text('총 $totalStorageSize 사용중'),
                   ],
                 ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+                Expanded(
+                  child: ListView(
+                    children: [
+                      backButton,
+                      ...fileList.map((FileSystemEntity e) {
+                        if (e is Directory) {
+                          if (basename(e.path).contains('\$')) {
+                            return _renderFolder(context, e);
+                          } else {
+                            return _renderM3u8(context, e);
+                          }
+                        } else {
+                          return _renderNormal(context, e);
+                        }
+                      }).toList()
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    });
   }
 
   Future<void> _updateCurrentDirectory(Directory directory) async {

@@ -25,7 +25,6 @@ abstract class DownloadController {
     await Fluttertoast.cancel();
     await Fluttertoast.showToast(msg: "다운로드 초기화 작업을 시작 중입니다...");
 
-    final String saveDir = await _getSaveDir(type, courseTitle, courseId, title);
     List<String>? tempList = await _getUrlAndTitle(type, url, title);
     if (tempList == null || tempList.length != 2) {
       /* TODO: 에러 */
@@ -34,6 +33,7 @@ abstract class DownloadController {
     url = tempList[0];
     title = tempList[1];
 
+    final String saveDir = await _getSaveDir(type, courseTitle, courseId, title);
     bool isExists = await _checkDuplication(type, saveDir, title);
     if (isExists) {
       bool duplicateSelect = await showDialog(
@@ -87,12 +87,13 @@ abstract class DownloadController {
         var responseTemp = await requestGet(url, options: options, isFront: true);
         if (responseTemp == null) return null;
         res[0] = responseTemp.headers.value('location')!.split('?')[0];
-        res[1] = Uri.decodeFull(res[0].split('/').last);
+        res[1] = Uri.decodeFull(res[0].split('/0/').last);
         break;
       case DownloadType.normal:
       case DownloadType.m3u8:
         break;
     }
+    res[1] = res[1].replaceAll('/', '-');
 
     return res;
   }

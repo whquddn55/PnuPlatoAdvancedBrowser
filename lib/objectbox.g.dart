@@ -342,8 +342,7 @@ ModelDefinition getObjectBoxModel() {
           object.dbId = id;
         },
         objectToFB: (Notification object, fb.Builder fbb) {
-          final urlOffset =
-              object.url == null ? null : fbb.writeString(object.url!);
+          final urlOffset = fbb.writeString(object.url);
           final titleOffset = fbb.writeString(object.title);
           final bodyOffset = fbb.writeString(object.body);
           final typeOffset = fbb.writeString(object.type);
@@ -367,7 +366,7 @@ ModelDefinition getObjectBoxModel() {
               body: const fb.StringReader(asciiOptimization: true)
                   .vTableGet(buffer, rootOffset, 10, ''),
               url: const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 6),
+                  .vTableGet(buffer, rootOffset, 6, ''),
               time: DateTime.fromMillisecondsSinceEpoch(
                   const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0)),
               type: const fb.StringReader(asciiOptimization: true)

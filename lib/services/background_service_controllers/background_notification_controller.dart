@@ -109,6 +109,8 @@ abstract class BackgroundNotificationController {
 
     List<Notification> newNotificationList = [];
     for (var notificationItem in document.getElementsByClassName('notification-item')) {
+      final String? url = notificationItem.attributes['href'];
+      if (url == null) continue;
       final String timeago = notificationItem.getElementsByClassName('timeago')[0].text;
       final String courseName = notificationItem.getElementsByClassName('media-heading')[0].text.trim().split(' ')[0];
       final String content = notificationItem
@@ -118,10 +120,8 @@ abstract class BackgroundNotificationController {
               .replaceAll(timeago, '') +
           ' - ' +
           timeago;
-      final String? url = notificationItem.attributes['href'];
 
-      var newNotification =
-          Notification(title: courseName, body: content, url: url, time: DateTime.now(), type: url?.split('/')[4] ?? "removed").transType();
+      var newNotification = Notification(title: courseName, body: content, url: url, time: DateTime.now(), type: url.split('/')[4]).transType();
       newNotificationList.add(newNotification);
     }
 
