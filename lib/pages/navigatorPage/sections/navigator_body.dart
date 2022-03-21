@@ -13,10 +13,12 @@ class NavigatorBody extends StatefulWidget {
 class _NavigatorBodyState extends State<NavigatorBody> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    final TabController tabController = TabController(length: RouteController.to.pages.length, vsync: this);
+    final TabController tabController =
+        TabController(length: RouteController.to.pages.length, vsync: this, initialIndex: RouteController.to.currentIndex);
     DateTime? currentBackPressTime;
     return GetBuilder<RouteController>(
       builder: (controller) {
+        tabController.animateTo(controller.currentIndex);
         return WillPopScope(
           onWillPop: () async {
             bool res = !(await controller.maybePop());

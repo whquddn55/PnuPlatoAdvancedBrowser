@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/admin_bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
@@ -87,6 +89,8 @@ class MainDrawer extends StatelessWidget {
                   title: const Text('디버그버튼'),
                   onTap: () async {
                     await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+                    StorageController.storeNotificationList([]);
+                    NotificationController.fetchNotificationList();
                   }),
             ]);
           } else {

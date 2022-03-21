@@ -91,6 +91,7 @@ abstract class BackgroundDownloadController {
       content: NotificationContent(
         id: id,
         channelKey: 'ppab_noti_download_progress',
+        groupKey: id.toString(),
         title: title,
         body: '다운로드중...',
         autoDismissible: false,
@@ -117,7 +118,6 @@ abstract class BackgroundDownloadController {
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: id,
-        groupKey: 'ppab_noti_download_result',
         channelKey: 'ppab_noti_download_result',
         title: title,
         body: '다운로드 완료!',
@@ -135,7 +135,6 @@ abstract class BackgroundDownloadController {
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: id,
-        groupKey: 'ppab_noti_download_result',
         channelKey: 'ppab_noti_download_result',
         title: title,
         body: '다운로드 실패... ' + body,

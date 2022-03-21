@@ -91,7 +91,7 @@ void _onStart() async {
   if (Platform.isAndroid) FlutterBackgroundServiceAndroid.registerWith();
 
   await StorageController.initialize();
-  await BackgroundNotificationController.initilize();
+  await BackgroundNotificationController.initialize();
 
   /* ensure login */
   await BackgroundLoginController.login(autologin: true, username: null, password: null);

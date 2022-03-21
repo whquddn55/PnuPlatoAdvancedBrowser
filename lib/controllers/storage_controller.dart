@@ -16,7 +16,7 @@ abstract class StorageController {
   // static const int _defaultTodoListId = 1235;
   static const int _defaultNotificationId = 1236;
 
-  static late final Store store;
+  static late final Store _store;
   static Future<void> initialize() async {
     if (Platform.isAndroid) {
       PathProviderAndroid.registerWith();
@@ -33,15 +33,15 @@ abstract class StorageController {
 
     final String path = (await getApplicationDocumentsDirectory()).path + '/db';
     try {
-      store = await openStore(directory: path);
+      _store = await openStore(directory: path);
     } catch (e) {
-      store = Store.attach(getObjectBoxModel(), path);
+      _store = Store.attach(getObjectBoxModel(), path);
     }
-    if (store.box<UserData>().get(defaultUserDataId) == null) {
-      store.box<UserData>().put(UserData());
+    if (_store.box<UserData>().get(defaultUserDataId) == null) {
+      _store.box<UserData>().put(UserData());
     }
-    if (store.box<DBOrder>().get(_defaultNotificationId) == null) {
-      store.box<DBOrder>().put(DBOrder(id: _defaultNotificationId, idList: []));
+    if (_store.box<DBOrder>().get(_defaultNotificationId) == null) {
+      _store.box<DBOrder>().put(DBOrder(id: _defaultNotificationId, idList: []));
     }
   }
 
@@ -50,7 +50,7 @@ abstract class StorageController {
   }
 
   static List<Todo> loadTodoList() {
-    final res = store.box<Todo>().getAll().map((todo) => todo.transType()).toList();
+    final res = _store.box<Todo>().getAll().map((todo) => todo.transType()).toList();
     res.sort((a, b) {
       if (a.dueDate == b.dueDate) {
         if (a.courseId == b.courseId) {
@@ -67,73 +67,74 @@ abstract class StorageController {
   }
 
   static void storeTodoList(final List<Todo> todoList) {
-    store.box<Todo>().putMany(todoList);
+    _store.box<Todo>().putMany(todoList);
   }
 
   static List<Notification> loadNotificationList() {
-    final res = store.box<Notification>().getAll().map((notification) => notification.transType()).toList();
-    final notificationOrder = store.box<DBOrder>().get(_defaultNotificationId)!.idList;
+    final res = _store.box<Notification>().getAll().map((notification) => notification.transType()).toList();
+    final notificationOrder = _store.box<DBOrder>().get(_defaultNotificationId)!.idList;
     res.sort((a, b) =>
         notificationOrder.indexWhere((bdId) => int.parse(bdId) == a.dbId) - notificationOrder.indexWhere((bdId) => int.parse(bdId) == b.dbId));
     return res;
   }
 
   static void storeNotificationList(final List<Notification> notificationList) {
-    store.box<Notification>().putMany(notificationList);
+    _store.box<Notification>().removeAll();
+    _store.box<Notification>().putMany(notificationList);
     final todoOrder = DBOrder(id: _defaultNotificationId, idList: notificationList.map((notification) => notification.dbId.toString()).toList());
-    store.box<DBOrder>().put(todoOrder);
+    _store.box<DBOrder>().put(todoOrder);
   }
 
   static LoginInformation? loadLoginInformation() {
-    return store.box<LoginInformation>().get(defaultUserDataId);
+    return _store.box<LoginInformation>().get(defaultUserDataId);
   }
 
   static void storeLoginInformation(final LoginInformation loginInformation) {
-    store.box<LoginInformation>().put(loginInformation);
+    _store.box<LoginInformation>().put(loginInformation);
   }
 
   static String loadUsername() {
-    return store.box<UserData>().get(defaultUserDataId)!.username;
+    return _store.box<UserData>().get(defaultUserDataId)!.username;
   }
 
   static void storeUsername(final String username) {
-    var userData = store.box<UserData>().get(defaultUserDataId)!;
+    var userData = _store.box<UserData>().get(defaultUserDataId)!;
     userData.username = username;
-    store.box<UserData>().put(userData);
+    _store.box<UserData>().put(userData);
   }
 
   static String loadPassword() {
-    return store.box<UserData>().get(defaultUserDataId)!.password;
+    return _store.box<UserData>().get(defaultUserDataId)!.password;
   }
 
   static void storePassword(final String password) {
-    var userData = store.box<UserData>().get(defaultUserDataId)!;
+    var userData = _store.box<UserData>().get(defaultUserDataId)!;
     userData.password = password;
-    store.box<UserData>().put(userData);
+    _store.box<UserData>().put(userData);
   }
 
   static DateTime loadLastSyncTime() {
-    return store.box<UserData>().get(defaultUserDataId)!.lastSyncTime;
+    return _store.box<UserData>().get(defaultUserDataId)!.lastSyncTime;
   }
 
   static void storeLastSyncTime(final DateTime lastSyncTime) {
-    var userData = store.box<UserData>().get(defaultUserDataId)!;
+    var userData = _store.box<UserData>().get(defaultUserDataId)!;
     userData.lastSyncTime = lastSyncTime;
-    store.box<UserData>().put(userData);
+    _store.box<UserData>().put(userData);
   }
 
   static bool loadIsFirst() {
-    return store.box<UserData>().get(defaultUserDataId)!.isFirst;
+    return _store.box<UserData>().get(defaultUserDataId)!.isFirst;
   }
 
   static void storeIsFirst(final bool isFirst) {
-    var userData = store.box<UserData>().get(defaultUserDataId)!;
+    var userData = _store.box<UserData>().get(defaultUserDataId)!;
     userData.isFirst = isFirst;
-    store.box<UserData>().put(userData);
+    _store.box<UserData>().put(userData);
   }
 
   static void clearUserData() {
     var newUserData = UserData();
-    store.box<UserData>().put(newUserData);
+    _store.box<UserData>().put(newUserData);
   }
 }

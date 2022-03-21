@@ -6,9 +6,10 @@ import 'package:pnu_plato_advanced_browser/data/notification/notification.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/bakcground_download_controller.dart';
 
 abstract class BackgroundNotificationController {
-  static Future<void> initilize() async {
+  static Future<void> initialize() async {
     await AwesomeNotifications().initialize(null, [
       NotificationChannel(
+        channelGroupKey: 'ppab_noti',
         channelKey: 'ppab_noti_download_progress',
         channelName: '플라토 브라우저 다운로드 진행 상태',
         channelDescription: '플라토 브라우저 다운로드 진행 상태를 보여줌',
@@ -20,9 +21,9 @@ abstract class BackgroundNotificationController {
         channelShowBadge: false,
       ),
       NotificationChannel(
-        groupKey: 'ppab_noti_download_result',
-        channelGroupKey: 'ppab_noti_download_result',
+        channelGroupKey: 'ppab_noti',
         channelKey: 'ppab_noti_download_result',
+        groupKey: "ppab_noti_download_result",
         channelName: '플라토 브라우저 다운로드 결과',
         channelDescription: '플라토 브라우저 다운로드 결과를 보여줌',
         enableLights: true,
@@ -33,8 +34,9 @@ abstract class BackgroundNotificationController {
         importance: NotificationImportance.Max,
       ),
       NotificationChannel(
-        channelGroupKey: 'ppab_noti_normal',
+        channelGroupKey: 'ppab_noti',
         channelKey: 'ppab_noti_normal',
+        groupKey: "ppab_noti_normal",
         channelName: '플라토 브라우저 일반 알림',
         channelDescription: '플라토 브라우저 알림을 보여줌',
         enableLights: true,
@@ -45,8 +47,7 @@ abstract class BackgroundNotificationController {
         importance: NotificationImportance.Max,
       ),
     ], channelGroups: [
-      NotificationChannelGroup(channelGroupkey: 'ppab_noti_download_result', channelGroupName: 'ppab download result'),
-      NotificationChannelGroup(channelGroupkey: 'ppab_noti_normal', channelGroupName: 'ppab normal'),
+      NotificationChannelGroup(channelGroupkey: 'ppab_noti', channelGroupName: 'PPAB 알림'),
     ]);
 
     AwesomeNotifications().actionStream.listen((ReceivedAction receivedAction) {
