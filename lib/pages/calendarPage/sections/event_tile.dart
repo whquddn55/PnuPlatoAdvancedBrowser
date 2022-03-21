@@ -37,7 +37,7 @@ class EventTile extends StatelessWidget {
               child: Column(
                 children: [
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Flexible(flex: 8, child: Text(course?.title ?? '알 수 없음')),
+                    Flexible(flex: 8, child: Text(course?.title ?? '알 수 없음', style: const TextStyle(fontWeight: FontWeight.w900))),
                     Wrap(children: [Text(dateString)]),
                   ]),
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [

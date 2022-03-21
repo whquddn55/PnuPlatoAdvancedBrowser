@@ -33,7 +33,7 @@ class ArticleButton extends StatelessWidget {
                   child: NFMarquee(
                     text: article.title,
                     fontSize: 15,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ),

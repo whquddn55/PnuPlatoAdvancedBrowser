@@ -36,7 +36,7 @@ class FolderBottomSheet extends StatelessWidget {
                     child: Text(
                       activity.title,
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),

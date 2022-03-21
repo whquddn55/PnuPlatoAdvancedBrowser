@@ -72,7 +72,7 @@ class ActivityButton extends StatelessWidget {
                               TextSpan(
                                 text: activity.title,
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w900,
                                   color: titleColor,
                                 ),
                                 children: [

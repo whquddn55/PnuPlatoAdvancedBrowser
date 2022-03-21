@@ -121,6 +121,7 @@ class LectureTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text("${course.title} [${course.sub}]"),
+              const SizedBox(height: 5),
               _renderTodoCnt(),
             ],
           ),

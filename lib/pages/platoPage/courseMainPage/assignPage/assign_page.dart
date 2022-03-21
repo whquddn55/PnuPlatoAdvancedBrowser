@@ -220,7 +220,7 @@ class _AssignPageState extends State<AssignPage> {
                     const Divider(thickness: 1.0, height: 4.0),
                     const SizedBox(height: 20),
                     courseAssign.team != null
-                        ? Text(courseAssign.team!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
+                        ? Text(courseAssign.team!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900))
                         : const SizedBox.shrink(),
                     _renderSubmitForm(context, courseAssign),
                     const Divider(thickness: 1.0, height: 4.0),

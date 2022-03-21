@@ -39,16 +39,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.lightBlue,
         brightness: Brightness.light,
-        fontFamily: 'DoHyeonRegular',
+        fontFamily: 'NaNumSquearRound',
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           elevation: 0.0,
-          toolbarHeight: 50,
+          toolbarHeight: 40,
         ),
       ),
       themeMode: ThemeMode.light,
-      darkTheme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.dark, fontFamily: 'DoHyeonRegular'),
+      //darkTheme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.dark, fontFamily: 'DoHyeonRegular'),
       home: AppSettingController.isFirst ? const LandingPage() : const NavigatorPage(),
     );
   }

@@ -117,6 +117,9 @@ flutter:
     - family: DoHyeonRegular
       fonts:
         - asset: assets/fonts/DoHyeon-Regular.ttf
+    - family: NaNumSquearRound
+      fonts:
+        - asset: assets/fonts/NanumSquareRoundB.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

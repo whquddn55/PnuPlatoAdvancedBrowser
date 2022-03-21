@@ -118,7 +118,7 @@ class _ZoomBottomSheetState extends State<ZoomBottomSheet> {
                         child: Text(
                           widget.activity.title,
                           style: const TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
                       ),

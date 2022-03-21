@@ -67,7 +67,7 @@ class FileBottomSheet extends StatelessWidget {
                     child: Text(
                       file.title,
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),

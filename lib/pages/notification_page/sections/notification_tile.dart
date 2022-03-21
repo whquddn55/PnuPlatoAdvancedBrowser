@@ -20,7 +20,11 @@ class NotificationTile extends StatelessWidget {
           decoration: BoxDecoration(color: const Color(0xffdddddd), borderRadius: BorderRadius.circular(8.0)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [Text(notification.title), Text(notification.body)],
+            children: [
+              Text(notification.title, style: const TextStyle(fontWeight: FontWeight.w900)),
+              const SizedBox(height: 5),
+              Text(notification.body),
+            ],
           ),
         ),
       ),

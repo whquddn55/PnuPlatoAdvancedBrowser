@@ -40,7 +40,7 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
                     child: Text(
                       widget.activity.title,
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
