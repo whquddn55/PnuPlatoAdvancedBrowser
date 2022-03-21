@@ -48,16 +48,41 @@ WireShark를 통한 http감지는 TLS로 인해 복호화가 불가능하다. �
 
 # TodoList
 
-- [ ]  DownloadController Background로 옮기기( Background Maintain Time 측정 해보고, 문제 발생 시 Foreground로 작업하도록 수정해야함)
-- [ ]  Notification 파싱 방법 개선
-- [ ]  스마트 출석체크 페이지 뒤로가기 방지
-- [ ]  토론, 퀴즈, 설문조사 정상작동하는지 확인해보기
-- [ ]  스마트 출석체크 자동 확인
-- [ ]  BugReport, 공지사항 다시 확인해보기
-- [ ]  CourseMainPage에서 ExpandedTile에도 Todo를 표시하도록 개선
-- [ ]  쪽지 기능 추가
-- [ ]  이전 강좌 조회 기능 추가하기
-- [x]  Zoom기능 완벽하게 구현하기(bottom sheet 현재상태업데이트)
-- [ ]  Zoom, Assign 자동 업데이트 구현하기
-- [x]  마감기한을 알 수 없는 Todo는 따로 표시하도록 수정하기
-- [ ]  강좌목록 인증을 통해서 강좌 목록에 없는 강의는 재생 불가능하도록 하기
+- 기능
+    - [x]  Zoom기능 완벽하게 구현하기(bottom sheet 현재상태업데이트)
+        - [x]  Zoom, Assign 자동 업데이트 구현하기
+    - [x]  Todo 수동 업데이트 기능 추가하기
+    - [x]  마감기한을 알 수 없는 Todo는 따로 표시하도록 수정하기
+    - [x]  스마트 출석체크 페이지 뒤로가기 방지
+    - [x]  스마트 출석체크 자동 확인
+    - [x]  webview pull to refresh 추가하기
+    - [ ]  알림 터치 시 바로 이동
+        - [x]  Notification
+        - [ ]  Todo
+        - [ ]  File
+    - [ ]  Timer로 Todo status update
+    - [ ]  강좌목록 인증을 통해서 강좌 목록에 없는 강의는 재생 불가능하도록 하기
+    - [ ]  CourseMainPage에서 ExpandedTile에도 Todo를 표시하도록 개선
+    - [ ]  쪽지 기능 추가 - 다음 버전에서 추가
+    - [ ]  이전 강좌 조회 기능 추가하기 - 다음 버전에서 추가
+    - [ ]  동기화 progress noti 구현하기
+- 버그
+    - [x]  Notification 파싱 방법 개선
+    - [x]  토론, 퀴즈, 설문조사 정상작동하는지 확인해보기
+    - [x]  Vod 중복 이름 처리
+    - [x]  뒤로가기 2번 해야 종료되도록 수정
+    - [ ]  CourseMainPage에서 ScrollController 때문에 화면이 왔다갔다 하는 문제 해결하기
+    - [ ]  pc와 dex로 연결 후 vod 시청 시 앱 크기가 바뀔 경우 ui가 깨지는 현상
+    - [ ]  공지사항 알림터치 시 Emphasis되지 않음
+- 기타구현
+    - [x]  저장소 ui 재구현
+    - [x]  DownloadController Background로 옮기기( Background Maintain Time 측정 해보고, 문제 발생 시 Foreground로 작업하도록 수정해야함)
+        - [x]  알림 재 확인 및 m3u8 다운로드 cancel 구현해야함.
+- 테스트
+- [x]  Zoom, Assign, Vod 수행 후 Status 자동 업데이트
+- [x]  Todo 수동 업데이트
+- [x]  알림 Grouping
+- [ ]  스마트 출석체크 페이지 뒤로가기 시 페이지 바로 닫힘
+- [ ]  토론, 퀴즈, 설문조사 알림이 정상적으로 작동하는지
+- [ ]  BugReport, 공지사항
+- [ ]  Notification이 15개 이상 새로 생겼을 때 자동으로 그 다음 페이지도 search하는 지
