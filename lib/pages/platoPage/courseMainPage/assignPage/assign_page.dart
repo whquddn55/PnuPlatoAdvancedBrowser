@@ -190,49 +190,47 @@ class _AssignPageState extends State<AssignPage> {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(body: LoadingPage(msg: "로딩 중입니다..."));
         } else {
-          if (snapshot.data == null) {
-            return const ErrorPage(msg: "과제 정보를 가져오는데 문제가 발생했습니다...");
-          } else {
-            final courseAssign = snapshot.data!;
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(courseAssign.title),
-                centerTitle: true,
-                actions: [
-                  Row(
-                    children: [
-                      const Text("제출 상황:"),
-                      courseAssign.submitted != false ? const Icon(Icons.check, color: Colors.green) : const Icon(Icons.close, color: Colors.red),
-                    ],
-                  ),
-                ],
-              ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _renderSubmissionStatus(courseAssign),
-                      const Divider(thickness: 1.0, height: 4.0),
-                      _renderFileList(context, courseAssign.fileList, "첨부파일", CrossAxisAlignment.start),
-                      const Divider(thickness: 1.0, height: 4.0),
-                      courseAssign.content,
-                      const Divider(thickness: 1.0, height: 4.0),
-                      const SizedBox(height: 20),
-                      courseAssign.team != null
-                          ? Text(courseAssign.team!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
-                          : const SizedBox.shrink(),
-                      _renderSubmitForm(context, courseAssign),
-                      const Divider(thickness: 1.0, height: 4.0),
-                      const SizedBox(height: 40),
-                      _renderGradeResult(courseAssign),
-                    ],
-                  ),
+          if (snapshot.data == null) return const ErrorPage(msg: "과제 정보를 가져오는데 문제가 발생했습니다...");
+
+          final courseAssign = snapshot.data!;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(courseAssign.title),
+              centerTitle: true,
+              actions: [
+                Row(
+                  children: [
+                    const Text("제출 상황:"),
+                    courseAssign.submitted != false ? const Icon(Icons.check, color: Colors.green) : const Icon(Icons.close, color: Colors.red),
+                  ],
+                ),
+              ],
+            ),
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _renderSubmissionStatus(courseAssign),
+                    const Divider(thickness: 1.0, height: 4.0),
+                    _renderFileList(context, courseAssign.fileList, "첨부파일", CrossAxisAlignment.start),
+                    const Divider(thickness: 1.0, height: 4.0),
+                    courseAssign.content,
+                    const Divider(thickness: 1.0, height: 4.0),
+                    const SizedBox(height: 20),
+                    courseAssign.team != null
+                        ? Text(courseAssign.team!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
+                        : const SizedBox.shrink(),
+                    _renderSubmitForm(context, courseAssign),
+                    const Divider(thickness: 1.0, height: 4.0),
+                    const SizedBox(height: 40),
+                    _renderGradeResult(courseAssign),
+                  ],
                 ),
               ),
-            );
-          }
+            ),
+          );
         }
       },
     );

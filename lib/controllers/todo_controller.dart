@@ -91,7 +91,7 @@ class TodoController extends GetxController {
     bool modified = false;
     for (var todo in _todoList) {
       if (todo.runtimeType == (AssignTodo) && todo.userDefined == false && todo.id == id) {
-        if (todo.status == status) {
+        if (todo.status != status) {
           modified = true;
           todo.status = status;
         }
