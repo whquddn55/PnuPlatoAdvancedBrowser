@@ -42,16 +42,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    AwesomeNotifications().actionStream.listen((event) {
-      final String type = event.payload?["type"] ?? "";
-      if (type == "todo") {
-        RouteController.to.currentIndex = 1;
-      } else if (type == "file") {
-        RouteController.to.currentIndex = 3;
-      } else if (type == "notification") {
-        RouteController.to.currentIndex = 4;
-      }
-    });
+    AwesomeNotifications().actionStream.listen((event) => NotificationController.onNotificationTap(event));
     super.initState();
   }
 

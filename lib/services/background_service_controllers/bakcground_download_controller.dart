@@ -87,7 +87,7 @@ abstract class BackgroundDownloadController {
   }
 
   static Future<void> _showProgressNotification(final int id, final String title, {int? progress}) async {
-    await NotificationController.showNotification(NotificationType.progress, id, title, "다운로드중...", {});
+    await NotificationController.showNotification(NotificationType.progress, id, title, "다운로드중...", {}, progress: progress);
   }
 
   static Future<void> _showCompleteNotification(final int id, final String title) async {

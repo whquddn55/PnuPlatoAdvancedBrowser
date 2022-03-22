@@ -86,6 +86,6 @@ class Notification {
   }
 
   Future<void> show() async {
-    await NotificationController.showNotification(NotificationType.normal, hashCode, title, body, {url: url});
+    await NotificationController.showNotification(NotificationType.plato, hashCode, title, body, {url: url});
   }
 }

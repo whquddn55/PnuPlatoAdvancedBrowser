@@ -1,9 +1,11 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/route_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
-enum NotificationType { normal, result, progress }
+enum NotificationType { plato, todo, result, progress }
 
 abstract class NotificationController {
   static Future<void> initialize() async {
@@ -35,10 +37,23 @@ abstract class NotificationController {
       ),
       NotificationChannel(
         channelGroupKey: 'ppab_noti',
-        channelKey: 'ppab_noti_normal',
-        groupKey: "ppab_noti_normal",
-        channelName: '플라토 브라우저 일반 알림',
-        channelDescription: '플라토 브라우저 알림을 보여줌',
+        channelKey: 'ppab_noti_plato',
+        groupKey: "ppab_noti_plato",
+        channelName: '플라토 브라우저 플라토 알림',
+        channelDescription: '플라토에서 수신 된 알림을 보여줌',
+        enableLights: true,
+        playSound: true,
+        enableVibration: true,
+        channelShowBadge: true,
+        defaultPrivacy: NotificationPrivacy.Public,
+        importance: NotificationImportance.Max,
+      ),
+      NotificationChannel(
+        channelGroupKey: 'ppab_noti',
+        channelKey: 'ppab_noti_todo',
+        groupKey: "ppab_noti_todo",
+        channelName: '플라토 브라우저 Todo 알림',
+        channelDescription: '플라토에서 할 일을 보여줌',
         enableLights: true,
         playSound: true,
         enableVibration: true,
@@ -64,13 +79,28 @@ abstract class NotificationController {
   static Future<void> showNotification(
       final NotificationType type, final int id, final String title, final String body, final Map<String, String> payload,
       {int? progress}) async {
+    payload["type"] = type.name;
     switch (type) {
-      case NotificationType.normal:
-        payload["type"] = type.name;
+      case NotificationType.plato:
         await AwesomeNotifications().createNotification(
           content: NotificationContent(
             id: id,
-            channelKey: 'ppab_noti_normal',
+            channelKey: 'ppab_noti_plato',
+            title: title,
+            body: body,
+            payload: payload,
+            displayOnForeground: true,
+            wakeUpScreen: true,
+            displayOnBackground: true,
+            showWhen: true,
+          ),
+        );
+        break;
+      case NotificationType.todo:
+        await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: id,
+            channelKey: 'ppab_noti_todo',
             title: title,
             body: body,
             payload: payload,
@@ -88,6 +118,7 @@ abstract class NotificationController {
             channelKey: 'ppab_noti_download_result',
             title: title,
             body: body,
+            payload: payload,
             autoDismissible: true,
             displayOnForeground: true,
             displayOnBackground: true,
@@ -103,6 +134,7 @@ abstract class NotificationController {
             groupKey: id.toString(),
             title: title,
             body: body,
+            payload: payload,
             autoDismissible: false,
             displayOnForeground: true,
             displayOnBackground: true,
@@ -119,6 +151,26 @@ abstract class NotificationController {
             )
           ],
         );
+        break;
+    }
+  }
+
+  static void onNotificationTap(final ReceivedAction receivedAction) {
+    printLog(receivedAction);
+
+    switch (NotificationType.values.byName(receivedAction.payload!["type"]!)) {
+      case NotificationType.plato:
+        RouteController.to.currentIndex = 4;
+        break;
+      case NotificationType.todo:
+        RouteController.to.currentIndex = 1;
+
+        break;
+      case NotificationType.result:
+        RouteController.to.currentIndex = 3;
+        break;
+      case NotificationType.progress:
+        RouteController.to.currentIndex = 3;
         break;
     }
   }
