@@ -3,6 +3,8 @@ import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
+enum NotificationType { normal, result, progress }
+
 abstract class NotificationController {
   static Future<void> initialize() async {
     await AwesomeNotifications().initialize(null, [
@@ -53,5 +55,71 @@ abstract class NotificationController {
     await BackgroundService.sendData(BackgroundServiceAction.fetchNotificationList, data: null);
     var res = StorageController.loadNotificationList();
     return res.reversed.toList();
+  }
+
+  static Future<void> dismissNotification(final int id) async {
+    await AwesomeNotifications().dismiss(id);
+  }
+
+  static Future<void> showNotification(
+      final NotificationType type, final int id, final String title, final String body, final Map<String, String> payload,
+      {int? progress}) async {
+    switch (type) {
+      case NotificationType.normal:
+        payload["type"] = type.name;
+        await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: id,
+            channelKey: 'ppab_noti_normal',
+            title: title,
+            body: body,
+            payload: payload,
+            displayOnForeground: true,
+            wakeUpScreen: true,
+            displayOnBackground: true,
+            showWhen: true,
+          ),
+        );
+        break;
+      case NotificationType.result:
+        await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: id,
+            channelKey: 'ppab_noti_download_result',
+            title: title,
+            body: body,
+            autoDismissible: true,
+            displayOnForeground: true,
+            displayOnBackground: true,
+            showWhen: true,
+          ),
+        );
+        break;
+      case NotificationType.progress:
+        await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: id,
+            channelKey: 'ppab_noti_download_progress',
+            groupKey: id.toString(),
+            title: title,
+            body: body,
+            autoDismissible: false,
+            displayOnForeground: true,
+            displayOnBackground: true,
+            locked: true,
+            showWhen: true,
+            progress: progress,
+            notificationLayout: NotificationLayout.ProgressBar,
+          ),
+          actionButtons: [
+            NotificationActionButton(
+              key: "cancel",
+              label: "취소",
+              buttonType: ActionButtonType.KeepOnTop,
+            )
+          ],
+        );
+        break;
+    }
   }
 }

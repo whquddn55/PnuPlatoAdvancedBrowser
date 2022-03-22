@@ -1,6 +1,6 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/article_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/assign_notification.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/file_notification.dart';
@@ -86,21 +86,6 @@ class Notification {
   }
 
   Future<void> show() async {
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: hashCode,
-        channelKey: 'ppab_noti_normal',
-        title: title,
-        body: body,
-        payload: {
-          "type": "notification",
-          "url": url,
-        },
-        displayOnForeground: true,
-        wakeUpScreen: true,
-        displayOnBackground: true,
-        showWhen: true,
-      ),
-    );
+    await NotificationController.showNotification(NotificationType.normal, hashCode, title, body, {url: url});
   }
 }

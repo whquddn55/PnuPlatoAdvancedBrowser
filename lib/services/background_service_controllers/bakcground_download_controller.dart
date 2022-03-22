@@ -2,10 +2,10 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 
@@ -87,63 +87,15 @@ abstract class BackgroundDownloadController {
   }
 
   static Future<void> _showProgressNotification(final int id, final String title, {int? progress}) async {
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: id,
-        channelKey: 'ppab_noti_download_progress',
-        groupKey: id.toString(),
-        title: title,
-        body: '다운로드중...',
-        autoDismissible: false,
-        displayOnForeground: true,
-        displayOnBackground: true,
-        locked: true,
-        showWhen: true,
-        progress: progress,
-        notificationLayout: NotificationLayout.ProgressBar,
-      ),
-      actionButtons: [
-        NotificationActionButton(
-          key: "cancel",
-          label: "취소",
-          buttonType: ActionButtonType.KeepOnTop,
-        )
-      ],
-    );
+    await NotificationController.showNotification(NotificationType.progress, id, title, "다운로드중...", {});
   }
 
   static Future<void> _showCompleteNotification(final int id, final String title) async {
-    await AwesomeNotifications().dismiss(id);
-
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: id,
-        channelKey: 'ppab_noti_download_result',
-        title: title,
-        body: '다운로드 완료!',
-        autoDismissible: true,
-        displayOnForeground: true,
-        displayOnBackground: true,
-        showWhen: true,
-      ),
-    );
+    await NotificationController.showNotification(NotificationType.result, id, title, "다운로드 완료!", {});
   }
 
   static Future<void> _showFailNotification(final int id, final String title, {final String body = ""}) async {
-    await AwesomeNotifications().dismiss(id);
-
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: id,
-        channelKey: 'ppab_noti_download_result',
-        title: title,
-        body: '다운로드 실패... ' + body,
-        autoDismissible: true,
-        displayOnForeground: true,
-        displayOnBackground: true,
-        showWhen: true,
-      ),
-    );
+    await NotificationController.showNotification(NotificationType.result, id, title, "다운로드 실패..." + body, {});
   }
 
   static Future<bool> _downloadM3u8(final DownloadInformation downloadInformation) async {
@@ -201,7 +153,7 @@ abstract class BackgroundDownloadController {
           await _showFailNotification(id, downloadInformation.title, body: e.message);
           break;
         case DioErrorType.cancel:
-          await AwesomeNotifications().dismiss(id);
+          NotificationController.dismissNotification(id);
           break;
       }
       var dir = Directory(downloadInformation.saveDir);
