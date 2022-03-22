@@ -9,6 +9,7 @@ class LoadingPage extends StatelessWidget {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Padding(
             padding: EdgeInsets.all(8.0),

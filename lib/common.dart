@@ -455,6 +455,7 @@ Future<BuildContext> showProgressDialog(final BuildContext context, final String
             mainAxisSize: MainAxisSize.min,
             children: [
               const CircularProgressIndicator(),
+              const SizedBox(height: 5),
               Text(msg),
             ],
           ),
