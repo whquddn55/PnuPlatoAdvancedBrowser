@@ -25,7 +25,7 @@ final _entities = <ModelEntity>[
   ModelEntity(
       id: const IdUid(1, 3284734248980943431),
       name: 'Todo',
-      lastPropertyId: const IdUid(11, 7790827462074813127),
+      lastPropertyId: const IdUid(12, 9034691011289567091),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
@@ -82,6 +82,11 @@ final _entities = <ModelEntity>[
             id: const IdUid(11, 7790827462074813127),
             name: 'userDefined',
             type: 1,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(12, 9034691011289567091),
+            name: 'checked',
+            type: 1,
             flags: 0)
       ],
       relations: <ModelRelation>[],
@@ -89,7 +94,7 @@ final _entities = <ModelEntity>[
   ModelEntity(
       id: const IdUid(3, 4420181251981158404),
       name: 'Notification',
-      lastPropertyId: const IdUid(6, 4011268913774024298),
+      lastPropertyId: const IdUid(7, 8605540700619887406),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
@@ -182,7 +187,7 @@ final _entities = <ModelEntity>[
   ModelEntity(
       id: const IdUid(5, 5304213255211063717),
       name: 'UserData',
-      lastPropertyId: const IdUid(5, 7212746729534182033),
+      lastPropertyId: const IdUid(7, 3716490607939816256),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
@@ -206,8 +211,13 @@ final _entities = <ModelEntity>[
             type: 1,
             flags: 0),
         ModelProperty(
-            id: const IdUid(5, 7212746729534182033),
-            name: 'lastSyncTime',
+            id: const IdUid(6, 6435263826418195440),
+            name: 'lastNotiSyncTime',
+            type: 10,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(7, 3716490607939816256),
+            name: 'lastTodoSyncTime',
             type: 10,
             flags: 0)
       ],
@@ -266,7 +276,9 @@ ModelDefinition getObjectBoxModel() {
         1440128632270886262,
         4338693111533517871,
         8600077381834846601,
-        2531200934916819732
+        2531200934916819732,
+        7212746729534182033,
+        8605540700619887406
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -288,7 +300,7 @@ ModelDefinition getObjectBoxModel() {
           final courseIdOffset = fbb.writeString(object.courseId);
           final iconUrlOffset = fbb.writeString(object.iconUrl);
           final typeOffset = fbb.writeString(object.type);
-          fbb.startTable(12);
+          fbb.startTable(13);
           fbb.addInt64(0, object.dbId);
           fbb.addInt64(1, object.index);
           fbb.addOffset(2, idOffset);
@@ -300,6 +312,7 @@ ModelDefinition getObjectBoxModel() {
           fbb.addOffset(8, typeOffset);
           fbb.addInt64(9, object.statusIndex);
           fbb.addBool(10, object.userDefined);
+          fbb.addBool(11, object.checked);
           fbb.finish(fbb.endTable());
           return object.dbId;
         },
@@ -329,7 +342,8 @@ ModelDefinition getObjectBoxModel() {
                   const fb.Int64Reader().vTableGet(buffer, rootOffset, 22, 0),
               userDefined: const fb.BoolReader()
                   .vTableGet(buffer, rootOffset, 24, false))
-            ..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+            ..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
+            ..checked = const fb.BoolReader().vTableGet(buffer, rootOffset, 26, false);
 
           return object;
         }),
@@ -346,7 +360,7 @@ ModelDefinition getObjectBoxModel() {
           final titleOffset = fbb.writeString(object.title);
           final bodyOffset = fbb.writeString(object.body);
           final typeOffset = fbb.writeString(object.type);
-          fbb.startTable(7);
+          fbb.startTable(8);
           fbb.addInt64(0, object.dbId);
           fbb.addOffset(1, urlOffset);
           fbb.addOffset(2, titleOffset);
@@ -441,12 +455,13 @@ ModelDefinition getObjectBoxModel() {
         objectToFB: (UserData object, fb.Builder fbb) {
           final usernameOffset = fbb.writeString(object.username);
           final passwordOffset = fbb.writeString(object.password);
-          fbb.startTable(6);
+          fbb.startTable(8);
           fbb.addInt64(0, object.dbId);
           fbb.addOffset(1, usernameOffset);
           fbb.addOffset(2, passwordOffset);
           fbb.addBool(3, object.isFirst);
-          fbb.addInt64(4, object.lastSyncTime.millisecondsSinceEpoch);
+          fbb.addInt64(5, object.lastNotiSyncTime.millisecondsSinceEpoch);
+          fbb.addInt64(6, object.lastTodoSyncTime.millisecondsSinceEpoch);
           fbb.finish(fbb.endTable());
           return object.dbId;
         },
@@ -462,8 +477,10 @@ ModelDefinition getObjectBoxModel() {
                 .vTableGet(buffer, rootOffset, 8, '')
             ..isFirst =
                 const fb.BoolReader().vTableGet(buffer, rootOffset, 10, false)
-            ..lastSyncTime = DateTime.fromMillisecondsSinceEpoch(
-                const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0));
+            ..lastNotiSyncTime = DateTime.fromMillisecondsSinceEpoch(
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0))
+            ..lastTodoSyncTime = DateTime.fromMillisecondsSinceEpoch(
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0));
 
           return object;
         }),
@@ -539,6 +556,10 @@ class Todo_ {
   /// see [Todo.userDefined]
   static final userDefined =
       QueryBooleanProperty<Todo>(_entities[0].properties[10]);
+
+  /// see [Todo.checked]
+  static final checked =
+      QueryBooleanProperty<Todo>(_entities[0].properties[11]);
 }
 
 /// [Notification] entity fields to define ObjectBox queries.
@@ -625,9 +646,13 @@ class UserData_ {
   static final isFirst =
       QueryBooleanProperty<UserData>(_entities[3].properties[3]);
 
-  /// see [UserData.lastSyncTime]
-  static final lastSyncTime =
+  /// see [UserData.lastNotiSyncTime]
+  static final lastNotiSyncTime =
       QueryIntegerProperty<UserData>(_entities[3].properties[4]);
+
+  /// see [UserData.lastTodoSyncTime]
+  static final lastTodoSyncTime =
+      QueryIntegerProperty<UserData>(_entities[3].properties[5]);
 }
 
 /// [DBOrder] entity fields to define ObjectBox queries.

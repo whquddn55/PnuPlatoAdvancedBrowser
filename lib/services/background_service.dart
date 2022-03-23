@@ -130,8 +130,7 @@ void _onStart() async {
     printLog("send service: ${res["data"].toString()}");
   });
 
-  var lastFetchTodoTime = StorageController.loadLastSyncTime();
-  if (DateTime.now().difference(lastFetchTodoTime).inSeconds >= 300) {
+  if (DateTime.now().difference(StorageController.loadLastNotiSyncTime()).inSeconds >= 300) {
     await timerBody();
   }
 
@@ -148,6 +147,5 @@ Future<void> timerBody() async {
   // await File(
   //         '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat("MM-dd_HH:mm").format(DateTime.now())}.txt')
   //     .writeAsString(res.data, mode: FileMode.append);
-
-  StorageController.storeLastSyncTime(DateTime.now());
+  StorageController.storeLastNotiSyncTime(DateTime.now());
 }

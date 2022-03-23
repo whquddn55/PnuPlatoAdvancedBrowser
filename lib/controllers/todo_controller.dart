@@ -27,10 +27,16 @@ class TodoController extends GetxController {
     _todoList = StorageController.loadTodoList();
   }
 
+  void storeTodoList() {
+    StorageController.storeTodoList(_todoList);
+    update();
+  }
+
   Future<void> refreshTodoListAll() async {
     var courseIdList = CourseController.currentSemesterCourseList.map((course) => course.id).toList();
 
     await refreshTodoList(courseIdList);
+    StorageController.storeLastTodoSyncTime(DateTime.now());
   }
 
   Future<void> refreshTodoList(List<String> courseIdList) async {
@@ -65,8 +71,7 @@ class TodoController extends GetxController {
     }
 
     if (modified) {
-      StorageController.storeTodoList(_todoList);
-      update();
+      storeTodoList();
     }
   }
 
@@ -82,8 +87,7 @@ class TodoController extends GetxController {
     }
 
     if (modified) {
-      StorageController.storeTodoList(_todoList);
-      update();
+      storeTodoList();
     }
   }
 
@@ -99,8 +103,7 @@ class TodoController extends GetxController {
     }
 
     if (modified) {
-      StorageController.storeTodoList(_todoList);
-      update();
+      storeTodoList();
     }
   }
 
@@ -140,8 +143,7 @@ class TodoController extends GetxController {
       } else {
         _todoList.remove(target);
       }
-      StorageController.storeTodoList(_todoList);
-      update();
+      storeTodoList();
     }
   }
 

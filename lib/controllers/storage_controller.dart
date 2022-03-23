@@ -113,13 +113,23 @@ abstract class StorageController {
     _store.box<UserData>().put(userData);
   }
 
-  static DateTime loadLastSyncTime() {
-    return _store.box<UserData>().get(defaultUserDataId)!.lastSyncTime;
+  static DateTime loadLastNotiSyncTime() {
+    return _store.box<UserData>().get(defaultUserDataId)!.lastNotiSyncTime;
   }
 
-  static void storeLastSyncTime(final DateTime lastSyncTime) {
+  static void storeLastNotiSyncTime(final DateTime lastNotiSyncTime) {
     var userData = _store.box<UserData>().get(defaultUserDataId)!;
-    userData.lastSyncTime = lastSyncTime;
+    userData.lastNotiSyncTime = lastNotiSyncTime;
+    _store.box<UserData>().put(userData);
+  }
+
+  static DateTime loadLastTodoSyncTime() {
+    return _store.box<UserData>().get(defaultUserDataId)!.lastTodoSyncTime;
+  }
+
+  static void storeLastTodoSyncTime(final DateTime lastTodoSyncTime) {
+    var userData = _store.box<UserData>().get(defaultUserDataId)!;
+    userData.lastTodoSyncTime = lastTodoSyncTime;
     _store.box<UserData>().put(userData);
   }
 

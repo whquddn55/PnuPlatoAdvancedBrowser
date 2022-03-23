@@ -29,6 +29,7 @@ class Todo {
   int statusIndex;
   TodoStatus _status;
   final bool userDefined;
+  bool checked = false;
 
   Todo({
     required this.index,

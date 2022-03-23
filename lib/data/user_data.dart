@@ -9,5 +9,6 @@ class UserData {
   String username = "";
   String password = "";
   bool isFirst = true;
-  DateTime lastSyncTime = DateTime(2000);
+  DateTime lastNotiSyncTime = DateTime(2000);
+  DateTime lastTodoSyncTime = DateTime(2000);
 }
