@@ -267,10 +267,7 @@ abstract class CourseController {
     if (response == null) return false;
 
     Document document = Document.html(response.data);
-    for (var a in document.getElementsByTagName('a')) {
-      if (a.attributes['href'] != null && a.attributes['href']!.contains(CommonUrl.courseSmartAbsenceUrl)) return false;
-    }
-    return true;
+    return document.getElementsByTagName('form').isNotEmpty;
   }
 
   static List<DateTime?> _getDueTime(Element activity) {
