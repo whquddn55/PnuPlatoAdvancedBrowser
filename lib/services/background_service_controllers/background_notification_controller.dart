@@ -18,78 +18,56 @@ abstract class BackgroundNotificationController {
   }
 
   static Future<void> updateNotificationList() async {
+    final notificationList = StorageController.loadNotificationList();
+    final newNotificationList = await _fetchNewNotificationList(notificationList);
+    printLog(newNotificationList);
+    StorageController.storeNotificationList(_updateNotificationList(notificationList, newNotificationList));
+  }
+
+  static Future<List<Notification>> _fetchNewNotificationList(final List<Notification> notificationList) async {
     int page = 1;
-
-    var notificationList = StorageController.loadNotificationList();
-
+    final List<Notification> newNotificationList = [];
     while (true) {
-      final List<Notification>? newNotificationList = await _fetchNewNotificationList(page);
-      if (newNotificationList == null) return;
+      var response = await requestGet(CommonUrl.notificationUrl + page.toString(), isFront: false, retry: 3);
 
-      final bool totallyUpdated = await _updateNotificationList(notificationList, newNotificationList);
-      if (totallyUpdated == false) break;
+      if (response == null) {
+        return [];
+      }
+
+      Document document = Document.html(response.data);
+
+      bool totallyUpdate = document.getElementsByClassName('notification-item').isNotEmpty;
+      for (var notificationItem in document.getElementsByClassName('notification-item')) {
+        final String? url = notificationItem.attributes['href'];
+        if (url == null) continue;
+        final String timeago = notificationItem.getElementsByClassName('timeago')[0].text;
+        final String courseName = notificationItem.getElementsByClassName('media-heading')[0].text.trim().split(' ')[0];
+        final String content = notificationItem
+            .getElementsByClassName('media-body')[0]
+            .text
+            .replaceAll(notificationItem.getElementsByClassName('media-heading')[0].text, '')
+            .replaceAll(timeago, '');
+
+        final newNotification = Notification(title: courseName, body: content, url: url, time: DateTime.now(), type: url.split('/')[4]).transType();
+        if (notificationList.contains(newNotification)) {
+          totallyUpdate = false;
+          continue;
+        }
+        newNotificationList.add(newNotification);
+      }
+
+      if (!totallyUpdate) {
+        break;
+      }
       ++page;
     }
-
-    StorageController.storeNotificationList(notificationList);
-  }
-
-  static Future<bool> _updateNotificationList(List<Notification> notificationList, final List<Notification> newNotificationList) async {
-    int addedCnt = 0;
-    while (newNotificationList.isNotEmpty) {
-      var newNotification = newNotificationList.last;
-      newNotificationList.removeLast();
-
-      int prvNotificationIndex = notificationList.indexOf(newNotification);
-      if (prvNotificationIndex == -1) {
-        notificationList.add(newNotification);
-        await showNotification(newNotification);
-        ++addedCnt;
-      }
-    }
-
-    int splitIndex = 0;
-    for (int i = 0; i < notificationList.length; ++i) {
-      if (DateTime.now().difference(notificationList[i].time).inDays < 30) break;
-      splitIndex = i;
-    }
-    if (splitIndex != 0) {
-      notificationList = notificationList.sublist(splitIndex);
-    }
-    return addedCnt == 15;
-  }
-
-  static Future<List<Notification>?> _fetchNewNotificationList(int page) async {
-    var response = await requestGet(CommonUrl.notificationUrl + page.toString(), isFront: false, retry: 3);
-
-    if (response == null) {
-      return null;
-    }
-
-    Document document = Document.html(response.data);
-
-    List<Notification> newNotificationList = [];
-    for (var notificationItem in document.getElementsByClassName('notification-item')) {
-      final String? url = notificationItem.attributes['href'];
-      if (url == null) continue;
-      final String timeago = notificationItem.getElementsByClassName('timeago')[0].text;
-      final String courseName = notificationItem.getElementsByClassName('media-heading')[0].text.trim().split(' ')[0];
-      final String content = notificationItem
-              .getElementsByClassName('media-body')[0]
-              .text
-              .replaceAll(notificationItem.getElementsByClassName('media-heading')[0].text, '')
-              .replaceAll(timeago, '') +
-          ' - ' +
-          timeago;
-
-      var newNotification = Notification(title: courseName, body: content, url: url, time: DateTime.now(), type: url.split('/')[4]).transType();
-      newNotificationList.add(newNotification);
-    }
-
     return newNotificationList;
   }
 
-  static Future<void> showNotification(final Notification nofitication) async {
-    nofitication.show();
+  static List<Notification> _updateNotificationList(final List<Notification> notificationList, final List<Notification> newNotificationList) {
+    for (var notification in newNotificationList) {
+      notification.show();
+    }
+    return notificationList + newNotificationList;
   }
 }

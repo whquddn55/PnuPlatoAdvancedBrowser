@@ -69,7 +69,7 @@ abstract class NotificationController {
   static Future<List<Notification>> fetchNotificationList() async {
     await BackgroundService.sendData(BackgroundServiceAction.fetchNotificationList, data: null);
     var res = StorageController.loadNotificationList();
-    return res.reversed.toList();
+    return res;
   }
 
   static Future<void> dismissNotification(final int id) async {

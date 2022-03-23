@@ -34,7 +34,7 @@ class Notification {
 
   Notification transType() {
     switch (type) {
-      case "article":
+      case "ubboard":
         return ArticleNotification(title: title, body: body, url: url, time: time);
       case "folder":
         return FolderNotification(title: title, body: body, url: url, time: time);
@@ -58,7 +58,7 @@ class Notification {
   @override
   int get hashCode => dbId;
   @override
-  bool operator ==(final Object other) => other.runtimeType == runtimeType && hashCode == other.hashCode;
+  bool operator ==(final Object other) => (other is Notification) && hashCode == other.hashCode;
 
   Color getColor() {
     throw UnimplementedError("getcolor on notification");

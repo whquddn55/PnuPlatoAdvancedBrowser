@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
@@ -22,6 +23,8 @@ class LoginController extends GetxController {
     options.headers!["Cookie"] = loginInformation.moodleSessionKey;
 
     var response = await dio.Dio().post("https://plato.pusan.ac.kr/lib/ajax/service.php?info=core_fetch_notifications", data: body, options: options);
+
+    printLog("checkLogin on front : ${response.data != null && response.data[0]["error"] == false}");
     return response.data != null && response.data[0]["error"] == false;
   }
 

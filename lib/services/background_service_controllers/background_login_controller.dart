@@ -23,6 +23,7 @@ abstract class BackgroundLoginController {
     options.headers!["Cookie"] = loginInformation.moodleSessionKey;
 
     var response = await dio.Dio().post("https://plato.pusan.ac.kr/lib/ajax/service.php?info=core_fetch_notifications", data: body, options: options);
+    printLog("checkLogin on back : ${response.data != null && response.data[0]["error"] == false}");
     return response.data != null && response.data[0]["error"] == false;
   }
 

@@ -15,7 +15,7 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
-  List<noti.Notification> notificationList = StorageController.loadNotificationList().reversed.toList();
+  List<noti.Notification> notificationList = StorageController.loadNotificationList();
 
   @override
   void initState() {

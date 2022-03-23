@@ -10,7 +10,7 @@ class ArticleNotification extends noti.Notification {
     required String body,
     required String url,
     required DateTime time,
-  }) : super(title: title, body: body, url: url, time: time, type: "article");
+  }) : super(title: title, body: body, url: url, time: time, type: "ubboard");
 
   @override
   void open(final BuildContext context) {
