@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
@@ -31,9 +32,8 @@ class _BoardPageState extends State<BoardPage> {
         if (snapshot.connectionState == ConnectionState.done) {
           Map<String, dynamic> data = snapshot.data as Map<String, dynamic>;
           return Scaffold(
-            appBar: AppBar(
-              title: Text(data['title']),
-              centerTitle: true,
+            appBar: AppBarWrapper(
+              title: data['title'],
             ),
             body: SingleChildScrollView(
               child: Padding(

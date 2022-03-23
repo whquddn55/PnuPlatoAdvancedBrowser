@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
@@ -60,6 +59,7 @@ class _MyAppState extends State<MyApp> {
           foregroundColor: Colors.black,
           elevation: 0.0,
           toolbarHeight: 40,
+          titleTextStyle: TextStyle(fontSize: 16, color: Colors.black),
         ),
       ),
       themeMode: ThemeMode.light,

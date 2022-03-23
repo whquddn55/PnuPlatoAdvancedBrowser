@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 
 class InappwebviewWrapper extends StatefulWidget {
@@ -190,9 +191,8 @@ class _InappwebviewWrapperState extends State<InappwebviewWrapper> {
       return body;
     }
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        centerTitle: true,
+      appBar: AppBarWrapper(
+        title: widget.title,
         leading: BackButton(onPressed: () => Navigator.pop(context)),
       ),
       body: body,

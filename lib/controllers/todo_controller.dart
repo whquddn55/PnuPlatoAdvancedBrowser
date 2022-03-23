@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_assign_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_zoom_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
+import 'package:pnu_plato_advanced_browser/data/course_assign.dart';
+import 'package:pnu_plato_advanced_browser/data/course_zoom.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/vod_todo.dart';
@@ -11,6 +16,7 @@ import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 class TodoController extends GetxController {
   static TodoController get to => Get.find<TodoController>();
   static final Set<String> _refreshLock = {};
+  final RxBool progress = false.obs;
   List<Todo> _todoList = <Todo>[];
 
   List<Todo> get todoList {
@@ -25,6 +31,12 @@ class TodoController extends GetxController {
 
   Future<void> initialize() async {
     _todoList = StorageController.loadTodoList();
+    ever(progress, (progressStatus) async {
+      if (progressStatus == true) {
+        await Fluttertoast.cancel();
+        await Fluttertoast.showToast(msg: "캘린더 동기화 중입니다...", backgroundColor: Colors.black.withOpacity(0.2));
+      }
+    });
   }
 
   void storeTodoList() {
@@ -40,6 +52,7 @@ class TodoController extends GetxController {
   }
 
   Future<void> refreshTodoList(List<String> courseIdList) async {
+    progress.value = true;
     /* 중복 업데이트 방지 Lock */
     courseIdList = _lockCourseId(courseIdList);
     if (courseIdList.isEmpty) return;
@@ -53,9 +66,12 @@ class TodoController extends GetxController {
 
     /* unlock */
     _unlockCourseId();
+    progress.value = false;
+    update(["progress"]);
   }
 
-  Future<void> updateVodTodoStatus(final String courseId, final Map<int, List<Map<String, dynamic>>> vodStatusMap) async {
+  Future<Map<int, List<Map<String, dynamic>>>> updateVodTodoStatus(final String courseId) async {
+    final Map<int, List<Map<String, dynamic>>> vodStatusMap = await CourseController.getVodStatus(courseId, true);
     bool modified = false;
     for (var todo in _todoList) {
       for (var vodStatusList in vodStatusMap.values) {
@@ -73,9 +89,14 @@ class TodoController extends GetxController {
     if (modified) {
       storeTodoList();
     }
+    return vodStatusMap;
   }
 
-  Future<void> updateZoomTodoStatus(final String id, final TodoStatus status) async {
+  Future<CourseZoom?> updateZoomTodoStatus(final String id) async {
+    final CourseZoom? zoom = await CourseZoomController.fetchCourseZoom(id);
+    if (zoom == null) return null;
+
+    final TodoStatus status = zoom.status;
     bool modified = false;
     for (var todo in _todoList) {
       if (todo.runtimeType == (ZoomTodo) && todo.userDefined == false && todo.id == id) {
@@ -89,9 +110,14 @@ class TodoController extends GetxController {
     if (modified) {
       storeTodoList();
     }
+    return zoom;
   }
 
-  Future<void> updateAssignTodoStatus(final String id, final TodoStatus status) async {
+  Future<CourseAssign?> updateAssignTodoStatus(final String id) async {
+    final CourseAssign? assign = await CourseAssignController.fetchCourseAssign(id);
+    if (assign == null) return null;
+
+    final TodoStatus status = assign.submitted == true ? TodoStatus.done : TodoStatus.undone;
     bool modified = false;
     for (var todo in _todoList) {
       if (todo.runtimeType == (AssignTodo) && todo.userDefined == false && todo.id == id) {
@@ -105,9 +131,10 @@ class TodoController extends GetxController {
     if (modified) {
       storeTodoList();
     }
+    return assign;
   }
 
-  Future<void> changeTodoStatus(final BuildContext context, final Todo target) async {
+  void changeTodoStatus(final BuildContext context, final Todo target) async {
     var res = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -146,36 +173,6 @@ class TodoController extends GetxController {
       storeTodoList();
     }
   }
-
-  // Future<void> _updateTodoList(final List<Todo> newTodoList) async {
-  //   bool updated = false;
-  //   var candidateList = [];
-  //   for (var newTodo in newTodoList) {
-  //     var sameTodo = todoList.firstWhereOrNull((todo) => todo == newTodo);
-  //     if (sameTodo == null) {
-  //       updated = true;
-  //       candidateList.add(newTodo);
-  //     } else if (!(newTodo.availability == newTodo.availability &&
-  //         newTodo.dueDate == newTodo.dueDate &&
-  //         newTodo.iconUri == newTodo.iconUri &&
-  //         newTodo.title == newTodo.title &&
-  //         newTodo.status == newTodo.status)) {
-  //       updated = true;
-  //       todoList.remove(sameTodo);
-  //       candidateList.add(newTodo);
-  //     }
-  //   }
-
-  //   if (updated) {
-  //     for (var candidate in candidateList) {
-  //       todoList.add(candidate);
-  //     }
-  //     update();
-
-  //     Fluttertoast.cancel();
-  //     Fluttertoast.showToast(msg: "캘린더가 업데이트 되었습니다.");
-  //   }
-  // }
 
   List<String> _lockCourseId(List<String> courseIdList) {
     return courseIdList.where((courseId) {

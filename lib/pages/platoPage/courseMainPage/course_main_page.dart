@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/components/emphasis_container.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
@@ -61,12 +62,11 @@ class _CourseMainPageState extends State<CourseMainPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '강의 정보를 로딩 중입니다...'));
 
-          _refreshTodoList();
+          WidgetsBinding.instance!.addPostFrameCallback((_) => _refreshTodoList());
 
           return Scaffold(
-            appBar: AppBar(
-              title: Text('${widget.course.title} - ${widget.course.professor!.name}'),
-              centerTitle: true,
+            appBar: AppBarWrapper(
+              title: '${widget.course.title} - ${widget.course.professor?.name}',
               leading: const BackButton(),
             ),
             endDrawer: _renderEndDrawer(context),

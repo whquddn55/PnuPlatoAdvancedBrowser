@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/vod_course_activity.dart';
 
@@ -71,10 +70,7 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
                   ),
               const SizedBox(height: 8.0),
               FutureBuilder(
-                future: CourseController.getVodStatus(widget.courseId, true).then((value) async {
-                  await TodoController.to.updateVodTodoStatus(widget.courseId, value);
-                  return value;
-                }),
+                future: TodoController.to.updateVodTodoStatus(widget.courseId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
                     return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());

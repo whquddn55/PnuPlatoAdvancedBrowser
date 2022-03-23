@@ -2,6 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/noticeListPage/noticePage/notice_page.dart';
@@ -12,9 +13,8 @@ class NoticeListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("PPAB 공지사항"),
-        centerTitle: true,
+      appBar: AppBarWrapper(
+        title: "PPAB 공지사항",
       ),
       body: FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
         future: Get.find<NoticeController>().getNoticeList(),

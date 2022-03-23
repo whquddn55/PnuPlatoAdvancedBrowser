@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/sections/find_information_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/sections/login_form.dart';
 
@@ -9,9 +10,8 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('로그인'),
-          centerTitle: true,
+        appBar: AppBarWrapper(
+          title: '로그인',
         ),
         body: GestureDetector(
           child: SingleChildScrollView(

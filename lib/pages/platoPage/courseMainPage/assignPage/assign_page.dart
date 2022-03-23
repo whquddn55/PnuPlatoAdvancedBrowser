@@ -4,13 +4,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_treeview/flutter_treeview.dart';
 import 'package:intl/intl.dart';
+import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_assign_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assign.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
-import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 import 'package:pnu_plato_advanced_browser/inappwebview_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
@@ -182,10 +181,7 @@ class _AssignPageState extends State<AssignPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<CourseAssign?>(
-      future: CourseAssignController.fetchCourseAssign(widget.assignId).then((value) async {
-        TodoController.to.updateAssignTodoStatus(widget.assignId, value!.submitted == true ? TodoStatus.done : TodoStatus.undone);
-        return value;
-      }),
+      future: TodoController.to.updateAssignTodoStatus(widget.assignId),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(body: LoadingPage(msg: "로딩 중입니다..."));
@@ -194,9 +190,8 @@ class _AssignPageState extends State<AssignPage> {
 
           final courseAssign = snapshot.data!;
           return Scaffold(
-            appBar: AppBar(
-              title: Text(courseAssign.title),
-              centerTitle: true,
+            appBar: AppBarWrapper(
+              title: courseAssign.title,
               actions: [
                 Row(
                   children: [

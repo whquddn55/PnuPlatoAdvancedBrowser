@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/onlineAbsencePage/sections/column_vod.dart';
@@ -12,9 +13,8 @@ class OnlineAbsencePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('온라인 출석부'),
-          centerTitle: true,
+        appBar: AppBarWrapper(
+          title: '온라인 출석부',
         ),
         body: FutureBuilder(
           future: CourseController.getVodStatus(courseId, true),

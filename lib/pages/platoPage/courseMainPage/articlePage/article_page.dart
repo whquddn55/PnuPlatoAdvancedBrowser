@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_article_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
@@ -37,9 +38,8 @@ class _ArticlePageState extends State<ArticlePage> {
           }
           CourseArticle article = snapshot.data as CourseArticle;
           return Scaffold(
-            appBar: AppBar(
-              title: Text(article.boardTitle),
-              centerTitle: true,
+            appBar: AppBarWrapper(
+              title: article.boardTitle,
             ),
             body: SingleChildScrollView(
               child: Container(

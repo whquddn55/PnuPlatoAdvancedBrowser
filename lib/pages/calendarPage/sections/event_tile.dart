@@ -26,7 +26,7 @@ class EventTile extends StatelessWidget {
         alignment: Alignment.centerLeft,
         children: [
           InkWell(
-            onLongPress: () async => await TodoController.to.changeTodoStatus(context, event),
+            onLongPress: () => TodoController.to.changeTodoStatus(context, event),
             onTap: () => event.open(context),
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,

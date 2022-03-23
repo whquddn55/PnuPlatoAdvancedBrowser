@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 
@@ -9,9 +10,8 @@ class AdminBugReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("버그리포트 Admin"),
-        centerTitle: true,
+      appBar: AppBarWrapper(
+        title: "버그리포트 Admin",
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
           stream: FirebaseFirestore.instance.collection("users").orderBy("adminUnread", descending: true).orderBy("time").snapshots(),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/settingPage/sections/setting_checkbox.dart';
 import 'package:pnu_plato_advanced_browser/pages/settingPage/sections/setting_dropdown.dart';
@@ -10,24 +11,25 @@ class SettingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("세팅"),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        foregroundColor: Colors.black,
+      appBar: AppBarWrapper(
+        title: "세팅",
       ),
-      body: ListView(
+      body: Stack(
         children: [
-          const SettingTitle(title: "자동 동기화"),
-          const SettingCheckBox(title: "활성화", checked: true),
-          const SettingTitle(title: "기타"),
-          SettingDropdown(
-            title: "테마",
-            itemList: const ["화이트", "다크", "시스템"],
-            onChanged: (index) => null, //_setTheme(context, index),
-            initialIndex: 1,
+          ListView(
+            children: [
+              const SettingTitle(title: "자동 동기화"),
+              const SettingCheckBox(title: "활성화", checked: true),
+              const SettingTitle(title: "기타"),
+              SettingDropdown(
+                title: "테마",
+                itemList: const ["화이트", "다크", "시스템"],
+                onChanged: (index) => null, //_setTheme(context, index),
+                initialIndex: 1,
+              ),
+            ],
           ),
+          Container(color: Colors.grey.withOpacity(0.7), child: const Center(child: Text("아직 준비중이예요... 저 노력할게요...")))
         ],
       ),
     );

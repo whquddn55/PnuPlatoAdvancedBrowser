@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_zoom_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/zoom_course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course_zoom.dart';
@@ -92,10 +91,7 @@ class _ZoomBottomSheetState extends State<ZoomBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<CourseZoom?>(
-      future: CourseZoomController.fetchCourseZoom(widget.activity.id).then((value) async {
-        TodoController.to.updateZoomTodoStatus(widget.activity.id, value!.status);
-        return value;
-      }),
+      future: TodoController.to.updateZoomTodoStatus(widget.activity.id),
       builder: (context, snapshot) {
         return Padding(
           padding: const EdgeInsets.all(20.0),

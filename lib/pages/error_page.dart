@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 
 class ErrorPage extends StatelessWidget {
   final String msg;
@@ -8,9 +9,8 @@ class ErrorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("에러"),
-        centerTitle: true,
+      appBar: AppBarWrapper(
+        title: "에러",
       ),
       body: Center(
         child: Column(
