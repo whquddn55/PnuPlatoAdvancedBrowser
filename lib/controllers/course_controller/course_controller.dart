@@ -393,11 +393,12 @@ abstract class CourseController {
     }
     Document document = parse(response.data);
     for (var e in document.getElementsByClassName('coursefullname')) {
-      var middle = e.text.split(' ');
-
+      final middle = e.text.trim().split(' ');
+      final sub = middle.last.split('-')[1].substring(0, middle.last.split('-')[1].length - 1);
+      middle.removeLast();
       courseList.add(Course(
-        title: middle[0],
-        sub: middle[1].split('-')[1].substring(0, middle[1].split('-')[1].length - 1),
+        title: middle.join(' '),
+        sub: sub,
         id: e.attributes['href']!.split('id=')[1],
       ));
     }
@@ -410,10 +411,12 @@ abstract class CourseController {
 
     // Document document = parse(response.data["html"]);
     // for (var e in document.getElementsByClassName('course-label-r')) {
-    //   var middle = e.attributes["title"]!.split(' ');
+    //   final middle = e.attributes["title"]!.split(' ');
+    //   final sub = middle.last.split('-')[1].substring(0, middle.last.split('-')[1].length - 1);
+    //   middle.removeLast();
     //   courseList.add(Course(
-    //     title: middle[0],
-    //     sub: middle[1].split('-')[1].substring(0, middle[1].split('-')[1].length - 1),
+    //     title: middle.join(' '),
+    //     sub: sub,
     //     id: e.attributes['href']!.split('id=')[1],
     //   ));
     // }
