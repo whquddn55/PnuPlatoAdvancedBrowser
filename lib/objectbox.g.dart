@@ -341,9 +341,9 @@ ModelDefinition getObjectBoxModel() {
               statusIndex:
                   const fb.Int64Reader().vTableGet(buffer, rootOffset, 22, 0),
               userDefined: const fb.BoolReader()
-                  .vTableGet(buffer, rootOffset, 24, false))
-            ..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
-            ..checked = const fb.BoolReader().vTableGet(buffer, rootOffset, 26, false);
+                  .vTableGet(buffer, rootOffset, 24, false),
+              checked: const fb.BoolReader().vTableGet(buffer, rootOffset, 26, false))
+            ..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
           return object;
         }),

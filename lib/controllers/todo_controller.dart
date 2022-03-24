@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -52,10 +54,10 @@ class TodoController extends GetxController {
   }
 
   Future<void> refreshTodoList(List<String> courseIdList) async {
-    progress.value = true;
     /* 중복 업데이트 방지 Lock */
     courseIdList = _lockCourseId(courseIdList);
     if (courseIdList.isEmpty) return;
+    progress.value = true;
 
     await BackgroundService.sendData(
       BackgroundServiceAction.fetchTodoList,
@@ -67,7 +69,6 @@ class TodoController extends GetxController {
     /* unlock */
     _unlockCourseId();
     progress.value = false;
-    update(["progress"]);
   }
 
   Future<Map<int, List<Map<String, dynamic>>>> updateVodTodoStatus(final String courseId) async {
@@ -165,6 +166,7 @@ class TodoController extends GetxController {
           title: target.title,
           type: target.type,
           userDefined: true,
+          checked: target.checked,
         ).transType();
         _todoList.insert(_todoList.indexOf(target), newTodo);
       } else {

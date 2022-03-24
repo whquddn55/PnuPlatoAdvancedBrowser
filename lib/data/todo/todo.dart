@@ -42,6 +42,7 @@ class Todo {
     required this.type,
     required this.statusIndex,
     required this.userDefined,
+    required this.checked,
   })  : dbId = (courseId + type + id + userDefined.toString()).hashCode,
         _status = TodoStatus.values[statusIndex];
 
@@ -58,7 +59,7 @@ class Todo {
             index: index,
             status: status,
             title: title,
-            userDefined: userDefined);
+            userDefined: userDefined, checked:checked,);
       case "quiz":
         return QuizTodo(
             availability: availability,
@@ -69,7 +70,7 @@ class Todo {
             index: index,
             status: status,
             title: title,
-            userDefined: userDefined);
+            userDefined: userDefined, checked:checked,);
       case "vod":
         return VodTodo(
             availability: availability,
@@ -80,7 +81,7 @@ class Todo {
             index: index,
             status: status,
             title: title,
-            userDefined: userDefined);
+            userDefined: userDefined, checked:checked,);
       case "zoom":
         return ZoomTodo(
             availability: availability,
@@ -91,7 +92,7 @@ class Todo {
             index: index,
             status: status,
             title: title,
-            userDefined: userDefined);
+            userDefined: userDefined, checked:checked,);
       default:
         return UnknownTodo(
             availability: availability,
@@ -102,7 +103,7 @@ class Todo {
             index: index,
             status: status,
             title: title,
-            userDefined: userDefined);
+            userDefined: userDefined, checked:checked,);
     }
   }
 

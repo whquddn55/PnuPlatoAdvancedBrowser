@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/timer_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/sections/navigator_body.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
@@ -50,6 +51,7 @@ class NavigatorPage extends StatelessWidget {
                 if (snapshot.connectionState != ConnectionState.done) {
                   return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: 'DB 접속 중...'));
                 }
+                TimerController.initialize();
 
                 return const NavigatorBody();
               },

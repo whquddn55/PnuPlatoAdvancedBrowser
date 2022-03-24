@@ -14,6 +14,7 @@ class UnknownTodo extends Todo {
     required String iconUrl,
     required TodoStatus status,
     required bool userDefined,
+    required bool checked,
   }) : super(
           index: index,
           id: id,
@@ -25,6 +26,7 @@ class UnknownTodo extends Todo {
           statusIndex: status.index,
           type: "unknown",
           userDefined: userDefined,
+          checked: checked,
         );
 
   @override

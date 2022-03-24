@@ -14,6 +14,7 @@ class QuizTodo extends Todo {
     required String iconUrl,
     required TodoStatus status,
     required bool userDefined,
+    required bool checked,
   }) : super(
           index: index,
           id: id,
@@ -25,6 +26,7 @@ class QuizTodo extends Todo {
           statusIndex: status.index,
           type: "quiz",
           userDefined: userDefined,
+          checked: checked,
         );
 
   @override

@@ -23,16 +23,17 @@ abstract class BackgroundTodoController {
     var todoList = StorageController.loadTodoList();
     // 어차피 load할 때 sorting 되니 상관없다.
 
-    _updateTodoList(todoList, newTodoList, courseIdList);
+    _updateTodoList(todoList, newTodoList);
     StorageController.storeTodoList(todoList);
 
     return;
   }
 
-  static void _updateTodoList(List<Todo> prvTodoList, List<Todo> newTodoList, final List<String> courseIdList) {
+  static void _updateTodoList(List<Todo> prvTodoList, List<Todo> newTodoList) {
     for (var newTodo in newTodoList) {
       int prvIndex = prvTodoList.indexOf(newTodo);
       if (prvIndex != -1) {
+        newTodo.checked = prvTodoList[prvIndex].checked;
         prvTodoList[prvIndex] = newTodo;
       } else {
         prvTodoList.add(newTodo);
@@ -95,6 +96,7 @@ abstract class BackgroundTodoController {
         title: title,
         status: done ? TodoStatus.done : TodoStatus.undone,
         userDefined: false,
+        checked: false,
       ));
     }
     return todoList;
@@ -128,6 +130,7 @@ abstract class BackgroundTodoController {
           title: title,
           status: done ? TodoStatus.done : TodoStatus.undone,
           userDefined: false,
+          checked: false,
         ));
       }
     }
@@ -165,6 +168,7 @@ abstract class BackgroundTodoController {
           title: title,
           status: done ? TodoStatus.done : TodoStatus.undone,
           userDefined: false,
+          checked: false,
         ));
       }
     }
@@ -197,6 +201,7 @@ abstract class BackgroundTodoController {
           title: title,
           status: todoStatus,
           userDefined: false,
+          checked: false,
         ));
       }
     }
