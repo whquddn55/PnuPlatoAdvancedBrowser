@@ -66,7 +66,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
 
           return Scaffold(
             appBar: AppBarWrapper(
-              title: '${widget.course.title} - ${widget.course.professor?.name}',
+              title: widget.course.title,
               leading: const BackButton(),
             ),
             endDrawer: _renderEndDrawer(context),

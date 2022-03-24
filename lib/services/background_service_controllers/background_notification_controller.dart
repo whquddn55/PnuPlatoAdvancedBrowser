@@ -41,7 +41,7 @@ abstract class BackgroundNotificationController {
         final String? url = notificationItem.attributes['href'];
         if (url == null) continue;
         final String timeago = notificationItem.getElementsByClassName('timeago')[0].text;
-        final String courseName = notificationItem.getElementsByClassName('media-heading')[0].text.trim().split(' ')[0];
+        final String courseName = notificationItem.getElementsByClassName('media-heading')[0].text.split('(')[0].trim();
         final String content = notificationItem
             .getElementsByClassName('media-body')[0]
             .text
