@@ -68,6 +68,6 @@ abstract class BackgroundNotificationController {
     for (var notification in newNotificationList) {
       notification.show();
     }
-    return notificationList + newNotificationList;
+    return newNotificationList + notificationList;
   }
 }
