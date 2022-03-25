@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/db_order.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart';
@@ -47,6 +48,17 @@ abstract class StorageController {
 
   static Future<String> getDownloadDirectory() async {
     return (await getApplicationDocumentsDirectory()).path + '/downloads';
+  }
+
+  static List<Course> loadCourseList() {
+    final res = _store.box<Course>().getAll();
+    res.sort((a, b) => a.dbId - b.dbId);
+    return res;
+  }
+
+  static void storeCourseList(final List<Course> courseList) {
+    _store.box<Course>().removeAll();
+    _store.box<Course>().putMany(courseList);
   }
 
   static List<Todo> loadTodoList() {

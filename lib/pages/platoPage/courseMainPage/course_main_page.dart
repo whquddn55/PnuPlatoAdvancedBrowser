@@ -5,10 +5,12 @@ import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/components/emphasis_container.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_spec_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/course_activity.dart';
+import 'package:pnu_plato_advanced_browser/data/course_spec.dart';
+import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/gradePage/grade_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/plannerPage/planner_page.dart';
@@ -57,10 +59,12 @@ class _CourseMainPageState extends State<CourseMainPage> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async => setState(() {}),
-      child: FutureBuilder(
-        future: CourseController.updateCourseSpecification(widget.course),
+      child: FutureBuilder<CourseSpec?>(
+        future: CourseSpecController.fetchCourseSpecification(widget.course.id, widget.course.title),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '강의 정보를 로딩 중입니다...'));
+          CourseSpec? courseSpec = snapshot.data;
+          if (courseSpec == null) return Scaffold(appBar: AppBar(), body: const ErrorPage(msg: "강의 정보를 못 불러왔어요..."));
 
           WidgetsBinding.instance!.addPostFrameCallback((_) => _refreshTodoList());
 
@@ -69,8 +73,8 @@ class _CourseMainPageState extends State<CourseMainPage> {
               title: widget.course.title,
               leading: const BackButton(),
             ),
-            endDrawer: _renderEndDrawer(context),
-            body: ListView(children: [_renderSmartAbsence(), ..._renderAcivityList()]),
+            endDrawer: _renderEndDrawer(context, courseSpec),
+            body: ListView(children: [_renderSmartAbsence(), ..._renderAcivityList(courseSpec)]),
           );
         },
       ),
@@ -79,7 +83,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
 
   Widget _renderSmartAbsence() {
     return FutureBuilder<bool>(
-      future: CourseController.checkAutoAbsence(widget.course.id),
+      future: CourseSpecController.checkAutoAbsence(widget.course.id),
       builder: ((context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done || snapshot.data == false) return const SizedBox.shrink();
         return InkWell(
@@ -108,14 +112,14 @@ class _CourseMainPageState extends State<CourseMainPage> {
     );
   }
 
-  Widget _renderEndDrawer(final BuildContext context) {
+  Widget _renderEndDrawer(final BuildContext context, final CourseSpec courseSpec) {
     return Drawer(
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(widget.course.professor!.name),
+            accountName: Text(courseSpec.professor.name),
             accountEmail: null,
-            currentAccountPicture: CircleAvatar(backgroundImage: CachedNetworkImageProvider(widget.course.professor!.iconUri.toString())),
+            currentAccountPicture: CircleAvatar(backgroundImage: CachedNetworkImageProvider(courseSpec.professor.iconUri.toString())),
             otherAccountsPictures: [
               IconButton(
                 icon: Icon(Icons.email, color: Get.theme.primaryIconTheme.color),
@@ -128,7 +132,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
           ExpansionTile(
             title: const Text('팀티칭/조교'),
             expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
-            children: widget.course.assistantList.map((assistant) {
+            children: courseSpec.assistantList.map((assistant) {
               return TextButton.icon(
                 icon: CircleAvatar(
                   backgroundImage: CachedNetworkImageProvider(assistant.iconUri.toString()),
@@ -162,7 +166,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
                 MaterialPageRoute(
                   builder: (context) => PlannerPage(
                     title: '국문 계획표',
-                    uri: widget.course.koreanPlanUri,
+                    uri: courseSpec.koreanPlanUri,
                   ),
                 ),
               );
@@ -176,7 +180,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
                 MaterialPageRoute(
                   builder: (context) => PlannerPage(
                     title: '영문 계획표',
-                    uri: widget.course.englishPlanUri,
+                    uri: courseSpec.englishPlanUri,
                   ),
                 ),
               );
@@ -220,17 +224,17 @@ class _CourseMainPageState extends State<CourseMainPage> {
     );
   }
 
-  List<Widget> _renderAcivityList() {
+  List<Widget> _renderAcivityList(final CourseSpec courseSpec) {
     final targetActivityKey = GlobalKey();
     final currentWeekKey = GlobalKey();
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) => _scrollToTarget(targetActivityKey.currentContext, currentWeekKey.currentContext));
-    return [_renderArticleList(targetActivityKey), ..._renderWeekTileList(targetActivityKey, currentWeekKey)];
+    return [_renderArticleList(courseSpec, targetActivityKey), ..._renderWeekTileList(courseSpec, targetActivityKey, currentWeekKey)];
   }
 
-  Widget _renderArticleList(final GlobalKey targetActivityKey) {
+  Widget _renderArticleList(final CourseSpec courseSpec, final GlobalKey targetActivityKey) {
     final List<Widget> articleWidgetList = [];
 
-    for (var article in widget.course.articleList) {
+    for (var article in courseSpec.articleList) {
       bool isTarget = false;
       if (article.id == widget.targetActivityId) {
         _articleTileController.expand();
@@ -277,14 +281,13 @@ class _CourseMainPageState extends State<CourseMainPage> {
     );
   }
 
-  List<Widget> _renderWeekTileList(final GlobalKey targetActivityKey, final GlobalKey currentWeekKey) {
-    final int currentWeekIndex =
-        widget.course.currentWeek == null ? 100 : widget.course.activityMap.keys.toList().indexOf(widget.course.currentWeek!);
+  List<Widget> _renderWeekTileList(final CourseSpec courseSpec, final GlobalKey targetActivityKey, final GlobalKey currentWeekKey) {
+    final int currentWeekIndex = courseSpec.currentWeek == null ? 100 : courseSpec.activityMap.keys.toList().indexOf(courseSpec.currentWeek!);
     final List<Widget> weekTileWidgetList = [];
-    final List<List<CourseActivity>> weekList = widget.course.activityMap.values.toList();
+    final List<List<CourseActivity>> weekList = courseSpec.activityMap.values.toList();
     for (int weekIndex = 0; weekIndex < weekList.length; ++weekIndex) {
       final week = weekList[weekIndex];
-      final weekTitle = widget.course.activityMap.keys.toList()[weekIndex];
+      final weekTitle = courseSpec.activityMap.keys.toList()[weekIndex];
 
       bool isTargetWeek = false;
       /* Build activityButtons */
@@ -350,10 +353,10 @@ class _CourseMainPageState extends State<CourseMainPage> {
             title: Text(weekTitle),
             content: Column(
               children: [
-                widget.course.summaryMap[weekTitle] == ''
+                courseSpec.summaryMap[weekTitle] == ''
                     ? const SizedBox.shrink()
                     : Container(
-                        child: renderHtml(widget.course.summaryMap[weekTitle]!),
+                        child: renderHtml(courseSpec.summaryMap[weekTitle]!),
                         decoration: BoxDecoration(
                           border: Border.all(width: 1, color: Get.theme.hintColor),
                           borderRadius: BorderRadius.circular(3.0),

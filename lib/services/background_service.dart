@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
@@ -13,7 +15,7 @@ import 'package:pnu_plato_advanced_browser/services/background_service_controlle
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_background_service_ios/flutter_background_service_ios.dart';
 
-enum BackgroundServiceAction { logout, fetchTodoList, fetchNotificationList, download }
+enum BackgroundServiceAction { logout, fetchTodoListAll, fetchTodoList, fetchNotificationList, download }
 
 /* APP 부분 */
 abstract class BackgroundService {
@@ -45,21 +47,24 @@ abstract class BackgroundService {
       printLog("recevied app: $data");
 
       BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
-      switch (action) {
-        case BackgroundServiceAction.logout:
-          _completerMap[data["hashCode"]]?.complete(data);
-          break;
-        case BackgroundServiceAction.fetchTodoList:
-          _completerMap[data["hashCode"]]?.complete(data);
-
-          break;
-        case BackgroundServiceAction.fetchNotificationList:
-          _completerMap[data["hashCode"]]?.complete(data);
-          break;
-        case BackgroundServiceAction.download:
-          _completerMap[data["hashCode"]]?.complete(data);
-          break;
-      }
+      _completerMap[data["hashCode"]]?.complete(data);
+      // switch (action) {
+      //   case BackgroundServiceAction.logout:
+      //     _completerMap[data["hashCode"]]?.complete(data);
+      //     break;
+      //   case BackgroundServiceAction.fetchTodoListAll:
+      //     _completerMap[data["hashCode"]]?.complete(data);
+      //     break;
+      //   case BackgroundServiceAction.fetchTodoList:
+      //     _completerMap[data["hashCode"]]?.complete(data);
+      //     break;
+      //   case BackgroundServiceAction.fetchNotificationList:
+      //     _completerMap[data["hashCode"]]?.complete(data);
+      //     break;
+      //   case BackgroundServiceAction.download:
+      //     _completerMap[data["hashCode"]]?.complete(data);
+      //     break;
+      // }
       _completerMap.remove(data["hashCode"]);
     });
   }
@@ -112,6 +117,9 @@ void _onStart() async {
       case BackgroundServiceAction.logout:
         res["data"] = await BackgroundLoginController.logout();
         break;
+      case BackgroundServiceAction.fetchTodoListAll:
+        res["data"] = await BackgroundTodoController.fetchTodoListAll();
+        break;
       case BackgroundServiceAction.fetchTodoList:
         var courseIdList = List<String>.from(data["courseIdList"]);
         await BackgroundTodoController.fetchTodoList(courseIdList);
@@ -130,7 +138,7 @@ void _onStart() async {
     printLog("send service: ${res["data"].toString()}");
   });
 
-  if (DateTime.now().difference(StorageController.loadLastNotiSyncTime()).inSeconds >= 300) {
+  if (DateTime.now().difference(StorageController.loadLastNotiSyncTime()) >= const Duration(minutes: 5)) {
     await timerBody();
   }
 
@@ -142,10 +150,11 @@ void _onStart() async {
 
 Future<void> timerBody() async {
   await BackgroundNotificationController.updateNotificationList();
-  //var document = await getApplicationSupportDirectory();
+  await BackgroundTodoController.fetchTodoListAll();
 
-  // await File(
-  //         '/storage/emulated/0/Android/data/com.thuthi.PnuPlatoAdvancedBrowser.pnu_plato_advanced_browser/files/${DateFormat("MM-dd_HH:mm").format(DateTime.now())}.txt')
-  //     .writeAsString(res.data, mode: FileMode.append);
-  StorageController.storeLastNotiSyncTime(DateTime.now());
+  var document = await StorageController.getDownloadDirectory();
+
+  await File(
+          '$document/${DateFormat("MM-dd_HH:mm").format(StorageController.loadLastNotiSyncTime())} ${DateFormat("MM-dd_HH:mm").format(StorageController.loadLastTodoSyncTime())}')
+      .writeAsString('0', mode: FileMode.append);
 }

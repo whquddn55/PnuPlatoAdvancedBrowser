@@ -9,7 +9,6 @@ import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/admin_bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
@@ -102,8 +101,8 @@ class MainDrawer extends StatelessWidget {
             await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
             //TodoController.to.progress.value = !TodoController.to.progress.value;
             //StorageController.storeLoginInformation(LoginInformation(loginStatus: true));
-            // StorageController.storeNotificationList([]);
-            // NotificationController.fetchNotificationList();
+            StorageController.storeNotificationList([]);
+            NotificationController.fetchNotificationList();
           }),
     ]);
   }

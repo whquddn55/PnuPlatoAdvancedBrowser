@@ -10,7 +10,26 @@ import 'package:pnu_plato_advanced_browser/data/todo/vod_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 
 abstract class BackgroundTodoController {
-  static Future<void> fetchTodoList(final List<String> courseIdList) async {
+  static final Set<String> _refreshLock = {};
+
+  static Future<bool> fetchTodoListAll() async {
+    final now = DateTime.now();
+    final lastTodoSyncTime = StorageController.loadLastTodoSyncTime();
+    if (now.difference(lastTodoSyncTime) < const Duration(hours: 12)) {
+      return false;
+    }
+    final courseIdList = CourseController.currentSemesterCourseList.map((course) => course.id).toList();
+    await fetchTodoList(courseIdList);
+    StorageController.storeLastTodoSyncTime(DateTime.now());
+
+    return true;
+  }
+
+  static Future<void> fetchTodoList(List<String> courseIdList) async {
+    /* 중복 업데이트 방지 Lock */
+    courseIdList = _lockCourseId(courseIdList);
+    if (courseIdList.isEmpty) return;
+
     final List<Todo> newTodoList = <Todo>[];
     int index = 0;
     for (var courseId in courseIdList) {
@@ -21,12 +40,26 @@ abstract class BackgroundTodoController {
     }
 
     var todoList = StorageController.loadTodoList();
-    // 어차피 load할 때 sorting 되니 상관없다.
 
     _updateTodoList(todoList, newTodoList);
     StorageController.storeTodoList(todoList);
 
+    /* unlock */
+    _unlockCourseId();
+
     return;
+  }
+
+  static List<String> _lockCourseId(List<String> courseIdList) {
+    return courseIdList.where((courseId) {
+      bool res = _refreshLock.contains(courseId) == false;
+      _refreshLock.add(courseId);
+      return res;
+    }).toList();
+  }
+
+  static void _unlockCourseId() {
+    _refreshLock.clear();
   }
 
   static void _updateTodoList(List<Todo> prvTodoList, List<Todo> newTodoList) {

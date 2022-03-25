@@ -24,6 +24,9 @@ Color zoomColor = Colors.green.withOpacity(0.7);
 Color folderColor = Colors.orange.withOpacity(0.7);
 Color articleColor = Colors.purple.withOpacity(0.7);
 Color unknownColor = Colors.grey.withOpacity(0.7);
+Language language = Language.ko;
+
+enum Language { ko, en, cn }
 
 void printLog(final dynamic msg) {
   print("[DEBUG] ${msg.toString()}");
@@ -31,7 +34,6 @@ void printLog(final dynamic msg) {
 
 abstract class CommonUrl {
   static const String platoActionUrl = 'https://plato.pusan.ac.kr/theme/coursemosv2/action.php';
-  static const String platoMainUrl = 'https://plato.pusan.ac.kr/';
   static const String platoUserInformationUrl = 'https://plato.pusan.ac.kr/user/user_edit.php';
   static const String platoCalendarUrl = 'https://plato.pusan.ac.kr/calendar/export.php';
   static const String defaultAvatarUrl = 'https://plato.pusan.ac.kr/theme/image.php/coursemosv2/core/1636448872/u/f1';

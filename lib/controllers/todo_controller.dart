@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -17,7 +15,7 @@ import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
 class TodoController extends GetxController {
   static TodoController get to => Get.find<TodoController>();
-  static final Set<String> _refreshLock = {};
+
   final RxBool progress = false.obs;
   List<Todo> _todoList = <Todo>[];
 
@@ -47,16 +45,10 @@ class TodoController extends GetxController {
   }
 
   Future<void> refreshTodoListAll() async {
-    var courseIdList = CourseController.currentSemesterCourseList.map((course) => course.id).toList();
-
-    await refreshTodoList(courseIdList);
-    StorageController.storeLastTodoSyncTime(DateTime.now());
+    await BackgroundService.sendData(BackgroundServiceAction.fetchTodoListAll);
   }
 
   Future<void> refreshTodoList(List<String> courseIdList) async {
-    /* 중복 업데이트 방지 Lock */
-    courseIdList = _lockCourseId(courseIdList);
-    if (courseIdList.isEmpty) return;
     progress.value = true;
 
     await BackgroundService.sendData(
@@ -66,8 +58,6 @@ class TodoController extends GetxController {
     _todoList = StorageController.loadTodoList();
     update();
 
-    /* unlock */
-    _unlockCourseId();
     progress.value = false;
   }
 
@@ -174,17 +164,5 @@ class TodoController extends GetxController {
       }
       storeTodoList();
     }
-  }
-
-  List<String> _lockCourseId(List<String> courseIdList) {
-    return courseIdList.where((courseId) {
-      bool res = _refreshLock.contains(courseId) == false;
-      _refreshLock.add(courseId);
-      return res;
-    }).toList();
-  }
-
-  void _unlockCourseId() {
-    _refreshLock.clear();
   }
 }

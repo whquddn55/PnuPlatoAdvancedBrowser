@@ -1,8 +1,7 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
@@ -33,7 +32,11 @@ class _MainCalendarState extends State<MainCalendar> {
     return Expanded(
       flex: 1,
       child: Container(
-        child: Text('$cnt', textAlign: TextAlign.center),
+        child: AutoSizeText(
+          '$cnt',
+          textAlign: TextAlign.center,
+          maxLines: 1,
+        ),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(3),

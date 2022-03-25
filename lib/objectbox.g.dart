@@ -13,6 +13,7 @@ import 'package:objectbox/internal.dart'; // generated code can access "internal
 import 'package:objectbox/objectbox.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'data/course.dart';
 import 'data/db_order.dart';
 import 'data/login_information.dart';
 import 'data/notification/notification.dart';
@@ -241,6 +242,35 @@ final _entities = <ModelEntity>[
             flags: 0)
       ],
       relations: <ModelRelation>[],
+      backlinks: <ModelBacklink>[]),
+  ModelEntity(
+      id: const IdUid(7, 7986024428822729645),
+      name: 'Course',
+      lastPropertyId: const IdUid(4, 3934253625317376529),
+      flags: 0,
+      properties: <ModelProperty>[
+        ModelProperty(
+            id: const IdUid(1, 167486112161231587),
+            name: 'dbId',
+            type: 6,
+            flags: 129),
+        ModelProperty(
+            id: const IdUid(2, 7107934111124358014),
+            name: 'id',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(3, 4641037228727225763),
+            name: 'title',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(4, 3934253625317376529),
+            name: 'sub',
+            type: 9,
+            flags: 0)
+      ],
+      relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[])
 ];
 
@@ -264,7 +294,7 @@ Future<Store> openStore(
 ModelDefinition getObjectBoxModel() {
   final model = ModelInfo(
       entities: _entities,
-      lastEntityId: const IdUid(6, 1760169772214913091),
+      lastEntityId: const IdUid(7, 7986024428822729645),
       lastIndexId: const IdUid(0, 0),
       lastRelationId: const IdUid(0, 0),
       lastSequenceId: const IdUid(0, 0),
@@ -513,6 +543,41 @@ ModelDefinition getObjectBoxModel() {
                   .vTableGet(buffer, rootOffset, 6, []));
 
           return object;
+        }),
+    Course: EntityDefinition<Course>(
+        model: _entities[5],
+        toOneRelations: (Course object) => [],
+        toManyRelations: (Course object) => {},
+        getId: (Course object) => object.dbId,
+        setId: (Course object, int id) {
+          object.dbId = id;
+        },
+        objectToFB: (Course object, fb.Builder fbb) {
+          final idOffset = fbb.writeString(object.id);
+          final titleOffset = fbb.writeString(object.title);
+          final subOffset = fbb.writeString(object.sub);
+          fbb.startTable(5);
+          fbb.addInt64(0, object.dbId);
+          fbb.addOffset(1, idOffset);
+          fbb.addOffset(2, titleOffset);
+          fbb.addOffset(3, subOffset);
+          fbb.finish(fbb.endTable());
+          return object.dbId;
+        },
+        objectFromFB: (Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+
+          final object = Course(
+              title: const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 8, ''),
+              sub: const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 10, ''),
+              id: const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 6, ''))
+            ..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+
+          return object;
         })
   };
 
@@ -663,4 +728,19 @@ class DBOrder_ {
   /// see [DBOrder.idList]
   static final idList =
       QueryStringVectorProperty<DBOrder>(_entities[4].properties[1]);
+}
+
+/// [Course] entity fields to define ObjectBox queries.
+class Course_ {
+  /// see [Course.dbId]
+  static final dbId = QueryIntegerProperty<Course>(_entities[5].properties[0]);
+
+  /// see [Course.id]
+  static final id = QueryStringProperty<Course>(_entities[5].properties[1]);
+
+  /// see [Course.title]
+  static final title = QueryStringProperty<Course>(_entities[5].properties[2]);
+
+  /// see [Course.sub]
+  static final sub = QueryStringProperty<Course>(_entities[5].properties[3]);
 }

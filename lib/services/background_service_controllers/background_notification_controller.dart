@@ -20,8 +20,8 @@ abstract class BackgroundNotificationController {
   static Future<void> updateNotificationList() async {
     final notificationList = StorageController.loadNotificationList();
     final newNotificationList = await _fetchNewNotificationList(notificationList);
-    printLog(newNotificationList);
     StorageController.storeNotificationList(_updateNotificationList(notificationList, newNotificationList));
+    StorageController.storeLastNotiSyncTime(DateTime.now());
   }
 
   static Future<List<Notification>> _fetchNewNotificationList(final List<Notification> notificationList) async {
