@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/LandingPage/sections/bottom_typography.dart';
-import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({Key? key}) : super(key: key);
@@ -90,8 +89,7 @@ class _LandingPageState extends State<LandingPage> {
                           },
                         );
                         if (res == true) {
-                          AppSettingController.isFirst = false;
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const NavigatorPage()));
+                          AppSettingController.to.isFirst = false;
                         } else {
                           showDialog(
                             context: context,

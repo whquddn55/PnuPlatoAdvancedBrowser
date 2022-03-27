@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_assign_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
@@ -15,9 +14,10 @@ import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
 class TodoController extends GetxController {
   static TodoController get to => Get.find<TodoController>();
+  static Stream progressStatusStream = Stream.periodic(const Duration(microseconds: 100), (cnt) {});
 
-  final RxBool progress = false.obs;
-  List<Todo> _todoList = <Todo>[];
+    List<Todo> _todoList = <Todo>[];
+  RxBool progress = RxBool(false);
 
   List<Todo> get todoList {
     final userDefinedList = _todoList.where((todo) => todo.userDefined == true);
@@ -30,13 +30,7 @@ class TodoController extends GetxController {
   }
 
   Future<void> initialize() async {
-    _todoList = StorageController.loadTodoList();
-    ever(progress, (progressStatus) async {
-      if (progressStatus == true) {
-        await Fluttertoast.cancel();
-        await Fluttertoast.showToast(msg: "캘린더 동기화 중입니다...", backgroundColor: Colors.black.withOpacity(0.2));
-      }
-    });
+    updateTodoList();
   }
 
   void storeTodoList() {
@@ -44,21 +38,24 @@ class TodoController extends GetxController {
     update();
   }
 
-  Future<void> refreshTodoListAll() async {
+  Future<void> fetchTodoListAll() async {
     await BackgroundService.sendData(BackgroundServiceAction.fetchTodoListAll);
   }
 
-  Future<void> refreshTodoList(List<String> courseIdList) async {
+  Future<void> fetchTodoList(List<String> courseIdList) async {
     progress.value = true;
-
+    update();
     await BackgroundService.sendData(
       BackgroundServiceAction.fetchTodoList,
       data: {"courseIdList": courseIdList},
     );
+    progress.value = false;
+    updateTodoList();
+  }
+
+  void updateTodoList() {
     _todoList = StorageController.loadTodoList();
     update();
-
-    progress.value = false;
   }
 
   Future<Map<int, List<Map<String, dynamic>>>> updateVodTodoStatus(final String courseId) async {

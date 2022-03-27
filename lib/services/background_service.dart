@@ -4,9 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_notification_controller.dart';
@@ -15,7 +16,7 @@ import 'package:pnu_plato_advanced_browser/services/background_service_controlle
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_background_service_ios/flutter_background_service_ios.dart';
 
-enum BackgroundServiceAction { logout, fetchTodoListAll, fetchTodoList, fetchNotificationList, download }
+enum BackgroundServiceAction { logout, fetchTodoListAll, fetchTodoList, fetchNotificationList, download, update }
 
 /* APP 부분 */
 abstract class BackgroundService {
@@ -47,25 +48,12 @@ abstract class BackgroundService {
       printLog("recevied app: $data");
 
       BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
-      _completerMap[data["hashCode"]]?.complete(data);
-      // switch (action) {
-      //   case BackgroundServiceAction.logout:
-      //     _completerMap[data["hashCode"]]?.complete(data);
-      //     break;
-      //   case BackgroundServiceAction.fetchTodoListAll:
-      //     _completerMap[data["hashCode"]]?.complete(data);
-      //     break;
-      //   case BackgroundServiceAction.fetchTodoList:
-      //     _completerMap[data["hashCode"]]?.complete(data);
-      //     break;
-      //   case BackgroundServiceAction.fetchNotificationList:
-      //     _completerMap[data["hashCode"]]?.complete(data);
-      //     break;
-      //   case BackgroundServiceAction.download:
-      //     _completerMap[data["hashCode"]]?.complete(data);
-      //     break;
-      // }
-      _completerMap.remove(data["hashCode"]);
+      if (action == BackgroundServiceAction.update) {
+        TodoController.to.updateTodoList();
+      } else {
+        _completerMap[data["hashCode"]]?.complete(data);
+        _completerMap.remove(data["hashCode"]);
+      }
     });
   }
 
@@ -139,18 +127,20 @@ void _onStart() async {
   });
 
   if (DateTime.now().difference(StorageController.loadLastNotiSyncTime()) >= const Duration(minutes: 5)) {
-    await timerBody();
+    await timerBody(service);
   }
 
   Timer.periodic(
     const Duration(minutes: 3),
-    (timer) async => timerBody(),
+    (timer) async => timerBody(service),
   );
 }
 
-Future<void> timerBody() async {
+Future<void> timerBody(final FlutterBackgroundService service) async {
   await BackgroundNotificationController.updateNotificationList();
   await BackgroundTodoController.fetchTodoListAll();
+  var res = <String, dynamic>{"action": BackgroundServiceAction.update.name};
+  service.sendData(res);
 
   var document = await StorageController.getDownloadDirectory();
 

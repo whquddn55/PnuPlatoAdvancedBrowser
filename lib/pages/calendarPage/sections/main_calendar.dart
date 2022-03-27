@@ -1,7 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
@@ -81,9 +81,9 @@ class _MainCalendarState extends State<MainCalendar> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            if (vodCnt != 0) _renderMarker(vodCnt, vodColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
-            if (assignCnt != 0) _renderMarker(assignCnt, assignColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
-            if (zoomCnt != 0) _renderMarker(zoomCnt, zoomColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
+            if (vodCnt != 0) _renderMarker(vodCnt, AppSettingController.to.vodColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
+            if (assignCnt != 0) _renderMarker(assignCnt, AppSettingController.to.assignColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
+            if (zoomCnt != 0) _renderMarker(zoomCnt, AppSettingController.to.zoomColor) else const Expanded(flex: 1, child: SizedBox.shrink()),
           ],
         ),
       ],

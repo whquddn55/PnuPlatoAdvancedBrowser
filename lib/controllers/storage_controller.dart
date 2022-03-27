@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:pnu_plato_advanced_browser/data/app_setting.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/db_order.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
@@ -14,8 +15,8 @@ import 'package:path_provider_ios/path_provider_ios.dart';
 
 abstract class StorageController {
   static const int defaultUserDataId = 1234;
-  // static const int _defaultTodoListId = 1235;
   static const int _defaultNotificationId = 1236;
+  static const int defaultAppSettingId = 1237;
 
   static late final Store _store;
   static Future<void> initialize() async {
@@ -43,6 +44,9 @@ abstract class StorageController {
     }
     if (_store.box<DBOrder>().get(_defaultNotificationId) == null) {
       _store.box<DBOrder>().put(DBOrder(id: _defaultNotificationId, idList: []));
+    }
+    if (_store.box<AppSetting>().get(defaultAppSettingId) == null) {
+      _store.box<AppSetting>().put(AppSetting());
     }
   }
 
@@ -145,18 +149,21 @@ abstract class StorageController {
     _store.box<UserData>().put(userData);
   }
 
-  static bool loadIsFirst() {
-    return _store.box<UserData>().get(defaultUserDataId)!.isFirst;
+  static storeAppSetting(final AppSetting appSetting) {
+    _store.box<AppSetting>().put(appSetting);
   }
 
-  static void storeIsFirst(final bool isFirst) {
-    var userData = _store.box<UserData>().get(defaultUserDataId)!;
-    userData.isFirst = isFirst;
-    _store.box<UserData>().put(userData);
+  static AppSetting loadAppSetting() {
+    return _store.box<AppSetting>().get(defaultAppSettingId)!;
   }
 
   static void clearUserData() {
     var newUserData = UserData();
     _store.box<UserData>().put(newUserData);
+  }
+
+  static void clearAppSetting() {
+    var newAppSetting = AppSetting();
+    _store.box<AppSetting>().put(newAppSetting);
   }
 }

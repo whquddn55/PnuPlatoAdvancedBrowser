@@ -17,7 +17,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await StorageController.initialize();
-  await AppSettingController.initilize();
 
   await initializeDateFormatting();
   await Firebase.initializeApp();
@@ -25,6 +24,8 @@ void main() async {
   Get.put(RouteController());
   Get.put(NoticeController());
   Get.put(TodoController());
+  Get.put(AppSettingController());
+  AppSettingController.to.initialize();
   await TodoController.to.initialize();
   await NotificationController.initialize();
 
@@ -48,24 +49,27 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'PnuPlatoAdvancedBrowser',
-      scrollBehavior: _CustomScrollBehavior(),
-      theme: ThemeData(
-        primaryColor: Colors.lightBlue,
-        brightness: Brightness.light,
-        fontFamily: 'NaNumSquearRound',
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          elevation: 0.0,
-          toolbarHeight: 40,
-          titleTextStyle: TextStyle(fontSize: 16, color: Colors.black),
+        title: 'PnuPlatoAdvancedBrowser',
+        scrollBehavior: _CustomScrollBehavior(),
+        theme: ThemeData(
+          primaryColor: Colors.lightBlue,
+          brightness: Brightness.light,
+          fontFamily: 'NaNumSquearRound',
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            elevation: 0.0,
+            toolbarHeight: 40,
+            titleTextStyle: TextStyle(fontSize: 16, color: Colors.black),
+          ),
         ),
-      ),
-      themeMode: ThemeMode.light,
-      //darkTheme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.dark, fontFamily: 'DoHyeonRegular'),
-      home: AppSettingController.isFirst ? const LandingPage() : const NavigatorPage(),
-    );
+        themeMode: ThemeMode.light,
+        //darkTheme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.dark, fontFamily: 'DoHyeonRegular'),
+        home: GetBuilder<AppSettingController>(
+          builder: (controller) {
+            return controller.isFirst ? const LandingPage() : const NavigatorPage();
+          },
+        ));
   }
 }
 

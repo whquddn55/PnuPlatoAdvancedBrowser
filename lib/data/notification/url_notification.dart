@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart' as noti;
 
 class UrlNotification extends noti.Notification {
@@ -12,7 +13,7 @@ class UrlNotification extends noti.Notification {
   }) : super(title: title, body: body, url: url, time: time, type: "url");
 
   @override
-  Color getColor() => unknownColor;
+  Color getColor() => AppSettingController.to.unknownColor;
 
   // @override
   // bool operator ==(final Object other) => other.runtimeType == UrlNotification && hashCode == other.hashCode;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart' as noti;
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/course_main_page.dart';
@@ -35,5 +35,5 @@ class ArticleNotification extends noti.Notification {
   }
 
   @override
-  Color getColor() => articleColor;
+  Color getColor() => AppSettingController.to.articleColor;
 }

@@ -17,7 +17,7 @@ class CalendarPage extends StatelessWidget {
       drawer: const MainDrawer(),
       body: LoginBuilderPage(
         () => RefreshIndicator(
-          onRefresh: () async => await TodoController.to.refreshTodoListAll(),
+          onRefresh: () async => await TodoController.to.fetchTodoListAll(),
           child: ListView(
             children: [
               const AcademicCalendar(),

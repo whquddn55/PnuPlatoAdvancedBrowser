@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 
 abstract class TimerController {
@@ -29,7 +28,7 @@ abstract class TimerController {
     }
     if (updated) {
       TodoController.to.storeTodoList();
-      await TodoController.to.refreshTodoList(courseIdSet.toList());
+      await TodoController.to.fetchTodoList(courseIdSet.toList());
     }
   }
 }

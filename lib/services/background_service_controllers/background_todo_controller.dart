@@ -1,4 +1,5 @@
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
@@ -10,8 +11,7 @@ import 'package:pnu_plato_advanced_browser/data/todo/vod_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 
 abstract class BackgroundTodoController {
-  static final Set<String> _refreshLock = {};
-
+  static Set<String> refreshLock = {};
   static Future<bool> fetchTodoListAll() async {
     final now = DateTime.now();
     final lastTodoSyncTime = StorageController.loadLastTodoSyncTime();
@@ -45,21 +45,21 @@ abstract class BackgroundTodoController {
     StorageController.storeTodoList(todoList);
 
     /* unlock */
-    _unlockCourseId();
+    _unlockCourseId(courseIdList);
 
     return;
   }
 
-  static List<String> _lockCourseId(List<String> courseIdList) {
+  static List<String> _lockCourseId(final List<String> courseIdList) {
     return courseIdList.where((courseId) {
-      bool res = _refreshLock.contains(courseId) == false;
-      _refreshLock.add(courseId);
-      return res;
+      return refreshLock.add(courseId);
     }).toList();
   }
 
-  static void _unlockCourseId() {
-    _refreshLock.clear();
+  static void _unlockCourseId(final List<String> courseIdList) {
+    for (var courseId in courseIdList) {
+      refreshLock.remove(courseId);
+    }
   }
 
   static void _updateTodoList(List<Todo> prvTodoList, List<Todo> newTodoList) {

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -17,16 +16,6 @@ import 'package:pnu_plato_advanced_browser/components/inner_player.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-Color vodColor = Colors.blue.withOpacity(0.7);
-Color assignColor = Colors.red.withOpacity(0.7);
-Color zoomColor = Colors.green.withOpacity(0.7);
-Color folderColor = Colors.orange.withOpacity(0.7);
-Color articleColor = Colors.purple.withOpacity(0.7);
-Color unknownColor = Colors.grey.withOpacity(0.7);
-Language language = Language.ko;
-
-enum Language { ko, en, cn }
 
 void printLog(final dynamic msg) {
   print("[DEBUG] ${msg.toString()}");

@@ -8,7 +8,6 @@ class UserData {
   int dbId = StorageController.defaultUserDataId;
   String username = "";
   String password = "";
-  bool isFirst = true;
   DateTime lastNotiSyncTime = DateTime(2000);
   DateTime lastTodoSyncTime = DateTime(2000);
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
@@ -60,7 +60,7 @@ class LectureTile extends StatelessWidget {
                     margin: const EdgeInsets.only(right: 5),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
-                      color: vodColor,
+                      color: AppSettingController.to.vodColor,
                     ),
                   ),
                   Text('$undoneVodCnt / $totalVodCnt', style: TextStyle(color: undoneVodCnt == 0 ? Colors.grey : Colors.red)),
@@ -77,7 +77,7 @@ class LectureTile extends StatelessWidget {
                     margin: const EdgeInsets.only(right: 5),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
-                      color: assignColor,
+                      color: AppSettingController.to.assignColor,
                     ),
                   ),
                   Text('$undoneAssignCnt / $totalAssignCnt', style: TextStyle(color: undoneAssignCnt == 0 ? Colors.grey : Colors.red)),
@@ -94,7 +94,7 @@ class LectureTile extends StatelessWidget {
                     margin: const EdgeInsets.only(right: 5),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
-                      color: zoomColor,
+                      color: AppSettingController.to.zoomColor,
                     ),
                   ),
                   Text('$undoneZoomCnt / $totalZoomCnt', style: TextStyle(color: undoneZoomCnt == 0 ? Colors.grey : Colors.red)),

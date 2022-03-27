@@ -43,7 +43,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
   }
 
   void _refreshTodoList() async {
-    TodoController.to.refreshTodoList([widget.course.id]);
+    TodoController.to.fetchTodoList([widget.course.id]);
   }
 
   void _scrollToTarget(final BuildContext? targetActivityContext, final BuildContext? targetWeekContext) {

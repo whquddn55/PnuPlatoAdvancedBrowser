@@ -135,6 +135,7 @@ abstract class BackgroundLoginController {
     await dio.Dio().get(CommonUrl.logoutUrl + sessionKey);
 
     StorageController.clearUserData();
+    StorageController.clearAppSetting();
 
     return true;
   }

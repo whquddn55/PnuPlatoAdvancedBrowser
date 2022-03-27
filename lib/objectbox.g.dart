@@ -13,6 +13,7 @@ import 'package:objectbox/internal.dart'; // generated code can access "internal
 import 'package:objectbox/objectbox.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'data/app_setting.dart';
 import 'data/course.dart';
 import 'data/db_order.dart';
 import 'data/login_information.dart';
@@ -188,7 +189,7 @@ final _entities = <ModelEntity>[
   ModelEntity(
       id: const IdUid(5, 5304213255211063717),
       name: 'UserData',
-      lastPropertyId: const IdUid(7, 3716490607939816256),
+      lastPropertyId: const IdUid(9, 6354478781775989372),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
@@ -207,17 +208,12 @@ final _entities = <ModelEntity>[
             type: 9,
             flags: 0),
         ModelProperty(
-            id: const IdUid(4, 82835774111024215),
-            name: 'isFirst',
-            type: 1,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(6, 6435263826418195440),
+            id: const IdUid(8, 7457526091426554720),
             name: 'lastNotiSyncTime',
             type: 10,
             flags: 0),
         ModelProperty(
-            id: const IdUid(7, 3716490607939816256),
+            id: const IdUid(9, 6354478781775989372),
             name: 'lastTodoSyncTime',
             type: 10,
             flags: 0)
@@ -271,6 +267,25 @@ final _entities = <ModelEntity>[
             flags: 0)
       ],
       relations: <ModelRelation>[],
+      backlinks: <ModelBacklink>[]),
+  ModelEntity(
+      id: const IdUid(8, 3903414118031854863),
+      name: 'AppSetting',
+      lastPropertyId: const IdUid(4, 6447168916149222508),
+      flags: 0,
+      properties: <ModelProperty>[
+        ModelProperty(
+            id: const IdUid(1, 4259758747337110548),
+            name: 'dbId',
+            type: 6,
+            flags: 129),
+        ModelProperty(
+            id: const IdUid(2, 8318608979497059794),
+            name: 'isFirst',
+            type: 1,
+            flags: 0)
+      ],
+      relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[])
 ];
 
@@ -294,7 +309,7 @@ Future<Store> openStore(
 ModelDefinition getObjectBoxModel() {
   final model = ModelInfo(
       entities: _entities,
-      lastEntityId: const IdUid(7, 7986024428822729645),
+      lastEntityId: const IdUid(8, 3903414118031854863),
       lastIndexId: const IdUid(0, 0),
       lastRelationId: const IdUid(0, 0),
       lastSequenceId: const IdUid(0, 0),
@@ -308,7 +323,12 @@ ModelDefinition getObjectBoxModel() {
         8600077381834846601,
         2531200934916819732,
         7212746729534182033,
-        8605540700619887406
+        8605540700619887406,
+        82835774111024215,
+        6435263826418195440,
+        3716490607939816256,
+        1457919830521390142,
+        6447168916149222508
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -485,13 +505,12 @@ ModelDefinition getObjectBoxModel() {
         objectToFB: (UserData object, fb.Builder fbb) {
           final usernameOffset = fbb.writeString(object.username);
           final passwordOffset = fbb.writeString(object.password);
-          fbb.startTable(8);
+          fbb.startTable(10);
           fbb.addInt64(0, object.dbId);
           fbb.addOffset(1, usernameOffset);
           fbb.addOffset(2, passwordOffset);
-          fbb.addBool(3, object.isFirst);
-          fbb.addInt64(5, object.lastNotiSyncTime.millisecondsSinceEpoch);
-          fbb.addInt64(6, object.lastTodoSyncTime.millisecondsSinceEpoch);
+          fbb.addInt64(7, object.lastNotiSyncTime.millisecondsSinceEpoch);
+          fbb.addInt64(8, object.lastTodoSyncTime.millisecondsSinceEpoch);
           fbb.finish(fbb.endTable());
           return object.dbId;
         },
@@ -505,12 +524,10 @@ ModelDefinition getObjectBoxModel() {
                 .vTableGet(buffer, rootOffset, 6, '')
             ..password = const fb.StringReader(asciiOptimization: true)
                 .vTableGet(buffer, rootOffset, 8, '')
-            ..isFirst =
-                const fb.BoolReader().vTableGet(buffer, rootOffset, 10, false)
             ..lastNotiSyncTime = DateTime.fromMillisecondsSinceEpoch(
-                const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0))
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0))
             ..lastTodoSyncTime = DateTime.fromMillisecondsSinceEpoch(
-                const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0));
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 20, 0));
 
           return object;
         }),
@@ -576,6 +593,32 @@ ModelDefinition getObjectBoxModel() {
               id: const fb.StringReader(asciiOptimization: true)
                   .vTableGet(buffer, rootOffset, 6, ''))
             ..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+
+          return object;
+        }),
+    AppSetting: EntityDefinition<AppSetting>(
+        model: _entities[6],
+        toOneRelations: (AppSetting object) => [],
+        toManyRelations: (AppSetting object) => {},
+        getId: (AppSetting object) => object.dbId,
+        setId: (AppSetting object, int id) {
+          object.dbId = id;
+        },
+        objectToFB: (AppSetting object, fb.Builder fbb) {
+          fbb.startTable(5);
+          fbb.addInt64(0, object.dbId);
+          fbb.addBool(1, object.isFirst);
+          fbb.finish(fbb.endTable());
+          return object.dbId;
+        },
+        objectFromFB: (Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+
+          final object = AppSetting()
+            ..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
+            ..isFirst =
+                const fb.BoolReader().vTableGet(buffer, rootOffset, 6, false);
 
           return object;
         })
@@ -707,17 +750,13 @@ class UserData_ {
   static final password =
       QueryStringProperty<UserData>(_entities[3].properties[2]);
 
-  /// see [UserData.isFirst]
-  static final isFirst =
-      QueryBooleanProperty<UserData>(_entities[3].properties[3]);
-
   /// see [UserData.lastNotiSyncTime]
   static final lastNotiSyncTime =
-      QueryIntegerProperty<UserData>(_entities[3].properties[4]);
+      QueryIntegerProperty<UserData>(_entities[3].properties[3]);
 
   /// see [UserData.lastTodoSyncTime]
   static final lastTodoSyncTime =
-      QueryIntegerProperty<UserData>(_entities[3].properties[5]);
+      QueryIntegerProperty<UserData>(_entities[3].properties[4]);
 }
 
 /// [DBOrder] entity fields to define ObjectBox queries.
@@ -743,4 +782,15 @@ class Course_ {
 
   /// see [Course.sub]
   static final sub = QueryStringProperty<Course>(_entities[5].properties[3]);
+}
+
+/// [AppSetting] entity fields to define ObjectBox queries.
+class AppSetting_ {
+  /// see [AppSetting.dbId]
+  static final dbId =
+      QueryIntegerProperty<AppSetting>(_entities[6].properties[0]);
+
+  /// see [AppSetting.isFirst]
+  static final isFirst =
+      QueryBooleanProperty<AppSetting>(_entities[6].properties[1]);
 }
