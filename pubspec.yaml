@@ -64,6 +64,7 @@ dependencies:
   objectbox: ^1.4.1
   objectbox_flutter_libs: ^1.4.1
   watcher: ^1.0.1
+  mailer: ^5.1.0
   better_player:
     git:
       url: https://github.com/shiyiya/betterplayer

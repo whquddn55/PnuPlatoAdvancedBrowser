@@ -29,7 +29,7 @@ class TodoController extends GetxController {
     return res;
   }
 
-  Future<void> initialize() async {
+  void initialize() {
     updateTodoList();
   }
 

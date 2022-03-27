@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
@@ -39,12 +40,13 @@ abstract class BackgroundService {
       ),
     );
 
-    _service.onDataReceived.listen((data) {
+    _service.onDataReceived.listen((data) async {
       if (data == null) {
         return;
       }
-
       printLog("recevied app: $data");
+
+      if (data["error"] != null) {}
 
       BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
       if (action == BackgroundServiceAction.update) {
@@ -89,6 +91,7 @@ void _onStart() async {
   await BackgroundLoginController.login(autologin: true, username: null, password: null);
 
   final service = FlutterBackgroundService();
+
   service.onDataReceived.listen((data) async {
     if (data == null) {
       return;
@@ -96,35 +99,43 @@ void _onStart() async {
     printLog("receive service: $data");
 
     /* ensure login */
-    await BackgroundLoginController.login(autologin: true, username: null, password: null);
-
     var res = <String, dynamic>{"action": data["action"], "hashCode": data["hashCode"]};
-    final BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
-    switch (action) {
-      case BackgroundServiceAction.logout:
-        res["data"] = await BackgroundLoginController.logout();
-        break;
-      case BackgroundServiceAction.fetchTodoListAll:
-        await BackgroundTodoController.fetchTodoListAll();
-        break;
-      case BackgroundServiceAction.fetchTodoList:
-        var courseIdList = List<String>.from(data["courseIdList"]);
-        await BackgroundTodoController.fetchTodoList(courseIdList);
-        break;
-      case BackgroundServiceAction.fetchNotificationList:
-        await BackgroundNotificationController.updateNotificationList(data["enableNotify"]);
-        break;
-      case BackgroundServiceAction.download:
-        var downloadInformation = DownloadInformation.fromJson(Map<String, String>.from(data["downloadInformation"]));
-        await BackgroundDownloadController.download(downloadInformation);
-        break;
-      case BackgroundServiceAction.update:
-        break;
+    try {
+      await BackgroundLoginController.login(autologin: true, username: null, password: null);
+
+      final BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
+      switch (action) {
+        case BackgroundServiceAction.logout:
+          res["data"] = await BackgroundLoginController.logout();
+          break;
+        case BackgroundServiceAction.fetchTodoListAll:
+          await BackgroundTodoController.fetchTodoListAll();
+          break;
+        case BackgroundServiceAction.fetchTodoList:
+          var courseIdList = List<String>.from(data["courseIdList"]);
+          await BackgroundTodoController.fetchTodoList(courseIdList);
+          break;
+        case BackgroundServiceAction.fetchNotificationList:
+          await BackgroundNotificationController.updateNotificationList(data["enableNotify"]);
+          break;
+        case BackgroundServiceAction.download:
+          var downloadInformation = DownloadInformation.fromJson(Map<String, String>.from(data["downloadInformation"]));
+          await BackgroundDownloadController.download(downloadInformation);
+          break;
+        case BackgroundServiceAction.update:
+          break;
+      }
+    } catch (e, stacktrace) {
+      BackgroundTodoController.refreshLock.clear();
+      var mailresult = await ExceptionController.sendMail(
+        "PPAB Report: Back ${BackgroundLoginController.loginInformation.studentId}}",
+        e.toString() + "\n" + stacktrace.toString(),
+      );
+      res.addAll({"error": e.toString(), "stacktrace": stacktrace.toString(), "sended": mailresult});
     }
 
-    service.sendData(res);
-
     printLog("send service: ${res["data"].toString()}");
+    service.sendData(res);
   });
 
   if (StorageController.loadLastNotiSyncTime() != DateTime(2000) &&
@@ -139,15 +150,23 @@ void _onStart() async {
 }
 
 Future<void> timerBody(final FlutterBackgroundService service) async {
-  await BackgroundNotificationController.updateNotificationList(true);
-  final now = DateTime.now();
-  final lastTodoSyncTime = StorageController.loadLastTodoSyncTime();
-  if (now.difference(lastTodoSyncTime) >= const Duration(hours: 12)) {
-    await BackgroundTodoController.fetchTodoListAll();
-  }
+  try {
+    await BackgroundNotificationController.updateNotificationList(true);
+    final now = DateTime.now();
+    final lastTodoSyncTime = StorageController.loadLastTodoSyncTime();
+    if (now.difference(lastTodoSyncTime) >= const Duration(hours: 12)) {
+      await BackgroundTodoController.fetchTodoListAll();
+    }
 
-  var res = <String, dynamic>{"action": BackgroundServiceAction.update.name};
-  service.sendData(res);
+    var res = <String, dynamic>{"action": BackgroundServiceAction.update.name};
+    service.sendData(res);
+  } catch (e, stacktrace) {
+    BackgroundTodoController.refreshLock.clear();
+    var mailresult = await ExceptionController.sendMail(
+      "PPAB Report: Back ${BackgroundLoginController.loginInformation.studentId}}",
+      e.toString() + "\n" + stacktrace.toString(),
+    );
+  }
 
   var document = await StorageController.getDownloadDirectory();
 

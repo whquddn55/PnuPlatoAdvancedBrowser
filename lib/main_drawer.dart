@@ -99,10 +99,11 @@ class MainDrawer extends StatelessWidget {
           title: const Text('디버그버튼'),
           onTap: () async {
             await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+            throw "13123";
             //TodoController.to.progress.value = !TodoController.to.progress.value;
             //StorageController.storeLoginInformation(LoginInformation(loginStatus: true));
-            StorageController.storeNotificationList([]);
-            NotificationController.fetchNotificationList();
+            // StorageController.storeNotificationList([]);
+            // NotificationController.fetchNotificationList();
           }),
     ]);
   }
