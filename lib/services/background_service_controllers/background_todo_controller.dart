@@ -11,12 +11,12 @@ import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 
 abstract class BackgroundTodoController {
   static Set<String> refreshLock = {};
-  static Future<bool> fetchTodoListAll() async {
+  static Future<void> fetchTodoListAll() async {
     final courseIdList = CourseController.currentSemesterCourseList.map((course) => course.id).toList();
     await fetchTodoList(courseIdList);
     StorageController.storeLastTodoSyncTime(DateTime.now());
 
-    return true;
+    return;
   }
 
   static Future<void> fetchTodoList(List<String> courseIdList) async {

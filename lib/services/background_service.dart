@@ -105,7 +105,7 @@ void _onStart() async {
         res["data"] = await BackgroundLoginController.logout();
         break;
       case BackgroundServiceAction.fetchTodoListAll:
-        res["data"] = await BackgroundTodoController.fetchTodoListAll();
+        await BackgroundTodoController.fetchTodoListAll();
         break;
       case BackgroundServiceAction.fetchTodoList:
         var courseIdList = List<String>.from(data["courseIdList"]);
@@ -117,6 +117,8 @@ void _onStart() async {
       case BackgroundServiceAction.download:
         var downloadInformation = DownloadInformation.fromJson(Map<String, String>.from(data["downloadInformation"]));
         await BackgroundDownloadController.download(downloadInformation);
+        break;
+      case BackgroundServiceAction.update:
         break;
     }
 
