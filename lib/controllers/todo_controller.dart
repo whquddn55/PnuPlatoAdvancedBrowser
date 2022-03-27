@@ -16,7 +16,7 @@ class TodoController extends GetxController {
   static TodoController get to => Get.find<TodoController>();
   static Stream progressStatusStream = Stream.periodic(const Duration(microseconds: 100), (cnt) {});
 
-    List<Todo> _todoList = <Todo>[];
+  List<Todo> _todoList = <Todo>[];
   RxBool progress = RxBool(false);
 
   List<Todo> get todoList {
@@ -40,6 +40,7 @@ class TodoController extends GetxController {
 
   Future<void> fetchTodoListAll() async {
     await BackgroundService.sendData(BackgroundServiceAction.fetchTodoListAll);
+    updateTodoList();
   }
 
   Future<void> fetchTodoList(List<String> courseIdList) async {

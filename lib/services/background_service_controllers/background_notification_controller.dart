@@ -17,10 +17,10 @@ abstract class BackgroundNotificationController {
     });
   }
 
-  static Future<void> updateNotificationList() async {
+  static Future<void> updateNotificationList(final bool enableNotify) async {
     final notificationList = StorageController.loadNotificationList();
     final newNotificationList = await _fetchNewNotificationList(notificationList);
-    StorageController.storeNotificationList(_updateNotificationList(notificationList, newNotificationList));
+    StorageController.storeNotificationList(_updateNotificationList(notificationList, newNotificationList, enableNotify));
     StorageController.storeLastNotiSyncTime(DateTime.now());
   }
 
@@ -64,9 +64,12 @@ abstract class BackgroundNotificationController {
     return newNotificationList;
   }
 
-  static List<Notification> _updateNotificationList(final List<Notification> notificationList, final List<Notification> newNotificationList) {
+  static List<Notification> _updateNotificationList(
+      final List<Notification> notificationList, final List<Notification> newNotificationList, final bool enableNotify) {
     for (var notification in newNotificationList) {
-      notification.show();
+      if (enableNotify == true) {
+        notification.show();
+      }
     }
     return newNotificationList + notificationList;
   }

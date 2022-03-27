@@ -64,7 +64,6 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         themeMode: ThemeMode.light,
-        //darkTheme: ThemeData(primaryColor: Colors.lightBlue, brightness: Brightness.dark, fontFamily: 'DoHyeonRegular'),
         home: GetBuilder<AppSettingController>(
           builder: (controller) {
             return controller.isFirst ? const LandingPage() : const NavigatorPage();

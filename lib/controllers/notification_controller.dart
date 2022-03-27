@@ -66,8 +66,8 @@ abstract class NotificationController {
     ]);
   }
 
-  static Future<List<Notification>> fetchNotificationList() async {
-    await BackgroundService.sendData(BackgroundServiceAction.fetchNotificationList, data: null);
+  static Future<List<Notification>> fetchNotificationList({final bool enableNotify = true}) async {
+    await BackgroundService.sendData(BackgroundServiceAction.fetchNotificationList, data: {"enableNotify": enableNotify});
     var res = StorageController.loadNotificationList();
     return res;
   }

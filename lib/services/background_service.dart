@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
@@ -113,7 +112,7 @@ void _onStart() async {
         await BackgroundTodoController.fetchTodoList(courseIdList);
         break;
       case BackgroundServiceAction.fetchNotificationList:
-        await BackgroundNotificationController.updateNotificationList();
+        await BackgroundNotificationController.updateNotificationList(data["enableNotify"]);
         break;
       case BackgroundServiceAction.download:
         var downloadInformation = DownloadInformation.fromJson(Map<String, String>.from(data["downloadInformation"]));
@@ -126,8 +125,9 @@ void _onStart() async {
     printLog("send service: ${res["data"].toString()}");
   });
 
-  if (DateTime.now().difference(StorageController.loadLastNotiSyncTime()) >= const Duration(minutes: 5)) {
-    await timerBody(service);
+  if (StorageController.loadLastNotiSyncTime() != DateTime(2000) &&
+      DateTime.now().difference(StorageController.loadLastNotiSyncTime()) >= const Duration(minutes: 5)) {
+    await BackgroundNotificationController.updateNotificationList(true);
   }
 
   Timer.periodic(
@@ -137,8 +137,13 @@ void _onStart() async {
 }
 
 Future<void> timerBody(final FlutterBackgroundService service) async {
-  await BackgroundNotificationController.updateNotificationList();
-  await BackgroundTodoController.fetchTodoListAll();
+  await BackgroundNotificationController.updateNotificationList(true);
+  final now = DateTime.now();
+  final lastTodoSyncTime = StorageController.loadLastTodoSyncTime();
+  if (now.difference(lastTodoSyncTime) >= const Duration(hours: 12)) {
+    await BackgroundTodoController.fetchTodoListAll();
+  }
+
   var res = <String, dynamic>{"action": BackgroundServiceAction.update.name};
   service.sendData(res);
 

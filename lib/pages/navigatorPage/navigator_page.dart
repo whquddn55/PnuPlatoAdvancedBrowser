@@ -1,9 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/timer_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/sections/navigator_body.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
@@ -48,10 +53,19 @@ class NavigatorPage extends StatelessWidget {
               future:
                   Future.wait([_dbInitFuture(studentId), BackgroundService.initializeService(), CourseController.updateCurrentSemesterCourseList()]),
               builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.done) {
-                  return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: 'DB 접속 중...'));
-                }
-                TimerController.initialize();
+                if (snapshot.connectionState != ConnectionState.done) return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: 'DB동기화 중...'));
+
+                WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
+                  if (StorageController.loadLastTodoSyncTime() == DateTime(2000)) {
+                    await showProgressDialog(context, "앱 초기화 작업 중입니다...\n약간의 시간이 소요됩니다.").then((progressContext) async {
+                      await NotificationController.fetchNotificationList(enableNotify: false);
+                      await TodoController.to.fetchTodoListAll().then((_) {
+                        closeProgressDialog(progressContext);
+                      });
+                    });
+                  }
+                  TimerController.initialize();
+                });
 
                 return const NavigatorBody();
               },

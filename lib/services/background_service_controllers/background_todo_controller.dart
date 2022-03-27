@@ -1,5 +1,4 @@
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
@@ -13,11 +12,6 @@ import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 abstract class BackgroundTodoController {
   static Set<String> refreshLock = {};
   static Future<bool> fetchTodoListAll() async {
-    final now = DateTime.now();
-    final lastTodoSyncTime = StorageController.loadLastTodoSyncTime();
-    if (now.difference(lastTodoSyncTime) < const Duration(hours: 12)) {
-      return false;
-    }
     final courseIdList = CourseController.currentSemesterCourseList.map((course) => course.id).toList();
     await fetchTodoList(courseIdList);
     StorageController.storeLastTodoSyncTime(DateTime.now());
