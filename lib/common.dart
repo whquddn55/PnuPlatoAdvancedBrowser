@@ -250,10 +250,10 @@ Future<dio.Response?> requestAction(final PlatoActionType type, {required final 
 }
 
 HtmlWidget renderHtml(String html) {
-  html = html.replaceAll('<br>', '');
   return HtmlWidget(
     html,
     isSelectable: true,
+    textStyle: const TextStyle(fontSize: 12),
     onTapUrl: (url) async {
       if (Uri.parse(url).scheme == 'https') {
         ChromeSafariBrowser().open(

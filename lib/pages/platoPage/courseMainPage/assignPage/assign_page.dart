@@ -67,7 +67,11 @@ class _AssignPageState extends State<AssignPage> {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
-                  children: [CachedNetworkImage(imageUrl: courseFile.imgUrl), const SizedBox(width: 4.0), Text(courseFile.title)],
+                  children: [
+                    CachedNetworkImage(imageUrl: courseFile.imgUrl),
+                    const SizedBox(width: 4.0),
+                    Text(courseFile.title, style: TextStyle(color: Theme.of(context).primaryColor))
+                  ],
                 ),
               );
             } else {
@@ -124,7 +128,9 @@ class _AssignPageState extends State<AssignPage> {
             ),
             child: const Text("지금 과제물을 편집하면 제출 상태가 변경됩니다.\n(정상제출 => 늦은제출)"),
           ),
+        const SizedBox(height: 4),
         if (courseAssign.lastEditDate != null) Text("최종 수정 일시: ${DateFormat("yyyy-MM-dd hh:mm").format(courseAssign.lastEditDate!)}"),
+        const SizedBox(height: 4),
         if (courseAssign.submitable)
           BetaBadge(
             child: OutlinedButton(
@@ -211,7 +217,9 @@ class _AssignPageState extends State<AssignPage> {
                     const Divider(thickness: 1.0, height: 4.0),
                     _renderFileList(context, courseAssign.fileList, "첨부파일", CrossAxisAlignment.start),
                     const Divider(thickness: 1.0, height: 4.0),
+                    const SizedBox(height: 14),
                     courseAssign.content,
+                    const SizedBox(height: 14),
                     const Divider(thickness: 1.0, height: 4.0),
                     const SizedBox(height: 20),
                     courseAssign.team != null

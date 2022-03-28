@@ -82,7 +82,8 @@ class Notification {
       );
       return;
     }
-    Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: url.split('?id=')[1])));
+    Navigator.of(context, rootNavigator: true)
+        .push(MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: url.split('?id=')[1])));
   }
 
   Future<void> show() async {
