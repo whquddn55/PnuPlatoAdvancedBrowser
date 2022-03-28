@@ -6,20 +6,22 @@ import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 
 abstract class TimerController {
   static Timer? _timer;
+  static bool _lock = false;
 
   static void initialize() {
     if (_timer != null) return;
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      if (_lock == true) return;
       await _updateTodoStatus();
     });
   }
 
   static Future<void> _updateTodoStatus() async {
+    _lock = true;
     bool updated = false;
     Set<String> courseIdSet = <String>{};
     final now = DateTime.now();
     for (var todo in TodoController.to.todoList) {
-      courseIdSet.add(todo.courseId);
       if (todo.userDefined == false && todo.checked == false) {
         if (now.compareTo(todo.dueDate ?? now) == 1) {
           /* DueDate가 지나면 Update */
@@ -40,5 +42,6 @@ abstract class TimerController {
       TodoController.to.storeTodoList();
       await TodoController.to.fetchTodoList(courseIdSet.toList());
     }
+    _lock = false;
   }
 }

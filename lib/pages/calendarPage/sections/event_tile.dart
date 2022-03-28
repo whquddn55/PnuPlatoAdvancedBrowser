@@ -18,7 +18,7 @@ class EventTile extends StatelessWidget {
 
     final Color eventColor = event.getColor();
     final String dateString = event.dueDate == null ? '' : DateFormat.Hms().format(event.dueDate!);
-    final Widget remainTextWidget = _RemainText(dueDate: event.dueDate);
+    final Widget remainTextWidget = _RemainText(dueDate: event.dueDate, todoStatus: event.status);
 
     return Opacity(
       opacity: event.status == TodoStatus.done ? 0.3 : 1.0,
@@ -69,8 +69,9 @@ class EventTile extends StatelessWidget {
 }
 
 class _RemainText extends StatefulWidget {
+  final TodoStatus todoStatus;
   final DateTime? dueDate;
-  const _RemainText({Key? key, required this.dueDate}) : super(key: key);
+  const _RemainText({Key? key, required this.dueDate, required this.todoStatus}) : super(key: key);
 
   @override
   State<_RemainText> createState() => __RemainTextState();
@@ -86,7 +87,8 @@ class __RemainTextState extends State<_RemainText> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.dueDate == null) return const SizedBox.shrink();
+    if (widget.todoStatus == TodoStatus.doing) const Text("진행중!", style: TextStyle(color: Colors.red));
+    if (widget.dueDate == null) return const Text("알 수 없음", style: TextStyle(fontSize: 10, color: Colors.black));
     Duration remainTime = widget.dueDate!.difference(DateTime.now());
     if (remainTime.isNegative) return const SizedBox.shrink();
 
@@ -94,7 +96,7 @@ class __RemainTextState extends State<_RemainText> {
     String hours = (remainTime.inHours % 24).toString().padLeft(2, '0');
     String minutes = (remainTime.inMinutes % 60).toString().padLeft(2, '0');
     String seconds = (remainTime.inSeconds % 60).toString().padLeft(2, '0');
-    return Text("$days일 $hours:$minutes:$seconds");
+    return Text("$days일 $hours:$minutes:$seconds", style: const TextStyle(fontSize: 10, color: Colors.black));
   }
 
   @override
