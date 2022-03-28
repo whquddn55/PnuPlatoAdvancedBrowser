@@ -25,22 +25,18 @@ abstract class CourseController {
   //   return await _fetchCourseList(year: year, semester: semester);
   // }
 
-  static Future<bool> updateCurrentSemesterCourseList() async {
+  static Future<void> updateCurrentSemesterCourseList() async {
     var courseList = await _fetchCourseList(year: 2022, semester: 10);
-    if (courseList == null) {
-      return false;
-    }
     StorageController.storeCourseList(courseList);
 
-    return true;
+    return;
   }
 
   static Future<Map<int, List<Map<String, dynamic>>>> getVodStatus(final String courseId, final bool isFront) async {
     var response = await requestGet(CommonUrl.courseOnlineAbsenceUrl + courseId, isFront: isFront);
 
     if (response == null) {
-      /* TODO: 에러 */
-      return <int, List<Map<String, String>>>{};
+      throw Exception("response is null on getVodStatus");
     }
 
     Map<int, List<Map<String, dynamic>>> res = <int, List<Map<String, dynamic>>>{};
@@ -106,21 +102,19 @@ abstract class CourseController {
     var response = await requestGet(CommonUrl.vodViewerUrl + activityId, isFront: true);
 
     if (response == null) {
-      /* TODO: 에러 */
-      return Uri.parse('');
+      throw Exception("response is null on getM3u8Uri");
     }
     Document document = parse(response.data);
     return Uri.parse(document.getElementsByTagName('source')[0].attributes['src'] ?? '');
   }
 
-  static Future<List<Course>?> _fetchCourseList({int year = 0, int semester = 0}) async {
+  static Future<List<Course>> _fetchCourseList({int year = 0, int semester = 0}) async {
     final List<Course> courseList = <Course>[];
 
     var response = await requestGet(CommonUrl.courseListUrl + 'year=$year&semester=$semester', isFront: true);
 
     if (response == null) {
-      /* TODO: 에러 */
-      return null;
+      throw Exception("response is null on _fetchCourseList");
     }
     Document document = parse(response.data);
     for (var e in document.getElementsByClassName('coursefullname')) {
@@ -136,7 +130,7 @@ abstract class CourseController {
 
     // var response = await requestAction(PlatoActionType.courseList, isFront: true);
     // if (response == null) {
-    //   /* TODO: 에러 */
+    //   TOD: 에러
     //   return null;
     // }
 

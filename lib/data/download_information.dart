@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 enum DownloadType { activity, m3u8, normal }
 
 class DownloadInformation {

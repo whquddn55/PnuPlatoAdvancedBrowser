@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 import 'package:pnu_plato_advanced_browser/main_appbar.dart';
-import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/main_drawer.dart';
 import 'package:pnu_plato_advanced_browser/pages/login_builder_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/sections/lecture_tile.dart';

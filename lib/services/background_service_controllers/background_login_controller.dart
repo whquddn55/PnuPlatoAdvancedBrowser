@@ -72,8 +72,7 @@ abstract class BackgroundLoginController {
           }));
 
       /* always return 303 */
-      loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
-      /* TODO: popup error report */
+      loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.(not 303)';
       loginInformation.loginStatus = false;
       StorageController.storeLoginInformation(loginInformation);
       return;
@@ -84,8 +83,7 @@ abstract class BackgroundLoginController {
       }
       /* unknownError */
       else {
-        loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
-        /* TODO: popup error report */
+        loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.(unknown)';
         loginInformation.loginStatus = false;
         StorageController.storeLoginInformation(loginInformation);
         return;
@@ -93,8 +91,7 @@ abstract class BackgroundLoginController {
     }
     /* unknownError */
     catch (e) {
-      loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.';
-      /* TODO: popup error report */
+      loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.(unkown2)';
       loginInformation.loginStatus = false;
       StorageController.storeLoginInformation(loginInformation);
       return;
@@ -125,30 +122,25 @@ abstract class BackgroundLoginController {
     return;
   }
 
-  static Future<bool> logout() async {
+  static Future<void> logout() async {
     final LoginInformation loginInformation = (StorageController.loadLoginInformation())!;
 
     String? sessionKey = await _getSessionKey(loginInformation.moodleSessionKey);
-    if (sessionKey == null) {
-      return false;
-    }
     await dio.Dio().get(CommonUrl.logoutUrl + sessionKey);
 
     StorageController.clearUserData();
     StorageController.clearAppSetting();
 
-    return true;
+    return;
   }
 
-  static Future<String?> _getSessionKey(final String moodleSessionKey) async {
+  static Future<String> _getSessionKey(final String moodleSessionKey) async {
     var options = dio.Options(headers: {'Cookie': moodleSessionKey});
 
     var response = await requestGet(CommonUrl.platoCalendarUrl, options: options, isFront: false);
 
     if (response == null) {
-      /* TODO: 에러 */
-
-      return null;
+      throw Exception("response is null on _getSessionKey");
     }
 
     try {
@@ -157,7 +149,7 @@ abstract class BackgroundLoginController {
       String? sessionKey = data.substring(sessionkeyIndex + 10, data.indexOf(',', sessionkeyIndex) - 1);
       return sessionKey;
     } catch (e) {
-      return null;
+      throw Exception("parsing error on _getSessionKey!\n$response");
     }
   }
 
@@ -165,10 +157,8 @@ abstract class BackgroundLoginController {
     var response =
         await dio.Dio().get(CommonUrl.platoUserInformationUrl, options: dio.Options(headers: {"Cookie": loginInformation.moodleSessionKey}));
 
-    if (response == null) {
-      /* TODO: 에러 */
-
-      return;
+    if (response.data == null) {
+      throw Exception("response.data is null on _getInformation");
     }
     Document document = parse(response.data);
 

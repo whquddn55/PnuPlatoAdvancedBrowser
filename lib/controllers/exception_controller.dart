@@ -7,7 +7,7 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 
 abstract class ExceptionController {
   static Future<void> onExpcetion(final String subject, final String body) async {
-    final progressContext = await showProgressDialog(Get.context!, "");
+    final progressContext = await showProgressDialog(Get.key.currentContext!, "");
     bool sendResult = await sendMail(subject, body);
     closeProgressDialog(progressContext);
     await Get.dialog(

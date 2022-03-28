@@ -67,8 +67,7 @@ abstract class CourseAssignController {
           team = element.children[1].text;
           break;
         default:
-          /* TODO: 버그 리포트로 이동 */
-          break;
+          throw Exception("found new render model! $target");
       }
     }
 

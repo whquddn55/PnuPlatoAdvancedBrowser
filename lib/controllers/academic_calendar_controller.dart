@@ -4,11 +4,10 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/acamedic_calendar_item.dart';
 
 abstract class AcademicCalendarController {
-  static Future<List<AcademicCalendarItem>?> getAcademicCalendar() async {
+  static Future<List<AcademicCalendarItem>> getAcademicCalendar() async {
     var response = await requestGet(CommonUrl.academicCalendarUrl, isFront: true);
     if (response == null) {
-      /* TODO: 에러 */
-      return null;
+      throw Exception("response on getAcademicCalendar is null");
     }
 
     Document document = parse(response.data);

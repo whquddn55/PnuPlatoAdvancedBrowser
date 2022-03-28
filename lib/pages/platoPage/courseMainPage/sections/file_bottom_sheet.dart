@@ -35,7 +35,7 @@ class FileBottomSheet extends StatelessWidget {
 
   Future<void> _downloadHandler(BuildContext context) async {
     Navigator.pop(context);
-    var downloadResult = await DownloadController.enQueue(
+    await DownloadController.enQueue(
       title: file.title,
       url: file.url,
       courseTitle: courseTitle,

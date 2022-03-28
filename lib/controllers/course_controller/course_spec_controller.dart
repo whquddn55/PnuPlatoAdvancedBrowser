@@ -9,11 +9,10 @@ import 'package:pnu_plato_advanced_browser/data/course_spec.dart';
 import 'package:pnu_plato_advanced_browser/data/professor.dart';
 
 abstract class CourseSpecController {
-  static Future<CourseSpec?> fetchCourseSpecification(final String courseId, final String courseTitle) async {
+  static Future<CourseSpec> fetchCourseSpecification(final String courseId, final String courseTitle) async {
     var response = await requestGet(CommonUrl.courseMainUrl + courseId, isFront: true);
     if (response == null) {
-      /* TODO : 에러 */
-      return null;
+      throw Exception("response is null on fetchCourseSpecification");
     }
     Document document = parse(response.data);
 
@@ -109,8 +108,7 @@ abstract class CourseSpecController {
     var response = await requestGet(CommonUrl.courseBoardUrl + '$boardId&page=$page', isFront: true);
 
     if (response == null) {
-      /* TODO: 에러 */
-      return <String, dynamic>{};
+      throw Exception("response is null on getBoardInfo");
     }
     Map<String, dynamic> res = <String, dynamic>{};
     Document document = parse(response.data);

@@ -9,7 +9,7 @@ class UnknownCourseActivity extends CourseActivity {
     required String id,
     required String courseTitle,
     required String courseId,
-    required String? url,
+    required this.url,
     DateTime? startDate,
     DateTime? endDate,
     DateTime? lateDate,
@@ -18,8 +18,7 @@ class UnknownCourseActivity extends CourseActivity {
     String? iconUrl,
     String availablilityInfo = '',
     bool availablility = true,
-  })  : url = url,
-        super(
+  }) : super(
           title: title,
           id: id,
           courseTitle: courseTitle,

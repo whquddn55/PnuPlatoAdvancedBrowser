@@ -263,7 +263,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
         });
       }
     } catch (e) {
-      print(e.toString());
+      rethrow;
     }
 
     return totalSize;

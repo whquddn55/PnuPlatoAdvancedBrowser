@@ -22,8 +22,7 @@ class AdminBugReportPage extends StatelessWidget {
               return const LoadingPage(msg: "서버와 연결이 종료되었습니다...");
             } else {
               if (snapshot.data == null) {
-                print(snapshot.error);
-                return Container();
+                throw Exception("snapshot.data is null on AdminBugReportPage");
               }
               var docs = snapshot.data!.docs;
               return ListView.builder(

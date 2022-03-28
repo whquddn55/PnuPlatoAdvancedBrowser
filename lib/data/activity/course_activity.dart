@@ -42,7 +42,6 @@ abstract class CourseActivity {
     this.availablility = true,
   });
 
-  @factory
   static CourseActivity fromType({
     required final String type,
     required final String title,

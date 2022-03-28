@@ -54,7 +54,7 @@ class VodCourseActivity extends CourseActivity {
     Uri uri = await CourseController.getM3u8Uri(id);
     if (uri.toString() == '') {
     } else {
-      var downloadResult = await DownloadController.enQueue(
+      await DownloadController.enQueue(
         url: uri.toString(),
         title: title,
         courseTitle: courseTitle,

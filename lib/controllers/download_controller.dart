@@ -27,8 +27,7 @@ abstract class DownloadController {
 
     List<String>? tempList = await _getUrlAndTitle(type, url, title);
     if (tempList == null || tempList.length != 2) {
-      /* TODO: 에러 */
-      return;
+      throw Exception("response is null on enQueue $type, $url, $title");
     }
     url = tempList[0];
     title = tempList[1];

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/course_activity.dart';
-import 'package:pnu_plato_advanced_browser/data/course_file.dart';
-import 'package:pnu_plato_advanced_browser/data/download_information.dart';
-import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/file_bottom_sheet.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/folder_bottom_sheet.dart';
 
 class FolderCourseActivity extends CourseActivity {

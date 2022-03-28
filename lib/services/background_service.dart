@@ -106,7 +106,8 @@ void _onStart() async {
       final BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
       switch (action) {
         case BackgroundServiceAction.logout:
-          res["data"] = await BackgroundLoginController.logout();
+          await BackgroundLoginController.logout();
+          res["data"] = true;
           break;
         case BackgroundServiceAction.fetchTodoListAll:
           await BackgroundTodoController.fetchTodoListAll();
@@ -162,7 +163,7 @@ Future<void> timerBody(final FlutterBackgroundService service) async {
     service.sendData(res);
   } catch (e, stacktrace) {
     BackgroundTodoController.refreshLock.clear();
-    var mailresult = await ExceptionController.sendMail(
+    await ExceptionController.sendMail(
       "PPAB Report: Back ${BackgroundLoginController.loginInformation.studentId}}",
       e.toString() + "\n" + stacktrace.toString(),
     );

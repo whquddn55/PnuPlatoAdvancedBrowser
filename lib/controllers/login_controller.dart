@@ -46,7 +46,6 @@ class LoginController extends GetxController {
     var res = await BackgroundService.sendData(BackgroundServiceAction.logout);
 
     if (res == false) {
-      /* TODO: 에러 */
       return;
     }
 

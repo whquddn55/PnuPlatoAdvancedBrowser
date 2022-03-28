@@ -51,8 +51,7 @@ class UrlCourseActivity extends CourseActivity {
         isFront: true, options: Options(followRedirects: false, validateStatus: (status) => status == 303));
 
     if (response == null) {
-      /* TODO: 에러 */
-      return;
+      throw Exception("response is null on urlOpen");
     }
 
     await ChromeSafariBrowser().open(

@@ -12,15 +12,14 @@ import 'package:pnu_plato_advanced_browser/services/background_service_controlle
 abstract class BackgroundDownloadController {
   static Map<int, CancelToken> tokenMap = {};
   static Future<void> download(final DownloadInformation downloadInformation) async {
-    var res = true;
     await Fluttertoast.cancel();
     await Fluttertoast.showToast(msg: "다운로드를 시작합니다.");
     switch (downloadInformation.type) {
       case DownloadType.m3u8:
-        res &= await _downloadM3u8(downloadInformation);
+        await _downloadM3u8(downloadInformation);
         break;
       default:
-        res &= await _downloadNormal(downloadInformation);
+        await _downloadNormal(downloadInformation);
         break;
     }
     return;
@@ -47,7 +46,7 @@ abstract class BackgroundDownloadController {
       final CancelToken cancelToken = _registerCancelToken(id);
 
       await _showProgressNotification(id, downloadInformation.title);
-      var res = await Dio().download(
+      await Dio().download(
         downloadInformation.url,
         '${downloadInformation.saveDir}/${downloadInformation.title}',
         options: options,
@@ -193,7 +192,7 @@ abstract class BackgroundDownloadController {
           final int progress = (((i + junkSize) / tsUrlList.length) * 100).toInt();
           await _showProgressNotification(id, downloadInformation.title, progress: progress);
           break;
-        } on HttpException catch (e) {
+        } on HttpException catch (_) {
           ++retry;
         }
       }

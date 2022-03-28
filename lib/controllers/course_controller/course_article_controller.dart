@@ -37,12 +37,11 @@ abstract class CourseArticleController {
     return res;
   }
 
-  static Future<CourseArticle?> fetchCourseArticle(final CourseArticleMetaData article) async {
+  static Future<CourseArticle> fetchCourseArticle(final CourseArticleMetaData article) async {
     var response = await requestGet(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}',
         isFront: true, options: Options(validateStatus: (status) => status == 200 || status == 303, followRedirects: false));
     if (response == null || response.statusCode == 303) {
-      /* TODO: 에러 */
-      return null;
+      throw Exception("response is null on fetchCourseArticle");
     }
 
     Document document = parse(response.data);

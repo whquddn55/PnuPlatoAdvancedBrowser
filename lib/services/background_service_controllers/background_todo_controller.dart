@@ -2,7 +2,6 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_zoom_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/course_zoom.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
@@ -78,8 +77,7 @@ abstract class BackgroundTodoController {
 
     var response = await requestGet(CommonUrl.courseMainUrl + courseId, isFront: false);
     if (response == null) {
-      /* TODO : 에러 */
-      return [];
+      throw Exception("response is null on _fetchVod");
     }
 
     final List<Todo> todoList = <Todo>[];
@@ -135,8 +133,7 @@ abstract class BackgroundTodoController {
     var response = await requestGet(CommonUrl.courseAssignUrl + courseId, isFront: false);
 
     if (response == null) {
-      /* TODO : 에러 */
-      return [];
+      throw Exception("response is null on _fetchAssign");
     }
 
     final List<Todo> todoList = <Todo>[];
@@ -170,8 +167,7 @@ abstract class BackgroundTodoController {
     var response = await requestGet(CommonUrl.courseQuizUrl + courseId, isFront: false);
 
     if (response == null) {
-      /* TODO : 에러 */
-      return [];
+      throw Exception("response is null on _fetchQuiz");
     }
 
     final List<Todo> todoList = <Todo>[];
@@ -208,8 +204,7 @@ abstract class BackgroundTodoController {
     var response = await requestGet(CommonUrl.courseZoomUrl + courseId, isFront: false);
 
     if (response == null) {
-      /* TODO : 에러 */
-      return [];
+      throw Exception("response is null on _fetchZoom");
     }
     final List<Todo> todoList = <Todo>[];
     html.Document document = parse(response.data);

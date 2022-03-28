@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_assign_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
@@ -44,6 +45,7 @@ class TodoController extends GetxController {
 
   Future<void> fetchTodoList(List<String> courseIdList) async {
     progress.value = true;
+    Fluttertoast.showToast(msg: "할일을 동기화 중입니다...", backgroundColor: Colors.black.withOpacity(0.3));
     update();
     await BackgroundService.sendData(
       BackgroundServiceAction.fetchTodoList,

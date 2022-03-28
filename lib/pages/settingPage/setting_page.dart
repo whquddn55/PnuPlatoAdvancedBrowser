@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
-import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/settingPage/sections/setting_checkbox.dart';
 import 'package:pnu_plato_advanced_browser/pages/settingPage/sections/setting_dropdown.dart';
 import 'package:pnu_plato_advanced_browser/pages/settingPage/sections/setting_title.dart';
