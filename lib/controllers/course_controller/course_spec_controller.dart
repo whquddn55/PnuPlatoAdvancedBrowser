@@ -2,6 +2,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_article_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assistant.dart';
@@ -9,10 +10,11 @@ import 'package:pnu_plato_advanced_browser/data/course_spec.dart';
 import 'package:pnu_plato_advanced_browser/data/professor.dart';
 
 abstract class CourseSpecController {
-  static Future<CourseSpec> fetchCourseSpecification(final String courseId, final String courseTitle) async {
+  static Future<CourseSpec?> fetchCourseSpecification(final String courseId, final String courseTitle) async {
     var response = await requestGet(CommonUrl.courseMainUrl + courseId, isFront: true);
     if (response == null) {
-      throw Exception("response is null on fetchCourseSpecification");
+      ExceptionController.onExpcetion("response is null on fetchCourseSpecification");
+      return null;
     }
     Document document = parse(response.data);
 
@@ -108,7 +110,8 @@ abstract class CourseSpecController {
     var response = await requestGet(CommonUrl.courseBoardUrl + '$boardId&page=$page', isFront: true);
 
     if (response == null) {
-      throw Exception("response is null on getBoardInfo");
+      ExceptionController.onExpcetion("response is null on getBoardInfo");
+      return {};
     }
     Map<String, dynamic> res = <String, dynamic>{};
     Document document = parse(response.data);

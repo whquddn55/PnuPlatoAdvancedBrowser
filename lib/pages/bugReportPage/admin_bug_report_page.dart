@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.dart';
+import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 
 class AdminBugReportPage extends StatelessWidget {
@@ -22,7 +24,8 @@ class AdminBugReportPage extends StatelessWidget {
               return const LoadingPage(msg: "서버와 연결이 종료되었습니다...");
             } else {
               if (snapshot.data == null) {
-                throw Exception("snapshot.data is null on AdminBugReportPage");
+                ExceptionController.onExpcetion("snapshot.data is null on AdminBugReportPage");
+                return const ErrorPage(msg: "");
               }
               var docs = snapshot.data!.docs;
               return ListView.builder(

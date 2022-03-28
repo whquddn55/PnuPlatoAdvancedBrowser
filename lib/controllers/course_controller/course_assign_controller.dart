@@ -1,5 +1,6 @@
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_assign.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 import 'package:pnu_plato_advanced_browser/data/professor.dart';
@@ -7,7 +8,6 @@ import 'package:pnu_plato_advanced_browser/data/professor.dart';
 abstract class CourseAssignController {
   static Future<CourseAssign?> fetchCourseAssign(final String assignId) async {
     var response = await requestGet(CommonUrl.courseAssignViewUrl + assignId, isFront: true);
-
     if (response == null) {
       return null;
     }
@@ -44,7 +44,7 @@ abstract class CourseAssignController {
         case "채점 상황":
           graded = element.children[1].classes.contains('submissiongraded') ? true : false;
           break;
-        case "제종료 일시":
+        case "종료 일시":
           dueDate = DateTime.parse(element.children[1].text);
           break;
         case "마감까지 남은 기한":
@@ -67,7 +67,7 @@ abstract class CourseAssignController {
           team = element.children[1].text;
           break;
         default:
-          throw Exception("found new render model! $target");
+          ExceptionController.onExpcetion("found new render model! $target");
       }
     }
 

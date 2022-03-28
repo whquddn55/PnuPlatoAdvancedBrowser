@@ -4,9 +4,11 @@ import 'package:get/get.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 
 abstract class ExceptionController {
-  static Future<void> onExpcetion(final String subject, final String body) async {
+  static Future<void> onExpcetion(final String body) async {
+    final subject = "PPAB Report: Front ${LoginController.to.loginInformation.studentId}";
     final progressContext = await showProgressDialog(Get.key.currentContext!, "");
     bool sendResult = await sendMail(subject, body);
     closeProgressDialog(progressContext);

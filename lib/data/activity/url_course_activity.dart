@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/course_activity.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/url_bottom_sheet.dart';
 
@@ -51,7 +52,8 @@ class UrlCourseActivity extends CourseActivity {
         isFront: true, options: Options(followRedirects: false, validateStatus: (status) => status == 303));
 
     if (response == null) {
-      throw Exception("response is null on urlOpen");
+      ExceptionController.onExpcetion("response is null on urlOpen");
+      return;
     }
 
     await ChromeSafariBrowser().open(

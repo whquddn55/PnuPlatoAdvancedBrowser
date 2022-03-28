@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/permission_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
@@ -27,7 +28,8 @@ abstract class DownloadController {
 
     List<String>? tempList = await _getUrlAndTitle(type, url, title);
     if (tempList == null || tempList.length != 2) {
-      throw Exception("response is null on enQueue $type, $url, $title");
+      ExceptionController.onExpcetion("response is null on enQueue $type, $url, $title");
+      return;
     }
     url = tempList[0];
     title = tempList[1];

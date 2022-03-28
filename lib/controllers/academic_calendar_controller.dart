@@ -1,13 +1,15 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/acamedic_calendar_item.dart';
 
 abstract class AcademicCalendarController {
   static Future<List<AcademicCalendarItem>> getAcademicCalendar() async {
     var response = await requestGet(CommonUrl.academicCalendarUrl, isFront: true);
     if (response == null) {
-      throw Exception("response on getAcademicCalendar is null");
+      ExceptionController.onExpcetion("response on getAcademicCalendar is null");
+      return [];
     }
 
     Document document = parse(response.data);

@@ -3,6 +3,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_article_comment_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/article_comment.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
@@ -37,11 +38,12 @@ abstract class CourseArticleController {
     return res;
   }
 
-  static Future<CourseArticle> fetchCourseArticle(final CourseArticleMetaData article) async {
+  static Future<CourseArticle?> fetchCourseArticle(final CourseArticleMetaData article) async {
     var response = await requestGet(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}',
         isFront: true, options: Options(validateStatus: (status) => status == 200 || status == 303, followRedirects: false));
     if (response == null || response.statusCode == 303) {
-      throw Exception("response is null on fetchCourseArticle");
+      ExceptionController.onExpcetion("response is null on fetchCourseArticle");
+      return null;
     }
 
     Document document = parse(response.data);

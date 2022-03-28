@@ -24,7 +24,6 @@ void main() async {
 
       FlutterError.onError = (details) {
         ExceptionController.onExpcetion(
-          "PPAB Report: Front ${LoginController.to.loginInformation.studentId}",
           details.exception.toString() + "\n" + (details.stack?.toString() ?? ""),
         );
       };
@@ -43,7 +42,6 @@ void main() async {
       runApp(const MyApp());
     },
     (error, stacktrace) => ExceptionController.onExpcetion(
-      "PPAB Report: Front ${LoginController.to.loginInformation.studentId}",
       error.toString() + "\n" + (stacktrace.toString()),
     ),
   );

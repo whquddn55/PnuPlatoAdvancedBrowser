@@ -1,6 +1,7 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course.dart';
 
@@ -36,7 +37,8 @@ abstract class CourseController {
     var response = await requestGet(CommonUrl.courseOnlineAbsenceUrl + courseId, isFront: isFront);
 
     if (response == null) {
-      throw Exception("response is null on getVodStatus");
+      ExceptionController.onExpcetion("response is null on getVodStatus");
+      return {};
     }
 
     Map<int, List<Map<String, dynamic>>> res = <int, List<Map<String, dynamic>>>{};
@@ -102,7 +104,8 @@ abstract class CourseController {
     var response = await requestGet(CommonUrl.vodViewerUrl + activityId, isFront: true);
 
     if (response == null) {
-      throw Exception("response is null on getM3u8Uri");
+      ExceptionController.onExpcetion("response is null on getM3u8Uri");
+      return Uri();
     }
     Document document = parse(response.data);
     return Uri.parse(document.getElementsByTagName('source')[0].attributes['src'] ?? '');
@@ -114,7 +117,8 @@ abstract class CourseController {
     var response = await requestGet(CommonUrl.courseListUrl + 'year=$year&semester=$semester', isFront: true);
 
     if (response == null) {
-      throw Exception("response is null on _fetchCourseList");
+      ExceptionController.onExpcetion("response is null on _fetchCourseList");
+      return [];
     }
     Document document = parse(response.data);
     for (var e in document.getElementsByClassName('coursefullname')) {
