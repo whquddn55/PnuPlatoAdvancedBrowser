@@ -1,6 +1,8 @@
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_zoom_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
+import 'package:pnu_plato_advanced_browser/data/course_zoom.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/assign_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/quiz_todo.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
@@ -217,6 +219,11 @@ abstract class BackgroundTodoController {
         String id = tr.getElementsByClassName('cell c1')[0].getElementsByTagName('a')[0].attributes['href']!.split('?id=')[1];
         DateTime? dueDate = DateTime.tryParse(tr.getElementsByClassName('cell c2')[0].text.trim());
         TodoStatus todoStatus = _getZoomTodoStatus(tr);
+
+        if (dueDate == null) {
+          var zoom = await CourseZoomController.fetchCourseZoom(id);
+          dueDate = zoom!.startTime;
+        }
 
         todoList.add(ZoomTodo(
           index: index,
