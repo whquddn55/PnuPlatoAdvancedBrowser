@@ -93,7 +93,6 @@ class _MainCalendarState extends State<MainCalendar> {
   void _onDaySelected(final DateTime selectedDay, final DateTime focusedDay) {
     setState(() {
       _selectedDay = selectedDay;
-      _focusedDay = selectedDay;
     });
 
     bool empty = true;
@@ -156,7 +155,7 @@ class _MainCalendarState extends State<MainCalendar> {
           availableGestures: AvailableGestures.horizontalSwipe,
           focusedDay: _focusedDay,
           firstDay: DateTime(2020, 01, 01),
-          lastDay: DateTime(2025, 12, 31),
+          lastDay: DateTime(2040, 12, 31),
           locale: 'ko-KR',
           sixWeekMonthsEnforced: true,
           headerStyle: const HeaderStyle(

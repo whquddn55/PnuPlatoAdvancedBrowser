@@ -146,6 +146,10 @@ abstract class BackgroundTodoController {
         DateTime? dueDate = DateTime.tryParse(tr.getElementsByClassName('cell c2')[0].text.trim());
         bool done = tr.getElementsByClassName('cell c3')[0].text.trim().contains('완료');
 
+        if (dueDate != null && dueDate.hour == 0 && dueDate.minute == 0 && dueDate.second == 0) {
+          dueDate = dueDate.subtract(const Duration(seconds: 1));
+        }
+
         todoList.add(AssignTodo(
           index: index,
           availability: true,
@@ -183,6 +187,10 @@ abstract class BackgroundTodoController {
             dueDate == null ||
             (dueDate.compareTo(DateTime.now()) <= 0);
 
+        if (dueDate != null && dueDate.hour == 0 && dueDate.minute == 0 && dueDate.second == 0) {
+          dueDate = dueDate.subtract(const Duration(seconds: 1));
+        }
+
         todoList.add(QuizTodo(
           index: index,
           availability: true,
@@ -218,6 +226,10 @@ abstract class BackgroundTodoController {
         if (dueDate == null) {
           var zoom = await CourseZoomController.fetchCourseZoom(id);
           dueDate = zoom!.startTime;
+        }
+
+        if (dueDate.hour == 0 && dueDate.minute == 0 && dueDate.second == 0) {
+          dueDate = dueDate.subtract(const Duration(seconds: 1));
         }
 
         todoList.add(ZoomTodo(
@@ -285,6 +297,8 @@ abstract class BackgroundTodoController {
         res[1] = DateTime.parse(activity.getElementsByClassName('text-ubstrap')[0].text.split(' ~ ')[1]);
       }
     }
+
+    if (res[1] != null && res[1]!.hour == 0 && res[1]!.minute == 0 && res[1]!.second == 0) res[1] = res[1]!.subtract(const Duration(seconds: 1));
     return res;
   }
 
