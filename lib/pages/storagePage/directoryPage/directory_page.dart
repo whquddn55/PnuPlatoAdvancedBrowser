@@ -147,7 +147,9 @@ class _DirectoryPageState extends State<DirectoryPage> {
         onPrimary: Get.textTheme.bodyText2!.color,
       ),
       onPressed: () async {
-        var result = await OpenFile.open(fileSystemEntity.path, type: "application/x-compressed");
+        String? type;
+        if (fileSystemEntity.path.toString().contains('zip')) type = "application/zip";
+        var result = await OpenFile.open(fileSystemEntity.path, type: type);
         if (result.type != ResultType.done) {
           Fluttertoast.cancel();
           Fluttertoast.showToast(msg: result.message);

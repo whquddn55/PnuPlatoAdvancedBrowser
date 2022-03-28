@@ -70,7 +70,7 @@ class _AssignPageState extends State<AssignPage> {
                   children: [
                     CachedNetworkImage(imageUrl: courseFile.imgUrl),
                     const SizedBox(width: 4.0),
-                    Text(courseFile.title, style: TextStyle(color: Theme.of(context).primaryColor))
+                    Expanded(child: Text(courseFile.title, style: TextStyle(color: Theme.of(context).primaryColor)))
                   ],
                 ),
               );

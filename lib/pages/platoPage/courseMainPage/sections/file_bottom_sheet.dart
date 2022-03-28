@@ -26,7 +26,9 @@ class FileBottomSheet extends StatelessWidget {
       key: file.url,
     );
     closeProgressDialog(dialogContext);
-    var result = await OpenFile.open(cachedFile.path);
+    String? type;
+    if (cachedFile.path.contains('zip')) type = "application/zip";
+    var result = await OpenFile.open(cachedFile.path, type: type);
     if (result.type != ResultType.done) {
       Fluttertoast.cancel();
       Fluttertoast.showToast(msg: result.message);
