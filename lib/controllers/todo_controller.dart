@@ -14,7 +14,6 @@ import 'package:pnu_plato_advanced_browser/services/background_service.dart';
 
 class TodoController extends GetxController {
   static TodoController get to => Get.find<TodoController>();
-  static Stream progressStatusStream = Stream.periodic(const Duration(microseconds: 100), (cnt) {});
 
   List<Todo> _todoList = <Todo>[];
   RxBool progress = RxBool(false);

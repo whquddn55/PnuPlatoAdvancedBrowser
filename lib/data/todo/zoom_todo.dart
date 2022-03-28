@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/app_setting_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 

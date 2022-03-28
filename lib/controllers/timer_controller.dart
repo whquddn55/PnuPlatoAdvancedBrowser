@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
+import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 
 abstract class TimerController {
   static Timer? _timer;
@@ -20,10 +22,18 @@ abstract class TimerController {
       courseIdSet.add(todo.courseId);
       if (todo.userDefined == false && todo.checked == false) {
         if (now.compareTo(todo.dueDate ?? now) == 1) {
+          /* DueDate가 지나면 Update */
           todo.checked = true;
           updated = true;
           courseIdSet.add(todo.courseId);
         }
+      } else if (todo.runtimeType == ZoomTodo &&
+          todo.userDefined == false &&
+          todo.status == TodoStatus.doing &&
+          now.difference(todo.dueDate ?? now) >= const Duration(hours: 1)) {
+        /* DueDate에서 1시간이 지난 Zoom강의는 자동으로 done상태로 전환 */
+        todo.status = TodoStatus.done;
+        updated = true;
       }
     }
     if (updated) {
