@@ -27,7 +27,7 @@ abstract class CourseController {
   // }
 
   static Future<void> updateCurrentSemesterCourseList() async {
-    var courseList = await _fetchCourseList(year: 2021, semester: 10);
+    var courseList = await _fetchCurrentCourseList(); // await _fetchCourseList(year: 2022, semester: 10);
     if (courseList == null) return;
     StorageController.storeCourseList(courseList);
 
@@ -152,25 +152,36 @@ abstract class CourseController {
           id: e.attributes['href']!.split('id=')[1],
         ));
       }
+      return courseList;
+    } catch (e, stacktrace) {
+      ExceptionController.onExpcetion(e.toString() + "\n" + stacktrace.toString(), true);
+    }
+    return null;
+  }
 
-      // var response = await requestAction(PlatoActionType.courseList, isFront: true);
-      // if (response == null) {
-      //   TOD: 에러
-      //   return null;
-      // }
+  static Future<List<Course>?> _fetchCurrentCourseList() async {
+    final List<Course> courseList = <Course>[];
+    var response = await requestAction(PlatoActionType.courseList, isFront: true);
+    if (response == null) {
+      ExceptionController.onExpcetion("response is null on _fetchCurrentCourseList", true);
+      return null;
+    }
+    if (response.requestOptions.path == "null") {
+      return null;
+    }
 
-      // Document document = parse(response.data["html"]);
-      // for (var e in document.getElementsByClassName('course-label-r')) {
-      //   final middle = e.attributes["title"]!.split(' ');
-      //   final sub = middle.last.split('-')[1].substring(0, middle.last.split('-')[1].length - 1);
-      //   middle.removeLast();
-      //   courseList.add(Course(
-      //     title: middle.join(' '),
-      //     sub: sub,
-      //     id: e.attributes['href']!.split('id=')[1],
-      //   ));
-      // }
-
+    try {
+      Document document = parse(response.data["html"]);
+      for (var e in document.getElementsByClassName('course-label-r')) {
+        final middle = e.attributes["title"]!.split(' ');
+        final sub = middle.last.split('-')[1].substring(0, middle.last.split('-')[1].length - 1);
+        middle.removeLast();
+        courseList.add(Course(
+          title: middle.join(' '),
+          sub: sub,
+          id: e.attributes['href']!.split('id=')[1],
+        ));
+      }
       return courseList;
     } catch (e, stacktrace) {
       ExceptionController.onExpcetion(e.toString() + "\n" + stacktrace.toString(), true);

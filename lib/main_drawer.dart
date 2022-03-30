@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,9 +9,6 @@ import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
-import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
-import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
-import 'package:pnu_plato_advanced_browser/data/todo/zoom_todo.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/noticeListPage/notice_list_page.dart';
@@ -86,6 +85,30 @@ class MainDrawer extends StatelessWidget {
           Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => BugReportPage(studentId, false)));
         },
       ),
+      const Divider(height: 30),
+      ListTile(
+        trailing: const Icon(Icons.warning_amber_rounded),
+        title: const Text('초기화'),
+        onTap: () async {
+          var dialogResult = await showDialog(
+            context: context,
+            useRootNavigator: true,
+            builder: (context) {
+              return AlertDialog(
+                content: const Text("모든 세팅을 삭제하고 앱을 종료합니다."),
+                actions: [
+                  TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context, false)),
+                  TextButton(child: const Text("확인"), onPressed: () => Navigator.pop(context, true)),
+                ],
+              );
+            },
+          );
+          if (dialogResult == true) {
+            StorageController.clearAll();
+            exit(0);
+          }
+        },
+      ),
 
       /* Debug 용 */
       // const Divider(height: 0),
@@ -100,33 +123,40 @@ class MainDrawer extends StatelessWidget {
       //     trailing: const Icon(Icons.settings),
       //     title: const Text('디버그버튼'),
       //     onTap: () async {
-      //       // await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
-      //       var tdlist = TodoController.to.todoList;
-      //       for (var todo in tdlist) {
-      //         if (todo.id == "1319094") {
-      //           tdlist.remove(todo);
-      //           tdlist.add(ZoomTodo(
-      //             index: 1000,
-      //             id: "1319094",
-      //             title: "ㅎㅇㅎㅇ",
-      //             courseId: "119197",
-      //             dueDate: DateTime.now().add(Duration(seconds: 5)),
-      //             availability: true,
-      //             iconUrl: "",
-      //             status: TodoStatus.undone,
-      //             userDefined: false,
-      //             checked: false,
-      //           ));
-      //           break;
-      //         }
-      //       }
-      //       StorageController.storeTodoList(tdlist);
-      //       TodoController.to.updateTodoList();
-      //       //TodoController.to.progress.value = !TodoController.to.progress.value;
-      //       //StorageController.storeLoginInformation(LoginInformation(loginStatus: true));
-      //       // StorageController.storeNotificationList([]);
-      //       // NotificationController.fetchNotificationList();
-      //     }),
+      //       StorageController.removeTodo(AssignTodo(
+      //         id: "13190943",
+      //         title: "실시간Zoom강의",
+      //         courseId: "119200",
+      //         dueDate: DateTime.now(),
+      //         availability: true,
+      //         iconUrl: "",
+      //         status: TodoStatus.doing,
+      //         userDefined: false,
+      //         checked: false,
+      //       ));
+      //       TodoController.to.loadTodoList();
+      // StorageController.storeTodoList([]);
+      // TodoController.to.loadTodoList();
+      // await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+      // var tdlist = TodoController.to.todoList;
+      // tdlist.add(ZoomTodo(
+      //   id: "13190943",
+      //   title: "실시간Zoom강의",
+      //   courseId: "119200",
+      //   dueDate: DateTime.now(),
+      //   availability: true,
+      //   iconUrl: "",
+      //   status: TodoStatus.doing,
+      //   userDefined: false,
+      //   checked: false,
+      // ));
+      // StorageController.storeTodoList(tdlist);
+      // TodoController.to.loadTodoList();
+      //TodoController.to.progress.value = !TodoController.to.progress.value;
+      //StorageController.storeLoginInformation(LoginInformation(loginStatus: true));
+      // StorageController.storeNotificationList([]);
+      // NotificationController.fetchNotificationList();
+      // }),
     ]);
   }
 
@@ -147,14 +177,30 @@ class MainDrawer extends StatelessWidget {
           Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => const LoginPage()));
         },
       ),
-      const Divider(height: 0),
+      const Divider(height: 30),
       ListTile(
-          trailing: const Icon(Icons.bug_report_outlined),
-          title: const Text('버그리포트'),
-          onTap: () {
-            var studentId = "123"; //Get.find<UserDataController>().studentId.toString();
-            Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => BugReportPage(studentId, false)));
-          }),
+        trailing: const Icon(Icons.warning_amber_rounded),
+        title: const Text('초기화'),
+        onTap: () async {
+          var dialogResult = await showDialog(
+            context: context,
+            useRootNavigator: true,
+            builder: (context) {
+              return AlertDialog(
+                content: const Text("모든 세팅을 삭제하고 앱을 종료합니다."),
+                actions: [
+                  TextButton(child: const Text("취소"), onPressed: () => Navigator.pop(context, false)),
+                  TextButton(child: const Text("확인"), onPressed: () => Navigator.pop(context, true)),
+                ],
+              );
+            },
+          );
+          if (dialogResult == true) {
+            StorageController.clearAll();
+            exit(0);
+          }
+        },
+      ),
     ]);
   }
 

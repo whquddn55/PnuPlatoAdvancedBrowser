@@ -49,7 +49,7 @@ abstract class BackgroundService {
 
       BackgroundServiceAction action = BackgroundServiceAction.values.byName(data["action"]);
       if (action == BackgroundServiceAction.update) {
-        TodoController.to.updateTodoList();
+        TodoController.to.loadTodoList();
       } else {
         _completerMap[data["hashCode"]]?.complete(data);
         _completerMap.remove(data["hashCode"]);

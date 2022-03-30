@@ -5,7 +5,6 @@ import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 
 class QuizTodo extends Todo {
   QuizTodo({
-    required int index,
     required String id,
     required String title,
     required String courseId,
@@ -16,7 +15,6 @@ class QuizTodo extends Todo {
     required bool userDefined,
     required bool checked,
   }) : super(
-          index: index,
           id: id,
           title: title,
           courseId: courseId,

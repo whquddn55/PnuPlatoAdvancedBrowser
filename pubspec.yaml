@@ -119,9 +119,6 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: DoHyeonRegular
-      fonts:
-        - asset: assets/fonts/DoHyeon-Regular.ttf
     - family: NaNumSquearRound
       fonts:
         - asset: assets/fonts/NanumSquareRoundB.ttf

@@ -30,7 +30,12 @@ class TodoController extends GetxController {
   }
 
   void initialize() {
-    updateTodoList();
+    loadTodoList();
+  }
+
+  void loadTodoList() {
+    _todoList = StorageController.loadTodoList();
+    update();
   }
 
   void storeTodoList() {
@@ -40,7 +45,7 @@ class TodoController extends GetxController {
 
   Future<void> fetchTodoListAll() async {
     await BackgroundService.sendData(BackgroundServiceAction.fetchTodoListAll);
-    updateTodoList();
+    loadTodoList();
   }
 
   Future<void> fetchTodoList(List<String> courseIdList) async {
@@ -52,12 +57,7 @@ class TodoController extends GetxController {
       data: {"courseIdList": courseIdList},
     );
     progress.value = false;
-    updateTodoList();
-  }
-
-  void updateTodoList() {
-    _todoList = StorageController.loadTodoList();
-    update();
+    loadTodoList();
   }
 
   Future<Map<int, List<Map<String, dynamic>>>> updateVodTodoStatus(final String courseId) async {
@@ -150,7 +150,6 @@ class TodoController extends GetxController {
           dueDate: target.dueDate ?? DateTime.now(),
           iconUrl: target.iconUrl,
           id: target.id,
-          index: target.index,
           statusIndex: target.status == TodoStatus.done ? TodoStatus.undone.index : TodoStatus.done.index,
           title: target.title,
           type: target.type,
@@ -159,6 +158,7 @@ class TodoController extends GetxController {
         ).transType();
         _todoList.insert(_todoList.indexOf(target), newTodo);
       } else {
+        StorageController.removeTodo(target);
         _todoList.remove(target);
       }
       storeTodoList();

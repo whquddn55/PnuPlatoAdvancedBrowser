@@ -18,7 +18,6 @@ class Todo {
   @Id(assignable: true)
   int dbId;
 
-  final int index;
   final String id;
   final String title;
   final String courseId;
@@ -32,7 +31,6 @@ class Todo {
   bool checked = false;
 
   Todo({
-    required this.index,
     required this.id,
     required this.title,
     required this.courseId,
@@ -56,7 +54,6 @@ class Todo {
             dueDate: dueDate,
             iconUrl: iconUrl,
             id: id,
-            index: index,
             status: status,
             title: title,
             userDefined: userDefined, checked:checked,);
@@ -67,7 +64,6 @@ class Todo {
             dueDate: dueDate,
             iconUrl: iconUrl,
             id: id,
-            index: index,
             status: status,
             title: title,
             userDefined: userDefined, checked:checked,);
@@ -78,7 +74,6 @@ class Todo {
             dueDate: dueDate,
             iconUrl: iconUrl,
             id: id,
-            index: index,
             status: status,
             title: title,
             userDefined: userDefined, checked:checked,);
@@ -89,7 +84,6 @@ class Todo {
             dueDate: dueDate,
             iconUrl: iconUrl,
             id: id,
-            index: index,
             status: status,
             title: title,
             userDefined: userDefined, checked:checked,);
@@ -100,7 +94,6 @@ class Todo {
             dueDate: dueDate,
             iconUrl: iconUrl,
             id: id,
-            index: index,
             status: status,
             title: title,
             userDefined: userDefined, checked:checked,);

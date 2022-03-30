@@ -36,11 +36,6 @@ final _entities = <ModelEntity>[
             type: 6,
             flags: 129),
         ModelProperty(
-            id: const IdUid(2, 7180789667227499195),
-            name: 'index',
-            type: 6,
-            flags: 0),
-        ModelProperty(
             id: const IdUid(3, 88563245766398739),
             name: 'id',
             type: 9,
@@ -328,7 +323,8 @@ ModelDefinition getObjectBoxModel() {
         6435263826418195440,
         3716490607939816256,
         1457919830521390142,
-        6447168916149222508
+        6447168916149222508,
+        7180789667227499195
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -352,7 +348,6 @@ ModelDefinition getObjectBoxModel() {
           final typeOffset = fbb.writeString(object.type);
           fbb.startTable(13);
           fbb.addInt64(0, object.dbId);
-          fbb.addInt64(1, object.index);
           fbb.addOffset(2, idOffset);
           fbb.addOffset(3, titleOffset);
           fbb.addOffset(4, courseIdOffset);
@@ -372,7 +367,6 @@ ModelDefinition getObjectBoxModel() {
           final dueDateValue =
               const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 14);
           final object = Todo(
-              index: const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0),
               id: const fb.StringReader(asciiOptimization: true)
                   .vTableGet(buffer, rootOffset, 8, ''),
               title: const fb.StringReader(asciiOptimization: true)
@@ -390,8 +384,8 @@ ModelDefinition getObjectBoxModel() {
                   .vTableGet(buffer, rootOffset, 20, ''),
               statusIndex:
                   const fb.Int64Reader().vTableGet(buffer, rootOffset, 22, 0),
-              userDefined: const fb.BoolReader()
-                  .vTableGet(buffer, rootOffset, 24, false),
+              userDefined:
+                  const fb.BoolReader().vTableGet(buffer, rootOffset, 24, false),
               checked: const fb.BoolReader().vTableGet(buffer, rootOffset, 26, false))
             ..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
@@ -632,42 +626,39 @@ class Todo_ {
   /// see [Todo.dbId]
   static final dbId = QueryIntegerProperty<Todo>(_entities[0].properties[0]);
 
-  /// see [Todo.index]
-  static final index = QueryIntegerProperty<Todo>(_entities[0].properties[1]);
-
   /// see [Todo.id]
-  static final id = QueryStringProperty<Todo>(_entities[0].properties[2]);
+  static final id = QueryStringProperty<Todo>(_entities[0].properties[1]);
 
   /// see [Todo.title]
-  static final title = QueryStringProperty<Todo>(_entities[0].properties[3]);
+  static final title = QueryStringProperty<Todo>(_entities[0].properties[2]);
 
   /// see [Todo.courseId]
-  static final courseId = QueryStringProperty<Todo>(_entities[0].properties[4]);
+  static final courseId = QueryStringProperty<Todo>(_entities[0].properties[3]);
 
   /// see [Todo.dueDate]
-  static final dueDate = QueryIntegerProperty<Todo>(_entities[0].properties[5]);
+  static final dueDate = QueryIntegerProperty<Todo>(_entities[0].properties[4]);
 
   /// see [Todo.availability]
   static final availability =
-      QueryBooleanProperty<Todo>(_entities[0].properties[6]);
+      QueryBooleanProperty<Todo>(_entities[0].properties[5]);
 
   /// see [Todo.iconUrl]
-  static final iconUrl = QueryStringProperty<Todo>(_entities[0].properties[7]);
+  static final iconUrl = QueryStringProperty<Todo>(_entities[0].properties[6]);
 
   /// see [Todo.type]
-  static final type = QueryStringProperty<Todo>(_entities[0].properties[8]);
+  static final type = QueryStringProperty<Todo>(_entities[0].properties[7]);
 
   /// see [Todo.statusIndex]
   static final statusIndex =
-      QueryIntegerProperty<Todo>(_entities[0].properties[9]);
+      QueryIntegerProperty<Todo>(_entities[0].properties[8]);
 
   /// see [Todo.userDefined]
   static final userDefined =
-      QueryBooleanProperty<Todo>(_entities[0].properties[10]);
+      QueryBooleanProperty<Todo>(_entities[0].properties[9]);
 
   /// see [Todo.checked]
   static final checked =
-      QueryBooleanProperty<Todo>(_entities[0].properties[11]);
+      QueryBooleanProperty<Todo>(_entities[0].properties[10]);
 }
 
 /// [Notification] entity fields to define ObjectBox queries.

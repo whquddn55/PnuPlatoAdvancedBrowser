@@ -26,31 +26,30 @@ abstract class BackgroundTodoController {
     if (courseIdList.isEmpty) return;
 
     final List<Todo> newTodoList = <Todo>[];
-    int index = 0;
     bool hasNull = false;
     for (var courseId in courseIdList) {
-      var temp = await _fetchVod(courseId, index);
+      var temp = await _fetchVod(courseId);
       if (temp == null) {
         hasNull = true;
         break;
       }
       newTodoList.addAll(temp);
 
-      temp = await _fetchAssign(courseId, index);
+      temp = await _fetchAssign(courseId);
       if (temp == null) {
         hasNull = true;
         break;
       }
       newTodoList.addAll(temp);
 
-      temp = await _fetchQuiz(courseId, index);
+      temp = await _fetchQuiz(courseId);
       if (temp == null) {
         hasNull = true;
         break;
       }
       newTodoList.addAll(temp);
 
-      temp = await _fetchZoom(courseId, index);
+      temp = await _fetchZoom(courseId);
       if (temp == null) {
         hasNull = true;
         break;
@@ -95,7 +94,7 @@ abstract class BackgroundTodoController {
     }
   }
 
-  static Future<List<Todo>?> _fetchVod(final String courseId, int index) async {
+  static Future<List<Todo>?> _fetchVod(final String courseId) async {
     final List<Map<String, dynamic>> vodStatusList = await _fetchVodStatusList(courseId);
     if (vodStatusList.isEmpty) {
       return [];
@@ -143,7 +142,6 @@ abstract class BackgroundTodoController {
       final bool availablility = activity.getElementsByTagName('a').isNotEmpty;
 
       todoList.add(VodTodo(
-        index: index,
         availability: availablility,
         courseId: courseId,
         dueDate: dueDate[1]!,
@@ -158,7 +156,7 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>?> _fetchAssign(final String courseId, int index) async {
+  static Future<List<Todo>?> _fetchAssign(final String courseId) async {
     var response = await requestGet(CommonUrl.courseAssignUrl + courseId, isFront: false);
 
     if (response == null) {
@@ -183,7 +181,6 @@ abstract class BackgroundTodoController {
         }
 
         todoList.add(AssignTodo(
-          index: index,
           availability: true,
           courseId: courseId,
           dueDate: dueDate,
@@ -199,7 +196,7 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>?> _fetchQuiz(final String courseId, int index) async {
+  static Future<List<Todo>?> _fetchQuiz(final String courseId) async {
     var response = await requestGet(CommonUrl.courseQuizUrl + courseId, isFront: false);
 
     if (response == null) {
@@ -227,7 +224,6 @@ abstract class BackgroundTodoController {
         }
 
         todoList.add(QuizTodo(
-          index: index,
           availability: true,
           courseId: courseId,
           dueDate: dueDate,
@@ -243,7 +239,7 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>?> _fetchZoom(final String courseId, int index) async {
+  static Future<List<Todo>?> _fetchZoom(final String courseId) async {
     var response = await requestGet(CommonUrl.courseZoomUrl + courseId, isFront: false);
 
     if (response == null) {
@@ -272,7 +268,6 @@ abstract class BackgroundTodoController {
         }
 
         todoList.add(ZoomTodo(
-          index: index,
           availability: true,
           courseId: courseId,
           dueDate: dueDate,

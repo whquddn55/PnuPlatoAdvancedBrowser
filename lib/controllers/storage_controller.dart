@@ -50,6 +50,17 @@ abstract class StorageController {
     }
   }
 
+  static Future<void> clearAll() async {
+    _store.box<UserData>().removeAll();
+    _store.box<DBOrder>().removeAll();
+    _store.box<AppSetting>().removeAll();
+    _store.box<Course>().removeAll();
+    _store.box<Todo>().removeAll();
+    _store.box<Notification>().removeAll();
+    _store.box<LoginInformation>().removeAll();
+    _store.close();
+  }
+
   static Future<String> getDownloadDirectory() async {
     return (await getApplicationDocumentsDirectory()).path + '/downloads';
   }
@@ -70,16 +81,25 @@ abstract class StorageController {
     res.sort((a, b) {
       if (a.dueDate == b.dueDate) {
         if (a.courseId == b.courseId) {
-          if (a.index == b.index) {
-            return (a.userDefined ? 1 : 0) - (b.userDefined ? 1 : 0);
+          if (a.type == b.type) {
+            final int aId = int.parse(a.id);
+            final int bId = int.parse(b.id);
+            if (aId == bId) {
+              return (a.userDefined ? 1 : 0) - (b.userDefined ? 1 : 0);
+            }
+            return aId.compareTo(bId);
           }
-          return a.index - b.index;
+          return a.type.compareTo(b.type);
         }
-        return int.parse(a.courseId) - int.parse(b.courseId);
+        return int.parse(a.courseId).compareTo(int.parse(b.courseId));
       }
       return (a.dueDate ?? DateTime(0)).compareTo(b.dueDate ?? DateTime(0));
     });
     return res;
+  }
+
+  static void removeTodo(final Todo todo) {
+    _store.box<Todo>().remove(todo.dbId);
   }
 
   static void storeTodoList(final List<Todo> todoList) {
