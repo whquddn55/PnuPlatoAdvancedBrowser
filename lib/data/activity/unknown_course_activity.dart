@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/course_activity.dart';
+import 'package:pnu_plato_advanced_browser/inappwebview_wrapper.dart';
 
 class UnknownCourseActivity extends CourseActivity {
   final String? url;
@@ -41,13 +42,12 @@ class UnknownCourseActivity extends CourseActivity {
   @override
   Future<void> open(final BuildContext context) async {
     if (url == null) return;
-
     await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text("저 힘들어요..."),
-          content: const Text("아직 구현되지 않았어요. 버그리포트를 통해서 알려주세요.\n브라우저로 이동시켜드릴게요."),
+          content: const Text("퀴즈, 설문조사, 토론은 아직 구현되지 않았어요."),
           actions: [
             TextButton(
               child: const Text("확인"),
@@ -57,6 +57,21 @@ class UnknownCourseActivity extends CourseActivity {
         );
       },
     );
-    await ChromeSafariBrowser().open(url: Uri.parse(url!));
+    Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute(
+        builder: (context) => InappwebviewWrapper(
+          title,
+          url!,
+          (controller, uri) async {
+            await controller.evaluateJavascript(source: '''
+            document.getElementById('page-header').remove();
+            document.getElementsByClassName('page-content-navigation')[0].remove(); 
+            document.body.style.margin = '0px';
+            document.body.style.padding = '0px';
+            ''');
+          },
+        ),
+      ),
+    );
   }
 }

@@ -3,6 +3,7 @@ import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_spec_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_article.dart';
+import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/articlePage/article_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/boradPage/boardWritePage/board_write_page.dart';
@@ -30,6 +31,7 @@ class _BoardPageState extends State<BoardPage> {
       future: CourseSpecController.getBoardInfo(widget.boardId, page),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.data == null) return const ErrorPage(msg: "게시판 정보를 가져오는데 실패했어요.");
           Map<String, dynamic> data = snapshot.data as Map<String, dynamic>;
           return Scaffold(
             appBar: AppBarWrapper(

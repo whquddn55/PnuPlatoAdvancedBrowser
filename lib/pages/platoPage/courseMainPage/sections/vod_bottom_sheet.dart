@@ -121,8 +121,8 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
                   primary: Get.textTheme.bodyText1!.color,
                 ),
                 onPressed: () async {
+                  widget.activity.download();
                   Navigator.pop(context);
-                  await widget.activity.download();
                 },
               ),
               TextButton.icon(

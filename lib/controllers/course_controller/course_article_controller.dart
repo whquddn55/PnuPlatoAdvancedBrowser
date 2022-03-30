@@ -42,52 +42,60 @@ abstract class CourseArticleController {
     var response = await requestGet(CommonUrl.courseArticleUrl + 'id=${article.boardId}&bwid=${article.id}',
         isFront: true, options: Options(validateStatus: (status) => status == 200 || status == 303, followRedirects: false));
     if (response == null || response.statusCode == 303) {
-      ExceptionController.onExpcetion("response is null on fetchCourseArticle");
+      ExceptionController.onExpcetion("response is null on fetchCourseArticle", true);
+      return null;
+    }
+    if (response.requestOptions.path == "null") {
       return null;
     }
 
-    Document document = parse(response.data);
-    final String boardTitle = document.getElementsByClassName('main')[0].text.trim();
-    final String title = document.getElementsByClassName('subject')[0].text.trim();
-    final String writer = document.getElementsByClassName('writer')[0].text.trim();
-    final String date = document.getElementsByClassName('date')[0].text.trim();
-    final String content = document.getElementsByClassName('text_to_html')[0].innerHtml;
-    List<CourseFile>? fileList;
-    if (document.getElementsByClassName('files').length >= 2) {
-      fileList = document.getElementsByClassName('files')[1].children.map((li) {
-        var img = li.getElementsByTagName('img')[0];
-        var a = li.getElementsByTagName('a')[0];
-        return CourseFile(imgUrl: img.attributes['src']!, url: a.attributes['href']!, title: a.text.trim());
-      }).toList();
-    }
-    final bool commentable = document.getElementsByClassName('ubboard_comment').isNotEmpty;
-    final bool editable = document.getElementsByClassName('modify').isNotEmpty;
-    final bool deletable = document.getElementsByClassName('delete').isNotEmpty;
-    final ArticleCommentMetaData commentMetaData = CourseArticleCommentController.getArticleCommentMetaData(document);
+    try {
+      Document document = parse(response.data);
+      final String boardTitle = document.getElementsByClassName('main')[0].text.trim();
+      final String title = document.getElementsByClassName('subject')[0].text.trim();
+      final String writer = document.getElementsByClassName('writer')[0].text.trim();
+      final String date = document.getElementsByClassName('date')[0].text.trim();
+      final String content = document.getElementsByClassName('text_to_html')[0].innerHtml;
+      List<CourseFile>? fileList;
+      if (document.getElementsByClassName('files').length >= 2) {
+        fileList = document.getElementsByClassName('files')[1].children.map((li) {
+          var img = li.getElementsByTagName('img')[0];
+          var a = li.getElementsByTagName('a')[0];
+          return CourseFile(imgUrl: img.attributes['src']!, url: a.attributes['href']!, title: a.text.trim());
+        }).toList();
+      }
+      final bool commentable = document.getElementsByClassName('ubboard_comment').isNotEmpty;
+      final bool editable = document.getElementsByClassName('modify').isNotEmpty;
+      final bool deletable = document.getElementsByClassName('delete').isNotEmpty;
+      final ArticleCommentMetaData commentMetaData = CourseArticleCommentController.getArticleCommentMetaData(document);
 
-    List<ArticleComment>? commentList;
-    if (document.getElementsByClassName('comment_list').isNotEmpty) {
-      commentList = CourseArticleCommentController.getArticleCommentList(document);
+      List<ArticleComment>? commentList;
+      if (document.getElementsByClassName('comment_list').isNotEmpty) {
+        commentList = CourseArticleCommentController.getArticleCommentList(document);
+      }
+      return CourseArticle(
+        boardTitle: boardTitle,
+        title: title,
+        writer: writer,
+        date: date,
+        content: content,
+        fileList: fileList,
+        commentable: commentable,
+        editable: editable,
+        deletable: deletable,
+        commentMetaData: commentMetaData,
+        commentList: commentList,
+      );
+    } catch (e, stacktrace) {
+      ExceptionController.onExpcetion(e.toString() + "\n" + stacktrace.toString(), true);
     }
-    return CourseArticle(
-      boardTitle: boardTitle,
-      title: title,
-      writer: writer,
-      date: date,
-      content: content,
-      fileList: fileList,
-      commentable: commentable,
-      editable: editable,
-      deletable: deletable,
-      commentMetaData: commentMetaData,
-      commentList: commentList,
-    );
+    return null;
   }
 
   static Future<bool> deleteCourseArticle(final CourseArticleMetaData metaData) async {
     var res = await requestGet(CommonUrl.courseBoardActionUrl + "?id=" + metaData.boardId + "&bwid=" + metaData.id + "&type=delete", isFront: true);
 
-    if (res == null) {
+    if (res == null || res.requestOptions.path == "null") {
       return false;
     }
     return true;

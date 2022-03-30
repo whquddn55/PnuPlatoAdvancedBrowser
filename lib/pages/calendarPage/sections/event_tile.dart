@@ -87,7 +87,7 @@ class __RemainTextState extends State<_RemainText> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.todoStatus == TodoStatus.doing) const Text("진행중!", style: TextStyle(color: Colors.red));
+    if (widget.todoStatus.name == TodoStatus.doing.name) return const Text("진행중!", style: TextStyle(fontSize: 10, color: Colors.red));
     if (widget.dueDate == null) return const Text("알 수 없음", style: TextStyle(fontSize: 10, color: Colors.black));
     Duration remainTime = widget.dueDate!.difference(DateTime.now());
     if (remainTime.isNegative) return const SizedBox.shrink();

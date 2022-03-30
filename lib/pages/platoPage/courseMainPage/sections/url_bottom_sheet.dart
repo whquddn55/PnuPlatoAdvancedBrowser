@@ -63,8 +63,8 @@ class UrlBottomSheet extends StatelessWidget {
                   primary: Get.textTheme.bodyText1!.color,
                 ),
                 onPressed: () async {
-                  Navigator.pop(context);
                   await activity.open(context);
+                  Navigator.pop(context);
                 },
               ),
               TextButton.icon(

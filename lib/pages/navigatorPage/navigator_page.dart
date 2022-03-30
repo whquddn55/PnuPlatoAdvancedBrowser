@@ -8,6 +8,7 @@ import 'package:pnu_plato_advanced_browser/controllers/notification_controller.d
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/timer_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
+import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/sections/navigator_body.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service.dart';
@@ -39,9 +40,12 @@ class NavigatorPage extends StatelessWidget {
         if (snapshot.connectionState != ConnectionState.done) {
           return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '로그인 중...'));
         }
+        if (snapshot.data == null) {
+          return const ErrorPage(msg: "와이파이나 데이터 연결을 확인해주세요.");
+        }
         return GetBuilder<LoginController>(
           builder: (contoller) {
-            if (LoginController.to.loginInformation.loginStatus != true) {
+            if (LoginController.to.loginInformation.loginStatus == false) {
               return const NavigatorBody();
             }
 

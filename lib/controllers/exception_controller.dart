@@ -4,43 +4,50 @@ import 'package:get/get.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 
 abstract class ExceptionController {
-  static Future<void> onExpcetion(final String body) async {
-    final subject = "PPAB Report: Front ${LoginController.to.loginInformation.studentId}";
-    final progressContext = await showProgressDialog(Get.key.currentContext!, "");
-    bool sendResult = await sendMail(subject, body);
-    closeProgressDialog(progressContext);
-    await Get.dialog(
-      AlertDialog(
-        title: const Text("에러"),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text("에러가 발생했어요!${sendResult == true ? "\n개발자에게 관련 내용을 보냈습니다." : ""}"),
-              ExpandedTile(
-                title: const Text("내용 확인하기"),
-                content: Text(subject + "\n" + body, style: const TextStyle(fontSize: 8)),
-                controller: ExpandedTileController(),
-              ),
-            ],
+  static Future<void> onExpcetion(final String body, bool isFront) async {
+    final subject = isFront
+        ? "PPAB Report: Front ${StorageController.loadLoginInformation()?.studentId ?? ""}"
+        : "PPAB Report: Back ${StorageController.loadLoginInformation()?.studentId ?? ""}";
+    printLog(body);
+    if (isFront == false) {
+      await _sendMail(subject, body);
+    } else {
+      final progressContext = await showProgressDialog(Get.key.currentContext!, "");
+      bool sendResult = await _sendMail(subject, body);
+      closeProgressDialog(progressContext);
+      await Get.dialog(
+        AlertDialog(
+          title: const Text("에러"),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("에러가 발생했어요!${sendResult == true ? "\n개발자에게 관련 내용을 보냈습니다." : ""}"),
+                ExpandedTile(
+                  title: const Text("내용 확인하기"),
+                  content: Text(subject + "\n" + body, style: const TextStyle(fontSize: 8)),
+                  controller: ExpandedTileController(),
+                ),
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              child: const Text("확인"),
+              onPressed: () => Get.back(),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            child: const Text("확인"),
-            onPressed: () => Get.back(),
-          ),
-        ],
-      ),
-      barrierDismissible: false,
-      navigatorKey: Get.key,
-    );
+        barrierDismissible: false,
+        navigatorKey: Get.key,
+      );
+    }
   }
 
-  static Future<bool> sendMail(final String subject, final String body) async {
+  static Future<bool> _sendMail(final String subject, final String body) async {
     try {
       final smtpServer = SmtpServer("smtp.gmail.com", username: "ppab.thuthi@gmail.com", password: "bzfhkpwuyvgellgz");
       final message = Message()
@@ -49,7 +56,7 @@ abstract class ExceptionController {
         ..subject = subject
         ..text = body;
       await send(message, smtpServer);
-    } on MailerException catch (_) {
+    } on Exception catch (_) {
       return false;
     }
     return true;

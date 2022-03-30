@@ -34,7 +34,7 @@ class _ArticlePageState extends State<ArticlePage> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data == null) {
-            return const ErrorPage(msg: "교수님이 게시글을 삭제하신거 같아요...");
+            return const ErrorPage(msg: "게시글 정보를 가져오는데 실패했어요.");
           }
           CourseArticle article = snapshot.data as CourseArticle;
           return Scaffold(
@@ -81,8 +81,9 @@ class _ArticlePageState extends State<ArticlePage> {
                     ),
                     if (article.fileList != null) ArticleFileList(article.fileList!, widget.courseTitle, widget.courseId),
                     Divider(height: 0, thickness: 1, color: Colors.grey[700]),
+                    const SizedBox(height: 14),
                     renderHtml(article.content),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 14),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [

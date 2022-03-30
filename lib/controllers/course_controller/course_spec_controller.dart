@@ -13,76 +13,84 @@ abstract class CourseSpecController {
   static Future<CourseSpec?> fetchCourseSpecification(final String courseId, final String courseTitle) async {
     var response = await requestGet(CommonUrl.courseMainUrl + courseId, isFront: true);
     if (response == null) {
-      ExceptionController.onExpcetion("response is null on fetchCourseSpecification");
+      ExceptionController.onExpcetion("response is null on fetchCourseSpecification", true);
       return null;
     }
-    Document document = parse(response.data);
-
-    /* 강의 개요(summary) 가져오기 */
-    final Map<String, String> summaryMap = {};
-    for (var item in [
-      ...document.getElementById('section-0')!.getElementsByClassName('summary'),
-      ...document.getElementById('course-all-sections')!.getElementsByClassName('summary'),
-    ]) {
-      final String weeks = _getWeeks(item);
-      summaryMap[weeks] = item.innerHtml;
+    if (response.requestOptions.path == "null") {
+      return null;
     }
 
-    /* Activity 가져오기 */
-    final Map<String, List<CourseActivity>> activityMap = {};
-    for (var activity in [
-      ...document.getElementById('section-0')!.getElementsByClassName('activity'),
-      ...document.getElementById('course-all-sections')!.getElementsByClassName('activity'),
-    ]) {
-      final String weeks = _getWeeks(activity);
-
-      final String id = _getId(activity);
-      final String type = _getType(activity);
-      final String description = _getDescription(activity);
-      final String title = _getTitle(activity);
-      final String info = _getInfo(activity, type);
-      final List<DateTime?> dueDate = _getDueTime(activity);
-      final String? iconUrl = _getIconUrl(activity);
-      final String availablilityInfo =
-          activity.getElementsByClassName('availabilityinfo').isEmpty ? '' : activity.getElementsByClassName('availabilityinfo')[0].innerHtml;
-      final bool availablility = activity.getElementsByTagName('a').isNotEmpty;
-      final String? url = availablility ? activity.getElementsByTagName('a')[0].attributes['href'] : null;
-      var newActivity = CourseActivity.fromType(
-        type: type,
-        title: title.trim(),
-        id: id,
-        courseId: courseId,
-        courseTitle: courseTitle,
-        description: description.trim(),
-        info: info.trim(),
-        startDate: dueDate[0],
-        endDate: dueDate[1],
-        lateDate: dueDate[2],
-        iconUrl: iconUrl,
-        availablilityInfo: availablilityInfo,
-        availablility: availablility,
-        url: url,
-      );
-
-      if (activityMap[weeks] == null) {
-        activityMap[weeks] = <CourseActivity>[];
+    try {
+      Document document = parse(response.data);
+      /* 강의 개요(summary) 가져오기 */
+      final Map<String, String> summaryMap = {};
+      for (var item in [
+        ...document.getElementById('section-0')!.getElementsByClassName('summary'),
+        ...document.getElementById('course-all-sections')!.getElementsByClassName('summary'),
+      ]) {
+        final String weeks = _getWeeks(item);
+        summaryMap[weeks] = item.innerHtml;
       }
 
-      activityMap[weeks]!.add(newActivity);
-    }
+      /* Activity 가져오기 */
+      final Map<String, List<CourseActivity>> activityMap = {};
+      for (var activity in [
+        ...document.getElementById('section-0')!.getElementsByClassName('activity'),
+        ...document.getElementById('course-all-sections')!.getElementsByClassName('activity'),
+      ]) {
+        final String weeks = _getWeeks(activity);
 
-    return CourseSpec(
-      professor: _getProfessorInfo(document),
-      assistantList: _getAssistantInfoList(document),
-      articleList: _getArticleList(document),
-      koreanPlanUri: _getKoreanPlanUri(document),
-      englishPlanUri: _getEnglishPlanUri(document),
-      currentWeek: document.getElementsByClassName('course-box-current').isEmpty
-          ? null
-          : document.getElementsByClassName('course-box-current')[0].getElementsByClassName('sectionname')[0].text,
-      activityMap: activityMap,
-      summaryMap: summaryMap,
-    );
+        final String id = _getId(activity);
+        final String type = _getType(activity);
+        final String description = _getDescription(activity);
+        final String title = _getTitle(activity);
+        final String info = _getInfo(activity, type);
+        final List<DateTime?> dueDate = _getDueTime(activity);
+        final String? iconUrl = _getIconUrl(activity);
+        final String availablilityInfo =
+            activity.getElementsByClassName('availabilityinfo').isEmpty ? '' : activity.getElementsByClassName('availabilityinfo')[0].innerHtml;
+        final bool availablility = activity.getElementsByTagName('a').isNotEmpty;
+        final String? url = availablility ? activity.getElementsByTagName('a')[0].attributes['href'] : null;
+        var newActivity = CourseActivity.fromType(
+          type: type,
+          title: title.trim(),
+          id: id,
+          courseId: courseId,
+          courseTitle: courseTitle,
+          description: description.trim(),
+          info: info.trim(),
+          startDate: dueDate[0],
+          endDate: dueDate[1],
+          lateDate: dueDate[2],
+          iconUrl: iconUrl,
+          availablilityInfo: availablilityInfo,
+          availablility: availablility,
+          url: url,
+        );
+
+        if (activityMap[weeks] == null) {
+          activityMap[weeks] = <CourseActivity>[];
+        }
+
+        activityMap[weeks]!.add(newActivity);
+      }
+
+      return CourseSpec(
+        professor: _getProfessorInfo(document),
+        assistantList: _getAssistantInfoList(document),
+        articleList: _getArticleList(document),
+        koreanPlanUri: _getKoreanPlanUri(document),
+        englishPlanUri: _getEnglishPlanUri(document),
+        currentWeek: document.getElementsByClassName('course-box-current').isEmpty
+            ? null
+            : document.getElementsByClassName('course-box-current')[0].getElementsByClassName('sectionname')[0].text,
+        activityMap: activityMap,
+        summaryMap: summaryMap,
+      );
+    } catch (e, stacktrace) {
+      ExceptionController.onExpcetion(e.toString() + "\n" + stacktrace.toString(), true);
+    }
+    return null;
   }
 
   // static List<CourseActivity> getBoardList(final String courseId) {
@@ -99,7 +107,7 @@ abstract class CourseSpecController {
   //   return res;
   // }
 
-  static Future<Map<String, dynamic>> getBoardInfo(final String boardId, final int page) async {
+  static Future<Map<String, dynamic>?> getBoardInfo(final String boardId, final int page) async {
     /*
       title: 게시판 이름
       content: 게시판 설명
@@ -110,36 +118,56 @@ abstract class CourseSpecController {
     var response = await requestGet(CommonUrl.courseBoardUrl + '$boardId&page=$page', isFront: true);
 
     if (response == null) {
-      ExceptionController.onExpcetion("response is null on getBoardInfo");
-      return {};
+      ExceptionController.onExpcetion("response is null on getBoardInfo", true);
+      return null;
+    }
+    if (response.requestOptions.path == "null") {
+      return null;
     }
     Map<String, dynamic> res = <String, dynamic>{};
-    Document document = parse(response.data);
+    try {
+      Document document = parse(response.data);
 
-    res['title'] = document.getElementsByClassName('main')[0].text.trim();
-    res['content'] = document.getElementsByClassName('box generalbox').isEmpty ? '' : document.getElementsByClassName('box generalbox')[0].innerHtml;
-    if (document.getElementsByClassName('tp').isEmpty) {
-      res['pageLength'] = 1;
-    } else {
-      res['pageLength'] = int.parse(document.getElementsByClassName('tp')[0].text.split('/')[1].trim());
+      res['title'] = document.getElementsByClassName('main')[0].text.trim();
+      res['content'] =
+          document.getElementsByClassName('box generalbox').isEmpty ? '' : document.getElementsByClassName('box generalbox')[0].innerHtml;
+      if (document.getElementsByClassName('tp').isEmpty) {
+        res['pageLength'] = 1;
+      } else {
+        res['pageLength'] = int.parse(document.getElementsByClassName('tp')[0].text.split('/')[1].trim());
+      }
+      res['articleList'] = CourseArticleController.fetchCourseArticleMetaDataList(document, boardId);
+
+      if (document.getElementsByClassName('pull-right').length == 1) {
+        res["writable"] = true;
+      } else {
+        res["writable"] = false;
+      }
+
+      return res;
+    } catch (e, stacktrace) {
+      ExceptionController.onExpcetion(e.toString() + "\n" + stacktrace.toString(), true);
     }
-    res['articleList'] = CourseArticleController.fetchCourseArticleMetaDataList(document, boardId);
-
-    if (document.getElementsByClassName('pull-right').length == 1) {
-      res["writable"] = true;
-    } else {
-      res["writable"] = false;
-    }
-
-    return res;
+    return null;
   }
 
   static Future<bool> checkAutoAbsence(final String courseId) async {
     var response = await requestGet(CommonUrl.courseAutoAbsenceUrl + courseId, isFront: true);
-    if (response == null) return false;
+    if (response == null) {
+      ExceptionController.onExpcetion("response is null on checkAutoAbsence", true);
+      return false;
+    }
+    if (response.requestOptions.path == "null") {
+      return false;
+    }
 
-    Document document = Document.html(response.data);
-    return document.getElementsByTagName('form').isNotEmpty;
+    try {
+      Document document = Document.html(response.data);
+      return document.getElementsByTagName('form').isNotEmpty;
+    } catch (e, stacktrace) {
+      ExceptionController.onExpcetion(e.toString() + "\n" + stacktrace.toString(), true);
+    }
+    return false;
   }
 
   static List<DateTime?> _getDueTime(Element activity) {

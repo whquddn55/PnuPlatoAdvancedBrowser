@@ -31,7 +31,8 @@ class ArticleNotification extends noti.Notification {
       );
       return;
     }
-    Navigator.push(context, MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: url.split('bwid=')[1])));
+    Navigator.of(context, rootNavigator: true)
+        .push(MaterialPageRoute(builder: (context) => CourseMainPage(course: course, targetActivityId: url.split('bwid=')[1])));
   }
 
   @override

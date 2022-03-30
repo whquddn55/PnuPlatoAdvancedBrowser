@@ -6,7 +6,6 @@ import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/zoom_course_activity.dart';
 import 'package:pnu_plato_advanced_browser/data/course_zoom.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
-import 'package:pnu_plato_advanced_browser/pages/error_page.dart';
 
 class ZoomBottomSheet extends StatefulWidget {
   final String courseTitle;
@@ -21,7 +20,7 @@ class ZoomBottomSheet extends StatefulWidget {
 class _ZoomBottomSheetState extends State<ZoomBottomSheet> {
   Widget _renderZoomInfo(final AsyncSnapshot<CourseZoom?> snapshot) {
     if (snapshot.connectionState != ConnectionState.done) return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
-    if (snapshot.data == null) return errorWidget();
+    if (snapshot.data == null) return const SizedBox.shrink();
 
     final CourseZoom courseZoom = snapshot.data!;
     Color textColor = Colors.red;
@@ -57,7 +56,7 @@ class _ZoomBottomSheetState extends State<ZoomBottomSheet> {
 
   Widget _renderOpenButton(final BuildContext context, final AsyncSnapshot<CourseZoom?> snapshot) {
     if (snapshot.connectionState != ConnectionState.done) return const SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
-    if (snapshot.data == null) return errorWidget();
+    if (snapshot.data == null) return const SizedBox.shrink();
 
     final CourseZoom courseZoom = snapshot.data!;
 

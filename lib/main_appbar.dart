@@ -24,7 +24,7 @@ class MainAppbar extends AppBarWrapper {
               return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                 stream: FirebaseFirestore.instance.collection("users").doc(userDataController.loginInformation.studentId.toString()).snapshots(),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState != ConnectionState.active) {
+                  if (snapshot.connectionState != ConnectionState.active || snapshot.data == null) {
                     return IconButton(icon: const Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer());
                   }
                   int unread = snapshot.data!["unread"] + controller.unreadCount();

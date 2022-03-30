@@ -27,17 +27,43 @@ abstract class BackgroundTodoController {
 
     final List<Todo> newTodoList = <Todo>[];
     int index = 0;
+    bool hasNull = false;
     for (var courseId in courseIdList) {
-      newTodoList.addAll(await _fetchVod(courseId, index));
-      newTodoList.addAll(await _fetchAssign(courseId, index));
-      newTodoList.addAll(await _fetchQuiz(courseId, index));
-      newTodoList.addAll(await _fetchZoom(courseId, index));
+      var temp = await _fetchVod(courseId, index);
+      if (temp == null) {
+        hasNull = true;
+        break;
+      }
+      newTodoList.addAll(temp);
+
+      temp = await _fetchAssign(courseId, index);
+      if (temp == null) {
+        hasNull = true;
+        break;
+      }
+      newTodoList.addAll(temp);
+
+      temp = await _fetchQuiz(courseId, index);
+      if (temp == null) {
+        hasNull = true;
+        break;
+      }
+      newTodoList.addAll(temp);
+
+      temp = await _fetchZoom(courseId, index);
+      if (temp == null) {
+        hasNull = true;
+        break;
+      }
+      newTodoList.addAll(temp);
     }
 
-    var todoList = StorageController.loadTodoList();
+    if (hasNull == false) {
+      var todoList = StorageController.loadTodoList();
 
-    _updateTodoList(todoList, newTodoList);
-    StorageController.storeTodoList(todoList);
+      _updateTodoList(todoList, newTodoList);
+      StorageController.storeTodoList(todoList);
+    }
 
     /* unlock */
     _unlockCourseId(courseIdList);
@@ -69,7 +95,7 @@ abstract class BackgroundTodoController {
     }
   }
 
-  static Future<List<Todo>> _fetchVod(final String courseId, int index) async {
+  static Future<List<Todo>?> _fetchVod(final String courseId, int index) async {
     final List<Map<String, dynamic>> vodStatusList = await _fetchVodStatusList(courseId);
     if (vodStatusList.isEmpty) {
       return [];
@@ -78,6 +104,9 @@ abstract class BackgroundTodoController {
     var response = await requestGet(CommonUrl.courseMainUrl + courseId, isFront: false);
     if (response == null) {
       throw Exception("response is null on _fetchVod");
+    }
+    if (response.requestOptions.path == "null") {
+      return null;
     }
 
     final List<Todo> todoList = <Todo>[];
@@ -129,11 +158,14 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>> _fetchAssign(final String courseId, int index) async {
+  static Future<List<Todo>?> _fetchAssign(final String courseId, int index) async {
     var response = await requestGet(CommonUrl.courseAssignUrl + courseId, isFront: false);
 
     if (response == null) {
       throw Exception("response is null on _fetchAssign");
+    }
+    if (response.requestOptions.path == "null") {
+      return null;
     }
 
     final List<Todo> todoList = <Todo>[];
@@ -167,11 +199,14 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>> _fetchQuiz(final String courseId, int index) async {
+  static Future<List<Todo>?> _fetchQuiz(final String courseId, int index) async {
     var response = await requestGet(CommonUrl.courseQuizUrl + courseId, isFront: false);
 
     if (response == null) {
       throw Exception("response is null on _fetchQuiz");
+    }
+    if (response.requestOptions.path == "null") {
+      return null;
     }
 
     final List<Todo> todoList = <Todo>[];
@@ -208,12 +243,16 @@ abstract class BackgroundTodoController {
     return todoList;
   }
 
-  static Future<List<Todo>> _fetchZoom(final String courseId, int index) async {
+  static Future<List<Todo>?> _fetchZoom(final String courseId, int index) async {
     var response = await requestGet(CommonUrl.courseZoomUrl + courseId, isFront: false);
 
     if (response == null) {
       throw Exception("response is null on _fetchZoom");
     }
+    if (response.requestOptions.path == "null") {
+      return null;
+    }
+
     final List<Todo> todoList = <Todo>[];
     html.Document document = parse(response.data);
     for (var tr in document.getElementsByTagName('tr')) {
@@ -224,7 +263,7 @@ abstract class BackgroundTodoController {
         TodoStatus todoStatus = _getZoomTodoStatus(tr);
 
         if (dueDate == null) {
-          var zoom = await CourseZoomController.fetchCourseZoom(id);
+          var zoom = await CourseZoomController.fetchCourseZoom(id, false);
           dueDate = zoom!.startTime;
         }
 

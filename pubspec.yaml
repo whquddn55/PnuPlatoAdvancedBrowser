@@ -51,7 +51,7 @@ dependencies:
   path_provider: ^2.0.8
   permission_handler: ^9.2.0
   badges: ^2.0.2
-  flutter_svg: ^0.23.0+1
+  flutter_svg: ^1.0.3
   restart_app: ^1.1.0
   flutter_background_service: ^1.0.4
   url_launcher: ^6.0.20
@@ -65,6 +65,7 @@ dependencies:
   objectbox_flutter_libs: ^1.4.1
   watcher: ^1.0.1
   mailer: ^5.1.0
+  introduction_screen:
   better_player:
     git:
       url: https://github.com/shiyiya/betterplayer

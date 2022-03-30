@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
@@ -128,11 +127,8 @@ void _onStart() async {
       }
     } catch (e, stacktrace) {
       BackgroundTodoController.refreshLock.clear();
-      var mailresult = await ExceptionController.sendMail(
-        "PPAB Report: Back ${BackgroundLoginController.loginInformation.studentId}}",
-        e.toString() + "\n" + stacktrace.toString(),
-      );
-      res.addAll({"error": e.toString(), "stacktrace": stacktrace.toString(), "sended": mailresult});
+      await ExceptionController.onExpcetion(stacktrace.toString(), false);
+      res.addAll({"error": e.toString(), "stacktrace": stacktrace.toString()});
     }
 
     printLog("send service: ${res["data"].toString()}");
@@ -163,15 +159,12 @@ Future<void> timerBody(final FlutterBackgroundService service) async {
     service.sendData(res);
   } catch (e, stacktrace) {
     BackgroundTodoController.refreshLock.clear();
-    await ExceptionController.sendMail(
-      "PPAB Report: Back ${BackgroundLoginController.loginInformation.studentId}}",
-      e.toString() + "\n" + stacktrace.toString(),
-    );
+    await ExceptionController.onExpcetion(stacktrace.toString(), false);
   }
 
-  var document = await StorageController.getDownloadDirectory();
+  // var document = await StorageController.getDownloadDirectory();
 
-  await File(
-          '$document/${DateFormat("MM-dd_HH:mm").format(StorageController.loadLastNotiSyncTime())} ${DateFormat("MM-dd_HH:mm").format(StorageController.loadLastTodoSyncTime())}')
-      .writeAsString('0', mode: FileMode.append);
+  // await File(
+  //         '$document/${DateFormat("MM-dd_HH:mm").format(StorageController.loadLastNotiSyncTime())} ${DateFormat("MM-dd_HH:mm").format(StorageController.loadLastTodoSyncTime())}')
+  //     .writeAsString('0', mode: FileMode.append);
 }

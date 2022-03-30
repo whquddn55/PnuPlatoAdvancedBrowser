@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/notification/notification.dart';
@@ -31,6 +32,10 @@ abstract class BackgroundNotificationController {
       var response = await requestGet(CommonUrl.notificationUrl + page.toString(), isFront: false, retry: 3);
 
       if (response == null) {
+        ExceptionController.onExpcetion("response is null on _fetchNewNotificationList", true);
+        return [];
+      }
+      if (response.requestOptions.path == "null") {
         return [];
       }
 

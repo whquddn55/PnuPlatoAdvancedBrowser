@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/login_information.dart';
 
@@ -22,9 +23,18 @@ abstract class BackgroundLoginController {
     );
     options.headers!["Cookie"] = loginInformation.moodleSessionKey;
 
-    var response = await dio.Dio().post("https://plato.pusan.ac.kr/lib/ajax/service.php?info=core_fetch_notifications", data: body, options: options);
-    printLog("checkLogin on back : ${response.data != null && response.data[0]["error"] == false}");
-    return response.data != null && response.data[0]["error"] == false;
+    try {
+      var response =
+          await dio.Dio().post("https://plato.pusan.ac.kr/lib/ajax/service.php?info=core_fetch_notifications", data: body, options: options);
+
+      printLog("checkLogin on back : ${response.data != null && response.data[0]["error"] == false}");
+      return response.data != null && response.data[0]["error"] == false;
+    } on dio.DioError catch (e, stacktrace) {
+      if (e.type != dio.DioErrorType.other) {
+        await ExceptionController.onExpcetion(stacktrace.toString(), false);
+      }
+      return false;
+    }
   }
 
   static Future<void> login({required final bool autologin, String? username, String? password}) async {
@@ -49,11 +59,14 @@ abstract class BackgroundLoginController {
     }
 
     String body = 'username=$username&password=${Uri.encodeQueryComponent(password)}';
-    dio.Response response;
     try {
-      response = await dio.Dio().post(CommonUrl.loginUrl,
-          data: body,
-          options: dio.Options(followRedirects: false, contentType: 'application/x-www-form-urlencoded', headers: {
+      dio.Response response = await dio.Dio().post(
+        CommonUrl.loginUrl,
+        data: body,
+        options: dio.Options(
+          followRedirects: false,
+          contentType: 'application/x-www-form-urlencoded',
+          headers: {
             'Host': 'plato.pusan.ac.kr',
             'Connection': 'close',
             'Content-Length': body.length.toString(),
@@ -69,56 +82,48 @@ abstract class BackgroundLoginController {
             'Referer': 'https://plato.pusan.ac.kr/',
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-          }));
+          },
+          validateStatus: (status) => status == 303,
+        ),
+      );
 
-      /* always return 303 */
-      loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.(not 303)';
-      loginInformation.loginStatus = false;
-      StorageController.storeLoginInformation(loginInformation);
-      return;
-    } on dio.DioError catch (e, _) {
-      /* successfully login */
-      if (e.response!.statusCode == 303) {
-        response = e.response!;
-      }
-      /* unknownError */
-      else {
-        loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.(unknown)';
+      /* wrong id/pw */
+      if (response.headers.map['location']![0] == CommonUrl.loginErrorUrl) {
+        loginInformation.loginMsg = '잘못된 ID 또는 PW입니다. 다시 확인해주세요.';
         loginInformation.loginStatus = false;
         StorageController.storeLoginInformation(loginInformation);
         return;
       }
+
+      /* successfully login */
+      loginInformation.moodleSessionKey = response.headers.map['set-cookie']![1];
+      loginInformation.loginMsg = '로그인 성공!';
+      await _getInformation(loginInformation);
+
+      await _setCooKie(loginInformation);
+      loginInformation.loginStatus = true;
+
+      StorageController.storeUsername(username);
+      StorageController.storePassword(password);
+      StorageController.storeLoginInformation(loginInformation);
+
+      printLog("Sync With Plato : ${loginInformation.moodleSessionKey}");
+
+      return;
+    } on dio.DioError catch (e, stacktrace) {
+      printLog(e.type);
+      if (e.type != dio.DioErrorType.other) {
+        await ExceptionController.onExpcetion(stacktrace.toString(), false);
+      }
+      /* unknownError */
+
+      loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.(unknown)';
     }
     /* unknownError */
     catch (e) {
       loginInformation.loginMsg = '알 수 없는 이유로 로그인에 실패했습니다.(unkown2)';
-      loginInformation.loginStatus = false;
-      StorageController.storeLoginInformation(loginInformation);
       return;
     }
-
-    /* wrong id/pw */
-    if (response.headers.map['location']![0] == CommonUrl.loginErrorUrl) {
-      loginInformation.loginMsg = '잘못된 ID 또는 PW입니다. 다시 확인해주세요.';
-      loginInformation.loginStatus = false;
-      StorageController.storeLoginInformation(loginInformation);
-      return;
-    }
-
-    /* successfully login */
-    loginInformation.moodleSessionKey = response.headers.map['set-cookie']![1];
-    loginInformation.loginMsg = '로그인 성공!';
-    await _getInformation(loginInformation);
-
-    await _setCooKie(loginInformation);
-    loginInformation.loginStatus = true;
-
-    StorageController.storeUsername(username);
-    StorageController.storePassword(password);
-    StorageController.storeLoginInformation(loginInformation);
-
-    printLog("Sync With Plato : ${loginInformation.moodleSessionKey}");
-
     return;
   }
 
@@ -126,7 +131,14 @@ abstract class BackgroundLoginController {
     final LoginInformation loginInformation = (StorageController.loadLoginInformation())!;
 
     String? sessionKey = await _getSessionKey(loginInformation.moodleSessionKey);
-    await dio.Dio().get(CommonUrl.logoutUrl + sessionKey);
+    if (sessionKey == null) return;
+    try {
+      await dio.Dio().get(CommonUrl.logoutUrl + sessionKey);
+    } on dio.DioError catch (e, stacktrace) {
+      if (e.type != dio.DioErrorType.other) {
+        await ExceptionController.onExpcetion(stacktrace.toString(), false);
+      }
+    }
 
     StorageController.clearUserData();
     StorageController.clearAppSetting();
@@ -134,13 +146,16 @@ abstract class BackgroundLoginController {
     return;
   }
 
-  static Future<String> _getSessionKey(final String moodleSessionKey) async {
+  static Future<String?> _getSessionKey(final String moodleSessionKey) async {
     var options = dio.Options(headers: {'Cookie': moodleSessionKey});
 
     var response = await requestGet(CommonUrl.platoCalendarUrl, options: options, isFront: false);
 
     if (response == null) {
       throw Exception("response is null on _getSessionKey");
+    }
+    if (response.requestOptions.path == "null") {
+      return null;
     }
 
     try {
@@ -154,20 +169,26 @@ abstract class BackgroundLoginController {
   }
 
   static Future<void> _getInformation(LoginInformation loginInformation) async {
-    var response =
-        await dio.Dio().get(CommonUrl.platoUserInformationUrl, options: dio.Options(headers: {"Cookie": loginInformation.moodleSessionKey}));
+    try {
+      var response =
+          await dio.Dio().get(CommonUrl.platoUserInformationUrl, options: dio.Options(headers: {"Cookie": loginInformation.moodleSessionKey}));
 
-    if (response.data == null) {
-      throw Exception("response.data is null on _getInformation");
+      if (response.data == null) {
+        throw Exception("response.data is null on _getInformation");
+      }
+      Document document = parse(response.data);
+
+      loginInformation.studentId = document.getElementById('fitem_id_idnumber')!.children[1].text.trim();
+      loginInformation.department = document.getElementById('fitem_id_department')!.children[1].text.trim();
+      loginInformation.name = document.getElementById('id_firstname')!.attributes['value']!.trim();
+      loginInformation.imgUrl = document.getElementsByClassName('userpicture')[0].attributes['src']!;
+      loginInformation.sessionKey =
+          document.getElementsByTagName('input').firstWhere((element) => element.attributes['name'] == 'sesskey').attributes['value']!;
+    } on dio.DioError catch (e, stacktrace) {
+      if (e.type != dio.DioErrorType.other) {
+        await ExceptionController.onExpcetion(stacktrace.toString(), false);
+      }
     }
-    Document document = parse(response.data);
-
-    loginInformation.studentId = document.getElementById('fitem_id_idnumber')!.children[1].text.trim();
-    loginInformation.department = document.getElementById('fitem_id_department')!.children[1].text.trim();
-    loginInformation.name = document.getElementById('id_firstname')!.attributes['value']!.trim();
-    loginInformation.imgUrl = document.getElementsByClassName('userpicture')[0].attributes['src']!;
-    loginInformation.sessionKey =
-        document.getElementsByTagName('input').firstWhere((element) => element.attributes['name'] == 'sesskey').attributes['value']!;
 
     return;
   }

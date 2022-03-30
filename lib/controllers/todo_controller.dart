@@ -83,7 +83,7 @@ class TodoController extends GetxController {
   }
 
   Future<CourseZoom?> updateZoomTodoStatus(final String id) async {
-    final CourseZoom? zoom = await CourseZoomController.fetchCourseZoom(id);
+    final CourseZoom? zoom = await CourseZoomController.fetchCourseZoom(id, true);
     if (zoom == null) return null;
 
     final TodoStatus status = zoom.status;

@@ -28,7 +28,7 @@ class SettingPage extends StatelessWidget {
               ),
             ],
           ),
-          Container(color: Colors.grey.withOpacity(0.7), child: const Center(child: Text("아직 준비중이예요... 저 노력할게요...")))
+          Container(color: Colors.grey.withOpacity(0.7), child: const Center(child: Text("아직 준비중이에요... 저 노력할게요...")))
         ],
       ),
     );

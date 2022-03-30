@@ -28,7 +28,6 @@ abstract class DownloadController {
 
     List<String>? tempList = await _getUrlAndTitle(type, url, title);
     if (tempList == null || tempList.length != 2) {
-      ExceptionController.onExpcetion("response is null on enQueue $type, $url, $title");
       return;
     }
     url = tempList[0];
@@ -86,7 +85,13 @@ abstract class DownloadController {
       case DownloadType.activity:
         final Options options = Options(followRedirects: false, validateStatus: (status) => status == 303 || status == 200);
         var responseTemp = await requestGet(url, options: options, isFront: true);
-        if (responseTemp == null) return null;
+        if (responseTemp == null) {
+          ExceptionController.onExpcetion("response is null on _getUrlAndTitle", true);
+          return null;
+        }
+        if (responseTemp.requestOptions.path == "null") {
+          return null;
+        }
         res[0] = responseTemp.headers.value('location')!.split('?')[0];
         res[1] = Uri.decodeFull(res[0].split('/0/').last);
         break;

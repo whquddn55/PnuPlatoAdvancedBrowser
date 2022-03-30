@@ -159,15 +159,20 @@ Future<dio.Response?> requestGet(final String url, {dio.Options? options, requir
       } else {
         break;
       }
-    } on dio.DioError catch (e, _) {
-      printLog("[ERROR] ${e.response}");
-      time++;
+    } on dio.DioError catch (e, stacktrace) {
+      if (e.type == dio.DioErrorType.other) {
+        return dio.Response(requestOptions: dio.RequestOptions(path: "null", data: stacktrace.toString()));
+      } else {
+        printLog("[ERROR] ${e.response}");
+        time++;
+      }
     }
   }
   return response;
 }
 
-Future<dio.Response?> requestPost(final String url, final dynamic data, {dio.Options? options, final bool? isFront, final int retry = 5}) async {
+Future<dio.Response?> requestPost(final String url, final dynamic data,
+    {dio.Options? options, required final bool isFront, final int retry = 5}) async {
   dio.Response? response;
   int time = 0;
 
@@ -194,9 +199,13 @@ Future<dio.Response?> requestPost(final String url, final dynamic data, {dio.Opt
       } else {
         break;
       }
-    } on dio.DioError catch (e, _) {
-      printLog("[ERROR] ${e.response}");
-      time++;
+    } on dio.DioError catch (e, stacktrace) {
+      if (e.type == dio.DioErrorType.other) {
+        return dio.Response(requestOptions: dio.RequestOptions(path: "null", data: stacktrace.toString()));
+      } else {
+        printLog("[ERROR] ${e.response}");
+        time++;
+      }
     }
   }
   return response;
@@ -204,7 +213,7 @@ Future<dio.Response?> requestPost(final String url, final dynamic data, {dio.Opt
 
 enum PlatoActionType { courseList }
 
-Future<dio.Response?> requestAction(final PlatoActionType type, {required final bool? isFront, final int retry = 5}) async {
+Future<dio.Response?> requestAction(final PlatoActionType type, {required final bool isFront, final int retry = 5}) async {
   dio.Response? response;
   int time = 0;
 
@@ -241,12 +250,30 @@ Future<dio.Response?> requestAction(final PlatoActionType type, {required final 
       } else {
         break;
       }
-    } on dio.DioError catch (e, _) {
-      printLog("[ERROR] ${e.response}");
-      time++;
+    } on dio.DioError catch (e, stacktrace) {
+      if (e.type == dio.DioErrorType.other) {
+        return dio.Response(requestOptions: dio.RequestOptions(path: "null", data: stacktrace.toString()));
+      } else {
+        printLog("[ERROR] ${e.response}");
+        time++;
+      }
     }
   }
   return response;
+}
+
+Future<bool> openBrowser(final String url) async {
+  final bool browserAvilable = await ChromeSafariBrowser.isAvailable();
+  printLog(browserAvilable);
+  if (browserAvilable == false) return false;
+  ChromeSafariBrowser().open(
+    url: Uri.parse(url),
+    options: ChromeSafariBrowserClassOptions(
+      android: AndroidChromeCustomTabsOptions(showTitle: false, toolbarBackgroundColor: Colors.white),
+      ios: IOSSafariOptions(),
+    ),
+  );
+  return true;
 }
 
 HtmlWidget renderHtml(String html) {
@@ -256,10 +283,7 @@ HtmlWidget renderHtml(String html) {
     textStyle: const TextStyle(fontSize: 12),
     onTapUrl: (url) async {
       if (Uri.parse(url).scheme == 'https') {
-        ChromeSafariBrowser().open(
-            url: Uri.parse(url),
-            options: ChromeSafariBrowserClassOptions(
-                android: AndroidChromeCustomTabsOptions(showTitle: false, toolbarBackgroundColor: Colors.white), ios: IOSSafariOptions()));
+        openBrowser(url);
       } else {
         launch(url);
       }

@@ -14,6 +14,25 @@ class AcademicCalendar extends StatelessWidget {
         future: AcademicCalendarController.getAcademicCalendar(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.data == null) {
+              return ExpandedTile(
+                  theme: ExpandedTileThemeData(
+                      headerPadding: const EdgeInsets.all(3.0),
+                      headerColor: Get.theme.secondaryHeaderColor,
+                      headerRadius: 0.0,
+                      contentPadding: EdgeInsets.zero,
+                      contentRadius: 0.0,
+                      contentBackgroundColor: Colors.transparent),
+                  controller: _expandedTileController,
+                  title: const Text('학사일정(최근 60일)'),
+                  content: Center(
+                    child: Text('일정을 불러오는데 문제가 발생했습니다.',
+                        style: TextStyle(
+                          color: Get.theme.errorColor,
+                        )),
+                  ));
+            }
+            
             var data = snapshot.data as List<AcademicCalendarItem>;
             return ExpandedTile(
                 theme: ExpandedTileThemeData(

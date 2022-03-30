@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/activity/course_activity.dart';
@@ -51,17 +50,28 @@ class ZoomCourseActivity extends CourseActivity {
 
   @override
   Future<void> open(final BuildContext context) async {
+    final progressContext = await showProgressDialog(context, "로딩중입니다...");
     var response = await requestGet(CommonUrl.courseZoomOpenUrl + id,
         isFront: true, options: Options(followRedirects: false, validateStatus: (status) => status == 303));
+    closeProgressDialog(progressContext);
 
     if (response == null) {
-      ExceptionController.onExpcetion("response is null on zoomOpen");
+      ExceptionController.onExpcetion("response is null on zoomOpen", true);
+      return;
+    }
+    if (response.requestOptions.path == "null") {
       return;
     }
 
-    ChromeSafariBrowser().open(
-        url: Uri.parse(response.headers.value("location")!),
-        options: ChromeSafariBrowserClassOptions(
-            android: AndroidChromeCustomTabsOptions(showTitle: false, toolbarBackgroundColor: Colors.white), ios: IOSSafariOptions()));
+    final bool openResult = await openBrowser(response.headers.value("location")!);
+    if (openResult == false) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          content: const Text("크롬, 사파리 브라우저가 설치되지 않았어요."),
+          actions: [TextButton(child: const Text("확인"), onPressed: Navigator.of(context).pop)],
+        ),
+      );
+    }
   }
 }

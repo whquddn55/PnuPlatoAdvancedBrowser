@@ -144,7 +144,8 @@ class _AssignPageState extends State<AssignPage> {
                       CommonUrl.courseAssignViewUrl + widget.assignId + "&action=editsubmission",
                       (controller, uri) async {
                         await controller.evaluateJavascript(
-                            source: '''document.body.replaceChild(document.getElementById('mform1'), document.getElementById('page')); 
+                            source: '''
+                              document.body.replaceChild(document.getElementById('mform1'), document.getElementById('page')); 
                                document.getElementById('fitem_id_files_filemanager').style['margin-left'] = '0px';
                                while (document.getElementsByClassName('col-md-3 col-form-label d-flex justify-content-md-end').length) document.getElementsByClassName('col-md-3 col-form-label d-flex justify-content-md-end')[0].remove();
                                document.body.style.margin = '0px';

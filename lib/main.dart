@@ -17,16 +17,13 @@ import 'package:pnu_plato_advanced_browser/pages/LandingPage/landing_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/navigatorPage/navigator_page.dart';
 
 void main() async {
+  FlutterError.onError = (details) {
+    ExceptionController.onExpcetion(details.exception.toString() + "\n" + (details.stack?.toString() ?? ""), true);
+  };
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       await StorageController.initialize();
-
-      FlutterError.onError = (details) {
-        ExceptionController.onExpcetion(
-          details.exception.toString() + "\n" + (details.stack?.toString() ?? ""),
-        );
-      };
 
       await initializeDateFormatting();
       await Firebase.initializeApp();
@@ -41,9 +38,7 @@ void main() async {
 
       runApp(const MyApp());
     },
-    (error, stacktrace) => ExceptionController.onExpcetion(
-      error.toString() + "\n" + (stacktrace.toString()),
-    ),
+    (error, stacktrace) => ExceptionController.onExpcetion(error.toString() + "\n" + (stacktrace.toString()), true),
   );
 }
 

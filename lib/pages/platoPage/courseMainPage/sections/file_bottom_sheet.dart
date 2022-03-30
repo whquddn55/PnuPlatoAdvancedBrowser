@@ -18,7 +18,6 @@ class FileBottomSheet extends StatelessWidget {
   const FileBottomSheet({Key? key, required this.file, required this.fileType, required this.courseTitle, required this.courseId}) : super(key: key);
 
   Future<void> _viewHanlder(BuildContext context) async {
-    Navigator.pop(context);
     final BuildContext dialogContext = await showProgressDialog(context, "파일을 다운로드 중입니다...");
     var cachedFile = await DefaultCacheManager().getSingleFile(
       file.url,
@@ -26,6 +25,7 @@ class FileBottomSheet extends StatelessWidget {
       key: file.url,
     );
     closeProgressDialog(dialogContext);
+    Navigator.pop(context);
     String? type;
     if (cachedFile.path.contains('zip')) type = "application/zip";
     var result = await OpenFile.open(cachedFile.path, type: type);

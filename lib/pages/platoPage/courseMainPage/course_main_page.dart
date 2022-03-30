@@ -64,7 +64,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) return Scaffold(appBar: AppBar(), body: const LoadingPage(msg: '강의 정보를 로딩 중입니다...'));
           CourseSpec? courseSpec = snapshot.data;
-          if (courseSpec == null) return Scaffold(appBar: AppBar(), body: const ErrorPage(msg: "강의 정보를 못 불러왔어요..."));
+          if (courseSpec == null) return const ErrorPage(msg: "강의 정보를 못 불러왔어요...");
 
           WidgetsBinding.instance!.addPostFrameCallback((_) => _refreshTodoList());
 
@@ -100,7 +100,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Icon(Icons.notification_important),
-                    Text("자동 출석체크가 진행중이예요!!"),
+                    Text("자동 출석체크가 진행중이에요!!"),
                   ],
                 ),
                 const Positioned.fill(child: EmphasisContainer()),
@@ -119,7 +119,8 @@ class _CourseMainPageState extends State<CourseMainPage> {
           UserAccountsDrawerHeader(
             accountName: Text(courseSpec.professor.name),
             accountEmail: null,
-            currentAccountPicture: CircleAvatar(backgroundImage: CachedNetworkImageProvider(courseSpec.professor.iconUri.toString())),
+            currentAccountPicture:
+                CircleAvatar(backgroundImage: CachedNetworkImageProvider(courseSpec.professor.iconUri.toString(), errorListener: () {})),
             otherAccountsPictures: [
               IconButton(
                 icon: Icon(Icons.email, color: Get.theme.primaryIconTheme.color),
@@ -135,7 +136,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
             children: courseSpec.assistantList.map((assistant) {
               return TextButton.icon(
                 icon: CircleAvatar(
-                  backgroundImage: CachedNetworkImageProvider(assistant.iconUri.toString()),
+                  backgroundImage: CachedNetworkImageProvider(assistant.iconUri.toString(), errorListener: () {}),
                 ),
                 label: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

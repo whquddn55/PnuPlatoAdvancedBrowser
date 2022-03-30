@@ -30,7 +30,7 @@ class NoticeListPage extends StatelessWidget {
                 child: Table(
                     columnWidths: const {
                       0: FlexColumnWidth(7),
-                      1: FlexColumnWidth(2),
+                      1: FlexColumnWidth(4),
                       2: FlexColumnWidth(4),
                     },
                     border: TableBorder(

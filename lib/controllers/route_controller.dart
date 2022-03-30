@@ -10,7 +10,7 @@ class RouteController extends GetxController {
   static RouteController get to => Get.find<RouteController>();
 
   final _pages = const [PlatoPage(), CalendarPage(), ChatPage(), StoragePage(), NotificationPage()];
-  late final _navigatedPages;
+  late final List<CustomNavigator> _navigatedPages;
   final _navigatorKeyList = List.generate(5, (index) => GlobalKey<NavigatorState>());
   int _currentIndex = 0;
   bool _showBottomNavBar = true;

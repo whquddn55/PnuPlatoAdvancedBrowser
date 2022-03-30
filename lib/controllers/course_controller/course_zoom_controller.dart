@@ -1,42 +1,52 @@
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/course_zoom.dart';
 import 'package:pnu_plato_advanced_browser/data/todo/todo.dart';
 
 abstract class CourseZoomController {
-  static Future<CourseZoom?> fetchCourseZoom(final String activityId) async {
-    var response = await requestGet(CommonUrl.courseZoomViewUrl + activityId, isFront: true);
+  static Future<CourseZoom?> fetchCourseZoom(final String activityId, bool isFront) async {
+    var response = await requestGet(CommonUrl.courseZoomViewUrl + activityId, isFront: isFront);
 
     if (response == null) {
+      ExceptionController.onExpcetion("response is null on fetchCourseZoom", true);
+      return null;
+    }
+    if (response.requestOptions.path == "null") {
       return null;
     }
 
-    Document document = Document.html(response.data);
-    late final DateTime startTime;
-    late final String runningTime;
-    late final TodoStatus status;
-    for (var tr in document.getElementsByClassName('ubzoom_view')[0].getElementsByTagName('tr')) {
-      switch (tr.children[0].text) {
-        case "시작 시간":
-          startTime = DateTime.parse(tr.children[1].text);
-          break;
-        case "강의 시간":
-          runningTime = tr.children[1].text;
-          break;
-        case "상태":
-          final String statusString = tr.children[1].text.trim();
-          if (statusString == '진행중') {
-            status = TodoStatus.doing;
-          } else if (statusString == '종료') {
-            status = TodoStatus.done;
-          } else {
-            status = TodoStatus.undone;
-          }
-          break;
+    try {
+      Document document = Document.html(response.data);
+      late final DateTime startTime;
+      late final String runningTime;
+      late final TodoStatus status;
+      for (var tr in document.getElementsByClassName('ubzoom_view')[0].getElementsByTagName('tr')) {
+        switch (tr.children[0].text) {
+          case "시작 시간":
+            startTime = DateTime.parse(tr.children[1].text);
+            break;
+          case "강의 시간":
+            runningTime = tr.children[1].text;
+            break;
+          case "상태":
+            final String statusString = tr.children[1].text.trim();
+            if (statusString == '진행중') {
+              status = TodoStatus.doing;
+            } else if (statusString == '종료') {
+              status = TodoStatus.done;
+            } else {
+              status = TodoStatus.undone;
+            }
+            break;
+        }
       }
-    }
 
-    return CourseZoom(startTime: startTime, runningTime: runningTime, status: status);
+      return CourseZoom(startTime: startTime, runningTime: runningTime, status: status);
+    } catch (e, stacktrace) {
+      ExceptionController.onExpcetion(e.toString() + "\n" + stacktrace.toString(), true);
+    }
+    return null;
   }
 
   // static Duration _parseRunningTime(String text) {

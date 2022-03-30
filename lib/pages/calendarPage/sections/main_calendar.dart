@@ -93,6 +93,7 @@ class _MainCalendarState extends State<MainCalendar> {
   void _onDaySelected(final DateTime selectedDay, final DateTime focusedDay) {
     setState(() {
       _selectedDay = selectedDay;
+      _focusedDay = selectedDay;
     });
 
     bool empty = true;
@@ -134,13 +135,15 @@ class _MainCalendarState extends State<MainCalendar> {
 
   Widget _renderUndatedEvents() {
     final List<Todo> undateEventList = widget.todoList.where((todo) => (todo.dueDate == null || todo.status == TodoStatus.doing)).toList();
+    if (undateEventList.isEmpty) return const SizedBox.shrink();
+
     final List<Widget> children = [];
+    children.add(const Divider(height: 20.0));
     children.add(const Text("진행중이거나 마감기한이 없는 할 일"));
     for (int i = 0; i < undateEventList.length; ++i) {
       children.add(EventTile(event: undateEventList[i], index: i));
     }
 
-    if (children.length == 1) return const SizedBox.shrink();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: children,

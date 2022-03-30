@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/article_comment.dart';
 
 abstract class CourseArticleCommentController {
@@ -61,7 +62,13 @@ abstract class CourseArticleCommentController {
       retry: 1,
     );
 
-    if (res == null) return null;
+    if (res == null) {
+      ExceptionController.onExpcetion("response is null on getVodStatus", true);
+      return null;
+    }
+    if (res.requestOptions.path == "null") {
+      return null;
+    }
     return getArticleCommentList(Document.html(res.data));
   }
 
@@ -81,7 +88,13 @@ abstract class CourseArticleCommentController {
       options: options,
       isFront: true,
     );
-    if (res == null) return null;
+    if (res == null) {
+      ExceptionController.onExpcetion("response is null on getVodStatus", true);
+      return null;
+    }
+    if (res.requestOptions.path == "null") {
+      return null;
+    }
     return getArticleCommentList(Document.html(res.data));
   }
 
@@ -100,7 +113,13 @@ abstract class CourseArticleCommentController {
       options: options,
       isFront: true,
     );
-    if (res == null) return null;
+    if (res == null) {
+      ExceptionController.onExpcetion("response is null on getVodStatus", true);
+      return null;
+    }
+    if (res.requestOptions.path == "null") {
+      return null;
+    }
     return getArticleCommentList(Document.html(res.data));
   }
 }

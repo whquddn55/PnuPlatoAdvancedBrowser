@@ -18,6 +18,7 @@ class SmartAbsencePage extends StatelessWidget {
         await controller.evaluateJavascript(
           source: '''document.getElementById('page-header').remove();
           document.getElementsByClassName('page-content-navigation')[0].remove();
+          document.getElementsByClassName('nav nav-tabs nav-coursemos mb-3')[0].remove();
           document.getElementById('page-lnb').remove();
           document.body.style.margin = '0px';
           document.body.style.padding = '0px';''',

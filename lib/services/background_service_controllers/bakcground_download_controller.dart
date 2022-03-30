@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:pnu_plato_advanced_browser/controllers/exception_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/notification_controller.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/services/background_service_controllers/background_login_controller.dart';
@@ -12,15 +13,22 @@ import 'package:pnu_plato_advanced_browser/services/background_service_controlle
 abstract class BackgroundDownloadController {
   static Map<int, CancelToken> tokenMap = {};
   static Future<void> download(final DownloadInformation downloadInformation) async {
-    await Fluttertoast.cancel();
-    await Fluttertoast.showToast(msg: "다운로드를 시작합니다.");
-    switch (downloadInformation.type) {
-      case DownloadType.m3u8:
-        await _downloadM3u8(downloadInformation);
-        break;
-      default:
-        await _downloadNormal(downloadInformation);
-        break;
+    final bool downloading = tokenMap[downloadInformation.url.hashCode] != null;
+
+    if (downloading == true) {
+      await Fluttertoast.cancel();
+      await Fluttertoast.showToast(msg: "이미 다운로드 중입니다.");
+    } else {
+      await Fluttertoast.cancel();
+      await Fluttertoast.showToast(msg: "다운로드를 시작합니다.");
+      switch (downloadInformation.type) {
+        case DownloadType.m3u8:
+          await _downloadM3u8(downloadInformation);
+          break;
+        default:
+          await _downloadNormal(downloadInformation);
+          break;
+      }
     }
     return;
   }
@@ -58,7 +66,7 @@ abstract class BackgroundDownloadController {
       tokenMap.remove(id);
 
       return true;
-    } on DioError catch (e) {
+    } on DioError catch (e, stacktrace) {
       switch (e.type) {
         case DioErrorType.connectTimeout:
         case DioErrorType.sendTimeout:
@@ -68,6 +76,9 @@ abstract class BackgroundDownloadController {
           await _showFailNotification(id, downloadInformation.title, body: e.message);
           var file = File('${downloadInformation.saveDir}/${downloadInformation.title}');
           if (await file.exists()) await file.delete();
+          if (e.type != DioErrorType.other) {
+            await ExceptionController.onExpcetion(stacktrace.toString(), false);
+          }
           break;
         case DioErrorType.cancel:
           break;
