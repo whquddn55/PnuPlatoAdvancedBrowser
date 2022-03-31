@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pnu_plato_advanced_browser/controllers/firebase_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 
 class BugReportChatting extends StatelessWidget {
@@ -9,20 +10,19 @@ class BugReportChatting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userDoc = FirebaseFirestore.instance.collection('users').doc(studentId);
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: userDoc.collection('chats').orderBy("time", descending: true).snapshots(),
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>?>(
+        stream: FirebaseController.to.getChatStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const LoadingPage(msg: "채팅내역을 불러오는 중입니다...");
-          } else if (snapshot.connectionState != ConnectionState.active) {
+          } else if (snapshot.connectionState != ConnectionState.active || snapshot.data == null) {
             return const LoadingPage(msg: "서버와 연결이 종료되었습니다...");
           } else {
             final docs = snapshot.data!.docs;
             if (isAdmin) {
-              userDoc.update({"adminUnread": 0});
+              FirebaseController.to.markAdminChatRead();
             } else {
-              userDoc.update({"unread": 0});
+              FirebaseController.to.markUserChatRead();
             }
             return ListView.builder(
                 reverse: true,

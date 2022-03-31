@@ -15,9 +15,7 @@ abstract class ExceptionController {
     if (isFront == false) {
       await _sendMail(subject, body);
     } else {
-      final progressContext = await showProgressDialog(Get.key.currentContext!, "");
       bool sendResult = await _sendMail(subject, body);
-      closeProgressDialog(progressContext);
       await Get.dialog(
         AlertDialog(
           title: const Text("에러"),

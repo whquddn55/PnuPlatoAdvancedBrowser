@@ -1,5 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pnu_plato_advanced_browser/controllers/firebase_controller.dart';
 
 class BugReportInput extends StatefulWidget {
   final String studentId;
@@ -15,20 +15,10 @@ class _BugReportInputState extends State<BugReportInput> {
   bool _isEmpty = true;
 
   void _buttonEvent() async {
-    await FirebaseFirestore.instance.collection('users').doc(widget.studentId).collection('chats').add({
-      "isUser": !widget.isAdmin,
-      "text": _controller.text,
-      "time": Timestamp.now(),
-    });
-
+    await FirebaseController.to.sendChat(widget.isAdmin, _controller.text);
     setState(() {
       _controller.clear();
       _isEmpty = true;
-    });
-
-    await FirebaseFirestore.instance.collection('users').doc(widget.studentId).update({
-      "time": Timestamp.now(),
-      (widget.isAdmin ? "unread" : "adminUnread"): FieldValue.increment(1),
     });
   }
 

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
-import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/firebase_controller.dart';
 import 'package:pnu_plato_advanced_browser/pages/loading_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/noticeListPage/noticePage/notice_page.dart';
 
@@ -17,13 +17,13 @@ class NoticeListPage extends StatelessWidget {
         title: "PPAB 공지사항",
       ),
       body: FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-        future: Get.find<NoticeController>().getNoticeList(),
+        future: FirebaseController.to.fetchNoticeList(),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return const LoadingPage(msg: "공지사항을 불러오는 중입니다...");
           }
           final noticeList = snapshot.data!;
-          return GetBuilder<NoticeController>(builder: (controller) {
+          return GetBuilder<FirebaseController>(builder: (controller) {
             return SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -78,7 +78,7 @@ class NoticeListPage extends StatelessWidget {
                       ),
                       ...noticeList.map((notice) {
                         var date = (notice["time"] as Timestamp).toDate();
-                        bool isNew = controller.isNew(notice.id);
+                        bool isNew = controller.noticeMap[notice.id] == false;
                         return TableRow(
                           children: [
                             TableRowInkWell(

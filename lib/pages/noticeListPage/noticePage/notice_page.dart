@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/firebase_controller.dart';
 
 class NoticePage extends StatelessWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> notice;
@@ -11,7 +11,7 @@ class NoticePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final date = (notice["time"] as Timestamp).toDate();
 
-    Get.find<NoticeController>().markRead(notice.id);
+    FirebaseController.to.markNoticeRead(notice.id);
 
     return Scaffold(
       appBar: AppBar(

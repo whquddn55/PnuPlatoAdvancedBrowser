@@ -6,9 +6,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
-import 'package:pnu_plato_advanced_browser/controllers/notice_controller.dart';
+import 'package:pnu_plato_advanced_browser/controllers/firebase_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/login_controller.dart';
 import 'package:pnu_plato_advanced_browser/controllers/storage_controller.dart';
+import 'package:pnu_plato_advanced_browser/pages/bugReportPage/admin_bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/bugReportPage/bug_report_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/loginPage/login_page.dart';
 import 'package:pnu_plato_advanced_browser/pages/noticeListPage/notice_list_page.dart';
@@ -57,9 +58,9 @@ class MainDrawer extends StatelessWidget {
           }),
       const Divider(height: 0),
       ListTile(
-        trailing: GetBuilder<NoticeController>(
+        trailing: GetBuilder<FirebaseController>(
           builder: (controller) {
-            int unread = controller.unreadCount();
+            int unread = controller.noticeUnreadCount();
             return Badge(child: const Icon(Icons.announcement), badgeContent: Text(unread.toString()), showBadge: unread != 0);
           },
         ),
@@ -70,16 +71,12 @@ class MainDrawer extends StatelessWidget {
       ),
       const Divider(height: 0),
       ListTile(
-        trailing: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance.collection("users").doc(studentId).snapshots(),
-          builder: (context, snapshot) {
-            int unread = 0;
-            if (snapshot.connectionState == ConnectionState.active) {
-              unread = snapshot.data!["unread"];
-            }
-            return Badge(child: const Icon(Icons.bug_report_outlined), badgeContent: Text(unread.toString()), showBadge: unread != 0);
-          },
-        ),
+        trailing: GetBuilder<FirebaseController>(builder: (controller) {
+          return Badge(
+              child: const Icon(Icons.bug_report_outlined),
+              badgeContent: Text(controller.unreadChatCount.toString()),
+              showBadge: controller.unreadChatCount != 0);
+        }),
         title: const Text('버그리포트'),
         onTap: () {
           Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => BugReportPage(studentId, false)));
@@ -114,7 +111,7 @@ class MainDrawer extends StatelessWidget {
       // const Divider(height: 0),
       // ListTile(
       //     trailing: const Icon(Icons.settings),
-      //     title: const Text('세팅2'),
+      //     title: const Text('관리자용버그리포트'),
       //     onTap: () {
       //       Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => const AdminBugReportPage()));
       //     }),
