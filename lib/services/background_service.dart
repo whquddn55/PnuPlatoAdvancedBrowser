@@ -58,6 +58,10 @@ abstract class BackgroundService {
   }
 
   static Future<dynamic> sendData(final BackgroundServiceAction action, {Map<String, dynamic>? data}) async {
+    final bool isServiceRunning = await _service.isRunning();
+    if (isServiceRunning == false) {
+      await _service.startService();
+    }
     var completer = Completer();
     _completerMap[completer.hashCode] = completer;
 

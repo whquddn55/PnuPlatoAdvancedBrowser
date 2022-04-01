@@ -22,9 +22,9 @@ class LandingPage5 extends StatelessWidget {
                     child: Image.asset("assets/landingImages/landing5.png", height: MediaQuery.of(context).size.height * 0.6),
                   ),
                 ),
-                const Divider(height: 10, thickness: 3),
               ],
             ),
+            const Divider(height: 10, thickness: 3),
           ],
         ),
         Column(

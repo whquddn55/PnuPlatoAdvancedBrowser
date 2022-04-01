@@ -5,6 +5,7 @@ import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/landing_pa
 import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/landing_page3.dart';
 import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/landing_page4.dart';
 import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/landing_page5.dart';
+import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/landing_page6.dart';
 
 class LandingPage extends StatefulWidget {
   static const int pageLength = 6;
@@ -36,7 +37,7 @@ class _LandingPageState extends State<LandingPage> {
                       LandingPage3(),
                       LandingPage4(),
                       LandingPage5(),
-                      LandingPage1(),
+                      LandingPage6(),
                     ],
                     onPageChanged: (index) => setState(() => _currentPage = index),
                   ),
@@ -64,6 +65,20 @@ class _LandingPageState extends State<LandingPage> {
         onPressed: _onDone,
       ));
     } else {
+      result.add(
+        Opacity(
+          opacity: _currentPage == 0 ? 0 : 1,
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.blue),
+            onPressed: _currentPage == 0
+                ? null
+                : () => setState(() {
+                      _currentPage = _currentPage - 1;
+                      _pageController.jumpToPage(_currentPage);
+                    }),
+          ),
+        ),
+      );
       for (int i = 0; i < LandingPage.pageLength; ++i) {
         result.add(Container(
           decoration: BoxDecoration(
@@ -76,6 +91,15 @@ class _LandingPageState extends State<LandingPage> {
         ));
         result.add(const SizedBox(width: 4));
       }
+      result.add(
+        IconButton(
+          icon: const Icon(Icons.arrow_forward, color: Colors.blue),
+          onPressed: () => setState(() {
+            _currentPage = _currentPage + 1;
+            _pageController.jumpToPage(_currentPage);
+          }),
+        ),
+      );
     }
 
     return result;
@@ -87,7 +111,7 @@ class _LandingPageState extends State<LandingPage> {
       useRootNavigator: true,
       builder: (context) {
         return AlertDialog(
-          content: const Text("[학번] 의 정보가 서버에 저장됩니다. 다른 정보는 일체 저장되지 않습니다.", style: TextStyle(fontSize: 12)),
+          content: const Text("주의사항을 다 확인하셨나요?", style: TextStyle(fontSize: 12)),
           actions: [
             TextButton(
               child: const Text("취소"),
@@ -96,7 +120,7 @@ class _LandingPageState extends State<LandingPage> {
               },
             ),
             TextButton(
-              child: const Text("동의"),
+              child: const Text("확인"),
               onPressed: () {
                 Navigator.pop(context, true);
               },
@@ -107,14 +131,6 @@ class _LandingPageState extends State<LandingPage> {
     );
     if (res == true) {
       AppSettingController.to.isFirst = false;
-    } else {
-      showDialog(
-        context: context,
-        useRootNavigator: true,
-        builder: (context) {
-          return const AlertDialog(content: Text("정보제공의 동의하지 않을 경우 앱 사용이 불가능합니다."));
-        },
-      );
     }
   }
 }

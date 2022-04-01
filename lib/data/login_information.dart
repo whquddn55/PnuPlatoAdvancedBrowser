@@ -23,8 +23,8 @@ class LoginInformation {
     this.moodleSessionKey = '',
     this.loginMsg = '',
     this.studentId = '학번',
-    this.name = 'thuthi',
-    this.department = '전기컴퓨터공학부',
+    this.name = '이름',
+    this.department = '학과(전공)',
     this.imgUrl = CommonUrl.defaultAvatarUrl,
   });
 
