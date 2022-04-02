@@ -1,52 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/ladning_image.dart';
 
 class LandingPage2 extends StatelessWidget {
   const LandingPage2({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    const BoxDecoration _imageDecoration = BoxDecoration(boxShadow: [BoxShadow(color: Colors.white)]);
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: _imageDecoration,
-                    child: Image.asset("assets/landingImages/landing2_1.png", height: MediaQuery.of(context).size.height * 0.3),
-                  ),
-                ),
-                const SizedBox(width: 5),
-                Expanded(
-                  child: Container(
-                    decoration: _imageDecoration,
-                    child: Image.asset("assets/landingImages/landing2_2.png", height: MediaQuery.of(context).size.height * 0.3),
-                  ),
-                ),
+              children: const [
+                LandingImage("assets/landingImages/landing2_1.png", 0.3),
+                SizedBox(width: 5),
+                LandingImage("assets/landingImages/landing2_2.png", 0.3),
               ],
             ),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: _imageDecoration,
-                    child: Image.asset("assets/landingImages/landing2_3.png", height: MediaQuery.of(context).size.height * 0.3),
-                  ),
-                ),
-                const SizedBox(width: 5),
-                Expanded(
-                  child: Container(
-                    decoration: _imageDecoration,
-                    child: Image.asset("assets/landingImages/landing2_4.png", height: MediaQuery.of(context).size.height * 0.3),
-                  ),
-                ),
+              children: const [
+                LandingImage("assets/landingImages/landing2_3.png", 0.3),
+                SizedBox(width: 5),
+                LandingImage("assets/landingImages/landing2_4.png", 0.3),
               ],
             ),
             const Divider(height: 10, thickness: 3),

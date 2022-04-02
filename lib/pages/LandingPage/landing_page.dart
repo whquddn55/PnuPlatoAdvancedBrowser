@@ -5,10 +5,8 @@ import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/landing_pa
 import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/landing_page3.dart';
 import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/landing_page4.dart';
 import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/landing_page5.dart';
-import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/landing_page6.dart';
 
 class LandingPage extends StatefulWidget {
-  static const int pageLength = 6;
   const LandingPage({Key? key}) : super(key: key);
 
   @override
@@ -17,6 +15,13 @@ class LandingPage extends StatefulWidget {
 
 class _LandingPageState extends State<LandingPage> {
   final PageController _pageController = PageController();
+  final _pages = const [
+    LandingPage1(),
+    LandingPage2(),
+    LandingPage3(),
+    LandingPage4(),
+    LandingPage5(),
+  ];
   int _currentPage = 0;
   @override
   Widget build(BuildContext context) {
@@ -31,14 +36,7 @@ class _LandingPageState extends State<LandingPage> {
                 Expanded(
                   child: PageView(
                     controller: _pageController,
-                    children: const [
-                      LandingPage1(),
-                      LandingPage2(),
-                      LandingPage3(),
-                      LandingPage4(),
-                      LandingPage5(),
-                      LandingPage6(),
-                    ],
+                    children: _pages,
                     onPageChanged: (index) => setState(() => _currentPage = index),
                   ),
                 ),
@@ -59,7 +57,7 @@ class _LandingPageState extends State<LandingPage> {
 
   List<Widget> _renderBottom() {
     final result = <Widget>[];
-    if (_currentPage == LandingPage.pageLength - 1) {
+    if (_currentPage == _pages.length - 1) {
       result.add(TextButton(
         child: const Text("PPAB시작"),
         onPressed: _onDone,
@@ -79,7 +77,7 @@ class _LandingPageState extends State<LandingPage> {
           ),
         ),
       );
-      for (int i = 0; i < LandingPage.pageLength; ++i) {
+      for (int i = 0; i < _pages.length; ++i) {
         result.add(Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -111,6 +109,16 @@ class _LandingPageState extends State<LandingPage> {
       useRootNavigator: true,
       builder: (context) {
         return AlertDialog(
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text("※PPAB는 공식적으로 한국어만 지원합니다.", style: TextStyle(fontSize: 11, color: Colors.redAccent)),
+              Text("※PPAB는 공식적으로 학부 강의만 지원합니다.\n제가 대학원을 가면...(안가요)", style: TextStyle(fontSize: 11, color: Colors.redAccent)),
+              Text("※PPAB는 부산대학교 공식앱이 아닙니다. 따라서, 정보가 정확하지 않습니다.", style: TextStyle(fontSize: 11, color: Colors.redAccent)),
+              Text("※PPAB는 버그리포트 위해 학번 정보를 수집합니다. 학번 이외의 비밀번호, 이름등의 정보는 일체 사용되지 않습니다.", style: TextStyle(fontSize: 11, color: Colors.redAccent)),
+            ],
+          ),
           content: const Text("주의사항을 다 확인하셨나요?", style: TextStyle(fontSize: 12)),
           actions: [
             TextButton(

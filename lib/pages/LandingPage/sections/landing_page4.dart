@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:pnu_plato_advanced_browser/pages/landingPage/sections/ladning_image.dart';
 
 class LandingPage4 extends StatelessWidget {
   const LandingPage4({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    const BoxDecoration _imageDecoration = BoxDecoration(boxShadow: [BoxShadow(color: Colors.white)]);
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Column(
@@ -15,20 +14,10 @@ class LandingPage4 extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: _imageDecoration,
-                    child: Image.asset("assets/landingImages/landing4_1.png", height: MediaQuery.of(context).size.height * 0.6),
-                  ),
-                ),
-                const SizedBox(width: 5),
-                Expanded(
-                  child: Container(
-                    decoration: _imageDecoration,
-                    child: Image.asset("assets/landingImages/landing4_2.png", height: MediaQuery.of(context).size.height * 0.6),
-                  ),
-                ),
+              children: const [
+                LandingImage("assets/landingImages/landing4_1.png", 0.6),
+                SizedBox(width: 5),
+                LandingImage("assets/landingImages/landing4_2.png", 0.6),
               ],
             ),
             const Divider(height: 10, thickness: 3),
