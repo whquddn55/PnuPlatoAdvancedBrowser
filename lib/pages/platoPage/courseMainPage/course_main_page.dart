@@ -117,17 +117,20 @@ class _CourseMainPageState extends State<CourseMainPage> {
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(courseSpec.professor.name),
+            accountName: Text(courseSpec.professor?.name ?? "교수님이 지정되지 않았습니다."),
             accountEmail: null,
-            currentAccountPicture:
-                CircleAvatar(backgroundImage: CachedNetworkImageProvider(courseSpec.professor.iconUri.toString(), errorListener: () {})),
+            currentAccountPicture: courseSpec.professor == null
+                ? const SizedBox.shrink()
+                : CircleAvatar(backgroundImage: CachedNetworkImageProvider(courseSpec.professor!.iconUri.toString(), errorListener: () {})),
             otherAccountsPictures: [
-              IconButton(
-                icon: Icon(Icons.email, color: Get.theme.primaryIconTheme.color),
-                onPressed: () {
-                  /* TODO: 메시지 페이지로 이동 */
-                },
-              ),
+              courseSpec.professor == null
+                  ? const SizedBox.shrink()
+                  : IconButton(
+                      icon: Icon(Icons.email, color: Get.theme.primaryIconTheme.color),
+                      onPressed: () {
+                        /* TODO: 메시지 페이지로 이동 */
+                      },
+                    ),
             ],
           ),
           ExpansionTile(

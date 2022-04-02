@@ -4,7 +4,7 @@ import 'package:pnu_plato_advanced_browser/data/course_assistant.dart';
 import 'package:pnu_plato_advanced_browser/data/professor.dart';
 
 class CourseSpec {
-  final Professor professor;
+  final Professor? professor;
   final List<CourseAssistant> assistantList;
   final List<CourseArticleMetaData> articleList;
   final Map<String, List<CourseActivity>> activityMap;

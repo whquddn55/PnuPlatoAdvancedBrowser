@@ -25,8 +25,8 @@ abstract class CourseSpecController {
       /* 강의 개요(summary) 가져오기 */
       final Map<String, String> summaryMap = {};
       for (var item in [
-        ...document.getElementById('section-0')!.getElementsByClassName('summary'),
-        ...document.getElementById('course-all-sections')!.getElementsByClassName('summary'),
+        ...document.getElementById('section-0')?.getElementsByClassName('summary') ?? [],
+        ...document.getElementById('course-all-sections')?.getElementsByClassName('summary') ?? [],
       ]) {
         final String weeks = _getWeeks(item);
         summaryMap[weeks] = item.innerHtml;
@@ -35,8 +35,8 @@ abstract class CourseSpecController {
       /* Activity 가져오기 */
       final Map<String, List<CourseActivity>> activityMap = {};
       for (var activity in [
-        ...document.getElementById('section-0')!.getElementsByClassName('activity'),
-        ...document.getElementById('course-all-sections')!.getElementsByClassName('activity'),
+        ...document.getElementById('section-0')?.getElementsByClassName('activity') ?? [],
+        ...document.getElementById('course-all-sections')?.getElementsByClassName('activity') ?? [],
       ]) {
         final String weeks = _getWeeks(activity);
 
@@ -237,7 +237,11 @@ abstract class CourseSpecController {
     return activity.id.split('-')[1];
   }
 
-  static Professor _getProfessorInfo(Document document) {
+  static Professor? _getProfessorInfo(Document document) {
+    return null;
+    if (document.getElementsByClassName('prof-user-name')[0].text.trim().contains("않았")) {
+      return null;
+    }
     return Professor(
       name: document.getElementsByClassName('prof-user-name')[0].text.trim(),
       id: document.getElementsByClassName('prof-user-message')[0].children[0].attributes['href']!.split('?id=')[1],
