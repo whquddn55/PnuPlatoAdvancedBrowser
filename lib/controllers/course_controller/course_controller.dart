@@ -169,6 +169,9 @@ abstract class CourseController {
     if (response.requestOptions.path == "null") {
       return null;
     }
+    if (response.data["html"] == null) {
+      return null;
+    }
 
     try {
       Document document = parse(response.data["html"]);

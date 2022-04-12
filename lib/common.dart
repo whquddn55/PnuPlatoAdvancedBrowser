@@ -141,9 +141,6 @@ Future<dio.Response?> requestGet(final String url, {dio.Options? options, requir
       await LoginController.to.login(autologin: true);
       loginInformation = LoginController.to.loginInformation;
     } else {
-      //loginInformation = BackgroundLoginController.loginInformation;
-      //loginInformation = await BackgroundLoginController.login(autologin: true);
-
       await BackgroundLoginController.login(autologin: true);
       loginInformation = BackgroundLoginController.loginInformation;
     }
@@ -184,9 +181,6 @@ Future<dio.Response?> requestPost(final String url, final dynamic data,
       await LoginController.to.login(autologin: true);
       loginInformation = LoginController.to.loginInformation;
     } else {
-      //loginInformation = BackgroundLoginController.loginInformation;
-      //loginInformation = await BackgroundLoginController.login(autologin: true);
-
       await BackgroundLoginController.login(autologin: true);
       loginInformation = BackgroundLoginController.loginInformation;
     }
@@ -227,9 +221,6 @@ Future<dio.Response?> requestAction(final PlatoActionType type, {required final 
       await LoginController.to.login(autologin: true);
       loginInformation = LoginController.to.loginInformation;
     } else {
-      //loginInformation = BackgroundLoginController.loginInformation;
-      //loginInformation = await BackgroundLoginController.login(autologin: true);
-
       await BackgroundLoginController.login(autologin: true);
       loginInformation = BackgroundLoginController.loginInformation;
     }
