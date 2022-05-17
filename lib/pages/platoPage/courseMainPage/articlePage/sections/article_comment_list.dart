@@ -204,7 +204,7 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
       },
     );
 
-    if (res) {
+    if (res == true) {
       controller.clear();
     }
     return res;

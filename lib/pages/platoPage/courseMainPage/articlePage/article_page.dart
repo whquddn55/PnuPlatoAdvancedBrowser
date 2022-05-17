@@ -136,7 +136,7 @@ class _ArticlePageState extends State<ArticlePage> {
       },
     );
 
-    if (dialogRes) {
+    if (dialogRes == true) {
       CourseArticleController.deleteCourseArticle(widget.metaData);
     }
   }

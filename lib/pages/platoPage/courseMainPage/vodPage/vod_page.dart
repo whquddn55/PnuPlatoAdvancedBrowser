@@ -21,7 +21,7 @@ class _VodPageState extends State<VodPage> {
   Widget build(BuildContext context) {
     final webViewWidget = WillPopScope(
       onWillPop: () async {
-        return await showDialog(
+        bool? result = await showDialog(
           context: context,
           builder: (context) => AlertDialog(
             content: const Text("동영상을 종료합니다.\n출석여부를 꼭 확인해주세요!"),
@@ -37,6 +37,7 @@ class _VodPageState extends State<VodPage> {
             ],
           ),
         );
+        return result == true;
       },
       child: SafeArea(
         child: Stack(

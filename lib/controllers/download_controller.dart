@@ -36,7 +36,7 @@ abstract class DownloadController {
     final String saveDir = await _getSaveDir(type, courseTitle, courseId, title);
     bool isExists = await _checkDuplication(type, saveDir, title);
     if (isExists) {
-      bool duplicateSelect = await showDialog(
+      bool? duplicateSelect = await showDialog(
         context: Get.context!,
         builder: (context) {
           return AlertDialog(
@@ -52,7 +52,7 @@ abstract class DownloadController {
         },
       );
 
-      if (duplicateSelect == false) return;
+      if (duplicateSelect != true) return;
     }
 
     await BackgroundService.sendData(BackgroundServiceAction.download,
