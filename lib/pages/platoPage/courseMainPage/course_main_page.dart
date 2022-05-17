@@ -357,7 +357,7 @@ class _CourseMainPageState extends State<CourseMainPage> {
             title: Text(weekTitle),
             content: Column(
               children: [
-                courseSpec.summaryMap[weekTitle] == ''
+                (courseSpec.summaryMap[weekTitle] == '' || courseSpec.summaryMap[weekTitle] == null)
                     ? const SizedBox.shrink()
                     : Container(
                         child: renderHtml(courseSpec.summaryMap[weekTitle]!),
