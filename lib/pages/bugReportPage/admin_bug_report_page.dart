@@ -32,6 +32,7 @@ class AdminBugReportPage extends StatelessWidget {
                 itemCount: docs.length,
                 itemBuilder: (context, index) {
                   int unread = docs[index]["adminUnread"];
+                  
                   return InkWell(
                       child: Card(
                         child: Padding(

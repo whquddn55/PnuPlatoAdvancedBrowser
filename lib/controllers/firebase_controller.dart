@@ -67,8 +67,7 @@ class FirebaseController extends GetxController {
     return unread;
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>?> getChatStream() {
-    final studentId = LoginController.to.loginInformation.studentId;
+  Stream<QuerySnapshot<Map<String, dynamic>>?> getChatStream(final String studentId) {
     try {
       final stream = FirebaseFirestore.instance
           .collection('users')

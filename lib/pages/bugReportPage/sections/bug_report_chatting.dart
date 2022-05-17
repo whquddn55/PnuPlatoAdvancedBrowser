@@ -11,7 +11,7 @@ class BugReportChatting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>?>(
-        stream: FirebaseController.to.getChatStream(),
+        stream: FirebaseController.to.getChatStream(studentId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const LoadingPage(msg: "채팅내역을 불러오는 중입니다...");
