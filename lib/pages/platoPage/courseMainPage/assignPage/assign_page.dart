@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_treeview/flutter_treeview.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/appbar_wrapper.dart';
@@ -68,7 +69,11 @@ class _AssignPageState extends State<AssignPage> {
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
                   children: [
-                    CachedNetworkImage(imageUrl: courseFile.imgUrl),
+                    CachedNetworkImage(
+                      imageUrl: courseFile.imgUrl,
+                      errorWidget: (buildContext, url, error) =>
+                          SvgPicture.asset("assets/icons/lobster.svg", height: 25, width: 25, color: Colors.red),
+                    ),
                     const SizedBox(width: 4.0),
                     Expanded(child: Text(courseFile.title, style: TextStyle(color: Theme.of(context).primaryColor)))
                   ],
@@ -76,7 +81,14 @@ class _AssignPageState extends State<AssignPage> {
               );
             } else {
               return Row(
-                children: [CachedNetworkImage(imageUrl: node.data["imgUrl"]), const SizedBox(width: 4.0), Text(node.data["title"])],
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: node.data["imgUrl"],
+                    errorWidget: (buildContext, url, error) => SvgPicture.asset("assets/icons/lobster.svg", height: 25, width: 25, color: Colors.red),
+                  ),
+                  const SizedBox(width: 4.0),
+                  Text(node.data["title"])
+                ],
               );
             }
           },
@@ -143,8 +155,7 @@ class _AssignPageState extends State<AssignPage> {
                       "과제 제출",
                       CommonUrl.courseAssignViewUrl + widget.assignId + "&action=editsubmission",
                       (controller, uri) async {
-                        await controller.evaluateJavascript(
-                            source: '''
+                        await controller.evaluateJavascript(source: '''
                               document.body.replaceChild(document.getElementById('mform1'), document.getElementById('page')); 
                                document.getElementById('fitem_id_files_filemanager').style['margin-left'] = '0px';
                                while (document.getElementsByClassName('col-md-3 col-form-label d-flex justify-content-md-end').length) document.getElementsByClassName('col-md-3 col-form-label d-flex justify-content-md-end')[0].remove();
@@ -170,7 +181,10 @@ class _AssignPageState extends State<AssignPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextButton.icon(
-          icon: CachedNetworkImage(imageUrl: courseAssign.gradeResult!.grader.iconUri.toString()),
+          icon: CachedNetworkImage(
+            imageUrl: courseAssign.gradeResult!.grader.iconUri.toString(),
+            errorWidget: (buildContext, url, error) => SvgPicture.asset("assets/icons/lobster.svg", height: 25, width: 25, color: Colors.red),
+          ),
           label: Text(courseAssign.gradeResult!.grader.name),
           onPressed: () {},
         ),

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/controllers/todo_controller.dart';
@@ -33,6 +34,8 @@ class _VodBottomSheetState extends State<VodBottomSheet> {
                     child: CachedNetworkImage(
                       imageUrl: widget.activity.iconUrl!,
                       height: 20,
+                      errorWidget: (buildContext, url, error) =>
+                          SvgPicture.asset("assets/icons/lobster.svg", height: 25, width: 25, color: Colors.red),
                     ),
                   ),
                   Flexible(

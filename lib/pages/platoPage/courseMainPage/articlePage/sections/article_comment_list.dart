@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
 import 'package:pnu_plato_advanced_browser/controllers/course_controller/course_article_comment_controller.dart';
@@ -114,7 +115,13 @@ class _ArticleCommentListState extends State<ArticleCommentList> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 50, width: 50, child: CachedNetworkImage(imageUrl: comment.imgUrl)),
+            SizedBox(
+                height: 50,
+                width: 50,
+                child: CachedNetworkImage(
+                  imageUrl: comment.imgUrl,
+                  errorWidget: (buildContext, url, error) => SvgPicture.asset("assets/icons/lobster.svg", height: 25, width: 25, color: Colors.red),
+                )),
             Flexible(
               fit: FlexFit.tight,
               child: Column(

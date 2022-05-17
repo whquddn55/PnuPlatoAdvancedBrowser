@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pnu_plato_advanced_browser/data/course_file.dart';
 import 'package:pnu_plato_advanced_browser/data/download_information.dart';
 import 'package:pnu_plato_advanced_browser/pages/platoPage/courseMainPage/sections/file_bottom_sheet.dart';
@@ -18,7 +19,10 @@ class ArticleFileList extends StatelessWidget {
         Divider(height: 0, thickness: 1, color: Colors.grey[700]),
         ...fileList.map<Widget>((fileInfo) {
           return TextButton.icon(
-            icon: CachedNetworkImage(imageUrl: fileInfo.imgUrl),
+            icon: CachedNetworkImage(
+              imageUrl: fileInfo.imgUrl,
+              errorWidget: (buildContext, url, error) => SvgPicture.asset("assets/icons/lobster.svg", height: 25, width: 25, color: Colors.red),
+            ),
             label: Text(fileInfo.title),
             onPressed: () async {
               showModalBottomSheet(

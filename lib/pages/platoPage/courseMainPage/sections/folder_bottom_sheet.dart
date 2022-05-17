@@ -30,6 +30,8 @@ class FolderBottomSheet extends StatelessWidget {
                     child: CachedNetworkImage(
                       imageUrl: activity.iconUrl.toString(),
                       height: 20,
+                      errorWidget: (buildContext, url, error) =>
+                          SvgPicture.asset("assets/icons/lobster.svg", height: 25, width: 25, color: Colors.red),
                     ),
                   ),
                   Flexible(
@@ -75,7 +77,11 @@ class FolderBottomSheet extends StatelessWidget {
                     CourseFile file = snapshot.data![index];
                     return TextButton.icon(
                       style: TextButton.styleFrom(alignment: Alignment.centerLeft),
-                      icon: CachedNetworkImage(imageUrl: file.imgUrl),
+                      icon: CachedNetworkImage(
+                        imageUrl: file.imgUrl,
+                        errorWidget: (buildContext, url, error) =>
+                            SvgPicture.asset("assets/icons/lobster.svg", height: 25, width: 25, color: Colors.red),
+                      ),
                       label: Text(file.title),
                       onPressed: () async {
                         await showModalBottomSheet(

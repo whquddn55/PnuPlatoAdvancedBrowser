@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pnu_plato_advanced_browser/common.dart';
@@ -45,7 +46,8 @@ class ActivityButton extends StatelessWidget {
                                     height: 20,
                                     child: CircularProgressIndicator(strokeWidth: 1),
                                   ),
-                                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                                  errorWidget: (buildContext, url, error) =>
+                                      SvgPicture.asset("assets/icons/lobster.svg", height: 25, width: 25, color: Colors.red),
                                   height: 20,
                                   width: 20,
                                 ),
